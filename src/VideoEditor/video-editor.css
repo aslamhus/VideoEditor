@@ -1,6 +1,6 @@
 .video-editor-container {
   position: relative;
-  width: 100%;
+  /* width: 100%; */
 }
 .video-editor-container video {
   width: 100%;
