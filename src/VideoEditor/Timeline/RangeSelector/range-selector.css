@@ -1,0 +1,56 @@
+.range-selector-container {
+  --range-selector-border-size: 4px;
+  --range-selector-border-color: var(--yellow);
+}
+.range-selector-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  visibility: hidden;
+}
+.range-selector-container::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+.range-selector {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  border: var(--range-selector-border-size) solid var(--range-selector-border-color);
+  margin: 0;
+  /** range selector must have border-box sizing so that it fits perfectly around timeline **/
+  box-sizing: border-box !important;
+  -webkit-box-sizing: border-box !important;
+  overflow: hidden;
+  cursor: default;
+}
+.range-selector {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+
+.selected-frames {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  /* adjusts selected frames height to account for range selector border */
+  margin: calc(var(--range-selector-border-size) * -1) !important;
+}
+.selected-frames::after {
+  content: '';
+  background: transparent !important;
+}

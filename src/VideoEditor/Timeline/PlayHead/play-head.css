@@ -1,0 +1,23 @@
+.play-head {
+  --play-head-width: 2px;
+  --play-head-color: white;
+
+  /* --play-head-color: green; */
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  left: 0;
+  position: absolute;
+  z-index: 3;
+
+  top: 0;
+  width: 0;
+  border-top: var(--play-head-width) solid var(--play-head-color);
+  border-bottom: var(--play-head-width) solid var(--play-head-color);
+  border-left: var(--play-head-width) solid var(--play-head-color);
+  border-right: var(--play-head-width) solid var(--play-head-color);
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  /** background: black; **/
+  /* transition: transform 0.25s linear; */
+}

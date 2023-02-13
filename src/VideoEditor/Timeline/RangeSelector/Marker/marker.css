@@ -1,0 +1,47 @@
+.marker {
+  --marker-border-size: 7px;
+  /** marker width must be greater than border-size * 2 **/
+  --marker-width: 30px;
+  --marker-border-color: rgb(243, 71, 19);
+  --marker-bg-color: rgb(255, 122, 33);
+}
+
+.marker {
+  border: var(--marker-border-size) solid var(--marker-border-color);
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+
+.marker {
+  /* opacity: 0.5; */
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  width: var(--marker-width);
+  height: 100%;
+  background: var(--marker-bg-color);
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  cursor: grab;
+}
+.marker {
+  cursor: grabbing;
+}
+
+.in-marker {
+  left: 0;
+  margin-left: calc(var(--marker-width) * -1);
+  /** top: calc(var(--marker-border-size) * -1); **/
+  top: 0;
+  border-radius: 20px 0px 0px 20px;
+}
+.out-marker {
+  right: 0;
+  /** The +1px is for pixel perfection. Sometimes there is a pixel gap for a reason
+  I haven't nailed down yet. It only appears on certain viewport widths **/
+  margin-right: calc(var(--marker-width) * -1);
+  /** top: calc(var(--marker-border-size) * -1); */
+  top: 0;
+  border-radius: 0 20px 20px 0;
+}

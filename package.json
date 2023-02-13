@@ -1,0 +1,48 @@
+{
+  "name": "videoeditor",
+  "version": "1.0.0",
+  "description": "video editor to crop or trim video files",
+  "main": "index.js",
+  "scripts": {
+    "test": "",
+    "start": "webpack serve --config './build/webpack.dev.js'",
+    "build": "webpack --config './build/webpack.prod.js'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aslamhus/VideoEditor.git"
+  },
+  "keywords": [
+    "video",
+    "trim",
+    "crop",
+    "video",
+    "editor"
+  ],
+  "author": "Aslam Husain <aslam.percy.husain@gmail.com> (https://github.com/aslamhus)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aslamhus/VideoEditor/issues"
+  },
+  "homepage": "https://github.com/aslamhus/VideoEditor#readme",
+  "dependencies": {
+    "@aslamhus/fileselect": "^2.3.2",
+    "autoprefixer": "^10.4.13",
+    "css-loader": "^6.7.3",
+    "gsap": "npm:@gsap/member@^3.11.4",
+    "html-webpack-plugin": "^5.5.0",
+    "postcss-loader": "^7.0.2",
+    "sass": "^1.58.0",
+    "sass-loader": "^13.2.0",
+    "style-loader": "^3.3.1",
+    "terser-webpack-plugin": "^5.3.6",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1",
+    "webpack-dev-server": "^4.11.1",
+    "webpack-merge": "^5.8.0"
+  },
+  "type": "module",
+  "devDependencies": {
+    "font-awesome": "^4.7.0"
+  }
+}

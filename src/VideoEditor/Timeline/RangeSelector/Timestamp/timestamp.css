@@ -1,0 +1,14 @@
+.timeline .timestamp {
+  position: absolute;
+  left: 50%;
+  bottom: -1rem;
+  transform: translate(-50%, 100%);
+  background: rgb(46, 46, 46);
+  padding: 1rem;
+  width: fit-content;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.timeline .timestamp p {
+  color: white;
+}

@@ -1,0 +1,67 @@
+.control-btn {
+  --control-btn: dodgerblue;
+  --control-btn-i: rgb(17, 86, 155);
+  --control-btn-hover: rgb(24, 114, 204);
+  --control-btn-hover-i: white;
+  --control-btn-focus-bg: dodgerblue;
+  --control-btn-focus-i: rgb(255, 255, 255);
+  --control-btn-active-icon: rgb(16, 78, 141);
+}
+.control-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(219, 219, 219);
+  border: 4px solid var(--control-btn);
+  border-radius: 50%;
+  width: 0;
+  height: 0;
+  padding: 35px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0 0.5rem;
+}
+
+.control-btn i {
+  position: relative;
+  width: 35px;
+  font-size: 30px;
+  background: transparent;
+  padding: 0px;
+  color: var(--control-btn-i);
+}
+
+.control-btn:active,
+.control-btn-active {
+  transform: scale(0.95);
+}
+.control-btn:active i {
+  transform: scale(1.05);
+}
+.control-btn:hover:not(.control-btn.active) {
+  border-color: var(--control-btn-hover);
+  /* background-color: var(--control-btn-hover);  */
+  opacity: 0.9;
+}
+.control-btn:hover:not(.control-btn-active) i {
+  color: var(--control-btn-hover);
+}
+
+.control-btn.control-btn-active {
+  background-color: var(--control-btn-focus-bg);
+  outline: none;
+}
+.control-btn.control-btn-active i {
+  color: var(--control-btn-focus-i);
+}
+
+@media (min-device-width: 360px) {
+  .control-btn {
+    padding: 25px;
+  }
+
+  .control-btn i {
+    width: 25px;
+    font-size: 22px;
+  }
+}
