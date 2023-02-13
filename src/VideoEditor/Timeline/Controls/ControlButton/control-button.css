@@ -1,13 +1,4 @@
 .control-btn {
-  --control-btn: dodgerblue;
-  --control-btn-i: rgb(17, 86, 155);
-  --control-btn-hover: rgb(24, 114, 204);
-  --control-btn-hover-i: white;
-  --control-btn-focus-bg: dodgerblue;
-  --control-btn-focus-i: rgb(255, 255, 255);
-  --control-btn-active-icon: rgb(16, 78, 141);
-}
-.control-btn {
   display: flex;
   justify-content: center;
   align-items: center;

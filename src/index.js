@@ -1,6 +1,7 @@
 import VideoEditor from './VideoEditor/VideoEditor';
 import { FileSelect } from '@aslamhus/fileselect';
-const crop = { width: 5, height: 3 };
+
+const crop = { width: 2, height: 3 };
 
 let renderDiv;
 window.onload = () => {

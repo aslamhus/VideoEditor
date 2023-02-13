@@ -34,10 +34,6 @@
 
 .frame {
   /** Frame **/
-  --frame-bg: rgb(111, 111, 111);
-  --frame-border-size: 2px;
-  --frame-border-style: solid;
-  --frame-border-color: rgb(58, 58, 58);
   display: inline-flex;
   justify-content: center;
   border-width: var(--frame-border-size);

@@ -1,7 +1,4 @@
 .play-head {
-  --play-head-width: 2px;
-  --play-head-color: white;
-
   /* --play-head-color: green; */
   box-sizing: border-box;
   -webkit-box-sizing: border-box;

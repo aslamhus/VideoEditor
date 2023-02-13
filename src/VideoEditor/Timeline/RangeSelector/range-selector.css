@@ -1,8 +1,4 @@
 .range-selector-container {
-  --range-selector-border-size: 4px;
-  --range-selector-border-color: var(--yellow);
-}
-.range-selector-container {
   position: absolute;
   width: 100%;
   height: 100%;

@@ -1,4 +1,33 @@
 .video-editor-container {
+  /** color scheme **/
+
+  /** frames **/
+  --frame-bg: rgb(111, 111, 111);
+  --frame-border-size: 2px;
+  --frame-border-style: solid;
+  --frame-border-color: rgb(58, 58, 58);
+  /** range select **/
+  --range-selector-border-size: 4px;
+  --range-selector-border-color: rgb(243, 71, 19);
+  /** markers **/
+  --marker-border-size: 7px;
+  /** marker width MUST be greater than (marker-border-size * 2) **/
+  --marker-width: 30px;
+  --marker-border-color: rgb(243, 71, 19);
+  --marker-bg-color: rgb(255, 122, 33);
+  /** playhead **/
+  --play-head-width: 2px;
+  --play-head-color: white;
+  /** control button **/
+  --control-btn: dodgerblue;
+  --control-btn-i: rgb(17, 86, 155);
+  --control-btn-hover: rgb(24, 114, 204);
+  --control-btn-hover-i: white;
+  --control-btn-focus-bg: dodgerblue;
+  --control-btn-focus-i: rgb(255, 255, 255);
+  --control-btn-active-icon: rgb(16, 78, 141);
+}
+.video-editor-container {
   position: relative;
   /* width: 100%; */
 }
