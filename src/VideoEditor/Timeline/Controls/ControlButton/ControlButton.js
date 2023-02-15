@@ -33,7 +33,7 @@ class ControlButton {
   toggle(value) {
     if (this.onToggle instanceof Function) {
       try {
-        this.onToggle({ target: this.btn, toggle: this.active });
+        this.onToggle({ target: this.btn, toggle: !this.active });
       } catch (error) {
         // escape hatch to avoid changing the toggle state
         return false;

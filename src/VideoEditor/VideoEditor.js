@@ -20,6 +20,8 @@ class VideoEditor {
     this.video = null;
     this.videoEditorContainer = null;
     this.timeline = null;
+
+    this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
   }
 
   createVideoEditor() {
@@ -29,11 +31,18 @@ class VideoEditor {
     return this.videoEditorContainer;
   }
 
+  appendCropOverlay() {
+    const container = this.video.closest('.video-container');
+    const svgOverlay = createCropSVG(this.crop, {
+      width: this.video.videoWidth,
+      height: this.video.videoHeight,
+    });
+    container.append(svgOverlay);
+  }
+
   createVideo() {
     const container = document.createElement('div');
     container.className = 'video-container';
-    const svgOverlay = createCropSVG(this.crop, { width: 640, height: 480 });
-    container.append(svgOverlay);
     this.video = document.createElement('video');
     this.video.id = 'video-preview';
     this.video.className = 'preview';
@@ -47,7 +56,8 @@ class VideoEditor {
     this.video.playbackRate = 16;
     container.append(this.video);
     // not sure why this is here and not in constructor
-    this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
+
+    this.attachVideoEvents(container);
     return container;
   }
 
@@ -56,8 +66,10 @@ class VideoEditor {
     this.handleDurationChange = (event) => {
       handleDuration(event, container);
     };
+    // this.handleLoadedMetaData();
     this.video.addEventListener('durationchange', this.handleDurationChange);
-    this.video.addEventListener('loadedmetadata', this.handleLoadedMetaData);
+    /** addEventListener 'loadedmetadata' doesn't seem to be working in safari, this works however: */
+    this.video.onloadedmetadata = this.handleLoadedMetaData;
   }
 
   handleDurationChange(event, container) {
@@ -82,7 +94,7 @@ class VideoEditor {
 
   removeEvents() {
     this.video.removeEventListener('durationchange', this.handleDurationChange);
-    this.video.removeEventListener('loadedmetadata', this.handleLoadedMetaData);
+    this.video.onloadedmetadata = null;
   }
 
   handleLoadedMetaData(event) {
@@ -96,6 +108,8 @@ class VideoEditor {
      */
     console.info('loadedmetadata');
     this.video.currentTime = 1e101;
+
+    this.appendCropOverlay();
   }
 
   // renderVideoEditor(container) {
@@ -106,7 +120,6 @@ class VideoEditor {
 
   render(container) {
     container.append(this.createVideoEditor());
-    this.attachVideoEvents(container);
   }
 }
 

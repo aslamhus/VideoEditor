@@ -2,7 +2,7 @@ import ControlButton from './ControlButton/ControlButton';
 import PlayButton from './PlayButton';
 import './controls.css';
 class Controls {
-  constructor({ video, onPlayToggle, onTrimToggle, onPlayClick }) {
+  constructor({ video, onPlayToggle, onTrimToggle, onPlayClick, onCropToggle }) {
     this.video = video;
     this.controls = null;
 
@@ -13,13 +13,19 @@ class Controls {
       onToggle: onTrimToggle,
       title: 'Trim video',
     });
+    this.cropBtn = new ControlButton({
+      className: 'crop-btn',
+      iconClassName: 'fa fa-crop',
+      onToggle: onCropToggle,
+      title: 'Crop video',
+    });
+    this.controlElements = [this.playBtn, this.trimBtn, this.cropBtn];
   }
 
   createControls() {
     this.controls = document.createElement('div');
     this.controls.className = 'video-editor-controls';
-    this.playBtn.render(this.controls);
-    this.trimBtn.render(this.controls);
+    this.controlElements.forEach((element) => element.render(this.controls));
     return this.controls;
   }
 

@@ -47,8 +47,6 @@ class Timeline {
         }
       },
       onTrimToggle: ({ target, toggle }) => {
-        console.log('hidden?', this.rangeSelector.hidden);
-        console.log('toggle', target, toggle);
         if (this.rangeSelector.hidden) {
           this.rangeSelector.show();
           target.setAttribute('title', 'Reset');
@@ -56,6 +54,9 @@ class Timeline {
           target.setAttribute('title', 'Trim video');
           this.rangeSelector.hide();
         }
+      },
+      onCropToggle: ({ target, toggle }) => {
+        console.log('crop video', target, toggle);
       },
     });
   }
