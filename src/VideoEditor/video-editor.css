@@ -34,3 +34,14 @@
 .video-editor-container video {
   width: 100%;
 }
+.video-container {
+  position: relative;
+  overflow: hidden;
+}
+.video-container svg {
+  position: absolute;
+  z-index: 1;
+  opacity: 0.85;
+}
+.video-container video {
+}

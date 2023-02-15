@@ -1,4 +1,6 @@
 import Timeline from './Timeline/Timeline.js';
+
+import { createCropSVG } from './utils/svg-crop-overlay';
 import './video-editor.css';
 import '@fontawesome/css/font-awesome.min.css';
 
@@ -28,6 +30,10 @@ class VideoEditor {
   }
 
   createVideo() {
+    const container = document.createElement('div');
+    container.className = 'video-container';
+    const svgOverlay = createCropSVG(this.crop, { width: 640, height: 480 });
+    container.append(svgOverlay);
     this.video = document.createElement('video');
     this.video.id = 'video-preview';
     this.video.className = 'preview';
@@ -39,8 +45,10 @@ class VideoEditor {
     this.video.preload = 'metadata';
     this.video.controls = false;
     this.video.playbackRate = 16;
+    container.append(this.video);
+    // not sure why this is here and not in constructor
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
-    return this.video;
+    return container;
   }
 
   attachVideoEvents(container) {
