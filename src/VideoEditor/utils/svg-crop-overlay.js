@@ -6,7 +6,7 @@
         t.o(i, n) &&
           !t.o(e, n) &&
           /******/ Object.defineProperty(e, n, { enumerable: !0, get: i[n] });
-      /******/
+        /******/
       /******/
     },
     /******/ o: (t, e) => Object.prototype.hasOwnProperty.call(t, e),
@@ -41,7 +41,7 @@ function createCropSVG(t = { width: 3, height: 2 }, e = { width: 640, height: 48
   const h = document.createElementNS(o, 'defs'),
     c = document.createElementNS(o, 'style');
   c.textContent =
-    '\n      .cls-1 {\n          fill: #0c0c0c;\n          fill-rule: evenodd;\n          opacity: 0.9;\n      }';
+    '\n      .cls-1 {\n          fill: #0c0c0c;\n          fill-rule: evenodd;\n          opacity: 1;\n      }';
   const s = document.createElementNS(o, 'path');
   s.classList.add('cls-1');
   const d = (function getCropPathDefinition({ viewBox: t, cropDimensions: e }) {
