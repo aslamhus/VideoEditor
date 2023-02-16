@@ -2,11 +2,11 @@
 /******/ var t = {
     /******/ // define getter functions for harmony exports
     /******/ d: (e, i) => {
-      /******/ /******/ for (var n in i)
-        t.o(i, n) &&
-          !t.o(e, n) &&
-          /******/ Object.defineProperty(e, n, { enumerable: !0, get: i[n] });
-        /******/
+      /******/ /******/ for (var h in i)
+        t.o(i, h) &&
+          !t.o(e, h) &&
+          /******/ Object.defineProperty(e, h, { enumerable: !0, get: i[h] });
+      /******/
       /******/
     },
     /******/ o: (t, e) => Object.prototype.hasOwnProperty.call(t, e),
@@ -29,21 +29,32 @@
  * @returns
  */
 function createCropSVG(t = { width: 3, height: 2 }, e = { width: 640, height: 480 }) {
-  const i = 'xMidYMid slice';
-  let n = 'xMinYMid slice';
-  t.height > t.width && (n = i);
-  const o = 'http://www.w3.org/2000/svg',
-    r = document.createElementNS(o, 'svg');
-  r.setAttribute('width', '100%'),
-    r.setAttribute('height', '100%'),
-    r.setAttribute('viewBox', `0 0 ${e.width} ${e.height}`),
-    r.setAttribute('preserveAspectRatio', n);
-  const h = document.createElementNS(o, 'defs'),
-    c = document.createElementNS(o, 'style');
-  c.textContent =
+  const i = 'xMidYMid slice',
+    h = 'xMidYMid slice';
+  let r;
+  switch (getAspectType(t)) {
+    case 'portrait':
+      // console.info('crop is portrait');
+      r = h;
+      break;
+    case 'landscape':
+    case 'square':
+      // console.log('crop is square');
+      r = i;
+  }
+  // console.log('preserveAspectRatio', preserveAspectRatio);
+  const n = 'http://www.w3.org/2000/svg',
+    c = document.createElementNS(n, 'svg');
+  c.setAttribute('width', '100%'),
+    c.setAttribute('height', '100%'),
+    c.setAttribute('viewBox', `0 0 ${e.width} ${e.height}`),
+    c.setAttribute('preserveAspectRatio', r);
+  const s = document.createElementNS(n, 'defs'),
+    o = document.createElementNS(n, 'style');
+  o.textContent =
     '\n      .cls-1 {\n          fill: #0c0c0c;\n          fill-rule: evenodd;\n          opacity: 1;\n      }';
-  const s = document.createElementNS(o, 'path');
-  s.classList.add('cls-1');
+  const a = document.createElementNS(n, 'path');
+  a.classList.add('cls-1');
   const d = (function getCropPathDefinition({ viewBox: t, cropDimensions: e }) {
     // you may need to dynamically set the padding-bottom of video container to the svg aspect ratio. It's set in the css right now.
     // you will also need to make sure crop is changed for the timeline frames.
@@ -69,24 +80,51 @@ function createCropSVG(t = { width: 3, height: 2 }, e = { width: 640, height: 48
      * cropAspect = 3/2
      * cropWidth =
      */
-    let i, n, o;
-    const r = e.height / e.width;
-    e.height > e.width
-      ? // portrait, find width
-        ((i = t.height / e.height), (o = t.height), (n = o / r))
-      : // landscape, find height
-        ((i = t.width / e.width), (n = t.width), (o = n * r));
-    // get literal crop height/width from svg dimensions
-    const h = ((t.width - n) / 2).toFixed(2),
-      c = h,
-      s = parseInt(c) + parseInt(n),
-      d = ((t.height - o) / 2).toFixed(2),
-      a = d,
-      p = parseInt(a) + parseInt(o),
-      l = `M0,0H${t.width}V${t.height}H0V0ZM${c},${a}H${s}V${p}H${c}V1Z`;
+    let i;
+    // const viewBoxAspectType = getAspectType(viewBox);
+    const h = getAspectType(e),
+      r = e.width / e.height,
+      n = t.width / t.height;
+    switch (h) {
+      case 'portrait':
+        i = r < n ? 'width' : 'height';
+      case 'square':
+      case 'landscape':
+        i = r > n ? 'width' : 'height';
+    }
+    const [c, s] = (function getRectLiteralDimensionsFromAspect({
+      aspect: t = { width: r, height: h },
+      rect: e = { width: r, height: h },
+      anchor: i,
+    }) {
+      let h, r, n;
+      const c = t.height / t.width;
+      if ('height' == i)
+        // find width
+        (n = e.height / t.height), (h = e.height), (r = h / c);
+      else {
+        if ('width' != i)
+          throw new TypeError(
+            'unexpected anchor value. Must be either width or height but found: ' + i
+          );
+        // find height
+        (n = e.width / t.width), (r = e.width), (h = r * c);
+      }
+      return [r, h];
+    })({ aspect: e, rect: t, anchor: i });
+    const o = ((t.width - c) / 2).toFixed(2),
+      a = o,
+      d = parseInt(a) + parseInt(c);
+    const p = ((t.height - s) / 2).toFixed(2),
+      w = p,
+      g = parseInt(w) + parseInt(s),
+      l = `M0,0H${t.width}V${t.height}H0V0ZM${a},${w}H${d}V${g}H${a}V1Z`;
     return l;
   })({ viewBox: e, cropDimensions: t });
-  return s.setAttribute('d', d), r.append(h), h.append(c), r.append(s), r;
+  return a.setAttribute('d', d), c.append(s), s.append(o), c.append(a), c;
+}
+function getAspectType({ width: t, height: e }) {
+  return t > e ? 'landscape' : t < e ? 'portrait' : 'square';
 }
 /* harmony export */ t.d(e, {
   /* harmony export */ k: () => /* binding */ createCropSVG,

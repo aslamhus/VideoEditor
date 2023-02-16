@@ -1,14 +1,14 @@
 export function cloneAllCanvasFrames(original, clone) {
-  const originals = original.querySelectorAll('canvas');
+  const originalCanvases = original.querySelectorAll('canvas');
   clone.querySelectorAll('canvas').forEach((newCanvas, index) => {
-    const oldCanvas = originals[index];
+    const original = originalCanvases[index];
     var context = newCanvas.getContext('2d');
 
     //set dimensions
-    newCanvas.width = oldCanvas.width;
-    newCanvas.height = oldCanvas.height;
+    newCanvas.width = original.width;
+    newCanvas.height = original.height;
 
     //apply the old canvas to the new one
-    context.drawImage(oldCanvas, 0, 0);
+    context.drawImage(original, 0, 0);
   });
 }

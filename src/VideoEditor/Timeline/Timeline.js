@@ -15,8 +15,8 @@ class Timeline {
     this.frameTotalLimit = frameTotalLimit; // eventually will be timeline width divided by frame width
     this.frameInterval = this.duration / this.frameTotalLimit;
 
-    this.crop = crop;
-    this.cropAspectRatio = crop.height / crop.width;
+    this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
+    this.cropAspectRatio = this.crop && this.crop.height / this.crop.width;
     this.timeline = null;
     this.playHead = new PlayHead({
       className: 'play-head',
@@ -138,6 +138,10 @@ class Timeline {
    */
   calculateVideoCrop() {
     const video = { width: this.video.videoWidth, height: this.video.videoHeight };
+    if (this.crop.width == video.width && this.crop.height == video.height) {
+      return [0, 0, video.width, video.height];
+    }
+
     // const cropWidth = 279.59;
     let ratio;
     if (this.crop.height > this.crop.width) {
@@ -150,6 +154,7 @@ class Timeline {
     const cropWidth = cropHeight / this.cropAspectRatio;
     const x = (video.width - cropWidth) / 2;
     const y = (video.height - cropHeight) / 2;
+    console.log(' crop', [x, y, cropWidth, cropHeight]);
     return [x, y, cropWidth, cropHeight];
   }
 
@@ -171,9 +176,9 @@ class Timeline {
       framesContainer.append(frameContainer);
       this.drawFrame(canvas);
       canvas.style.width = '';
-      console.log(
-        `countFrames ${countFrames}, frame limit ${this.frameTotalLimit}, timeIndex ${this.video.currentTime}, duration: ${this.video.duration}`
-      );
+      // console.log(
+      //   `countFrames ${countFrames}, frame limit ${this.frameTotalLimit}, timeIndex ${this.video.currentTime}, duration: ${this.video.duration}`
+      // );
       // if (countFrames > this.frameTotalLimit - 1) {
       //   console.error(
       //     'exceedeed total frame limit: countFrames, frameTimeIndex',
@@ -191,7 +196,7 @@ class Timeline {
       } else {
         console.info(
           `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.duration} `,
-          'color:red'
+          'color:green'
         );
         this.video.removeEventListener('seeked', renderFrameOnSeek);
         const myEvent = new Event('timelineReady');

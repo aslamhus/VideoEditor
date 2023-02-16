@@ -33,10 +33,11 @@ class VideoEditor {
 
   appendCropOverlay() {
     const container = this.video.closest('.video-container');
-    const svgOverlay = createCropSVG(this.crop, {
-      width: this.video.videoWidth,
-      height: this.video.videoHeight,
-    });
+    const viewBox = { width: this.video.videoWidth, height: this.video.videoHeight };
+    console.log('crop', this.crop);
+    console.log('viewBox', viewBox);
+    const svgOverlay = createCropSVG(this.crop, viewBox);
+
     container.append(svgOverlay);
   }
 
@@ -54,10 +55,11 @@ class VideoEditor {
     this.video.preload = 'metadata';
     this.video.controls = false;
     this.video.playbackRate = 16;
+    // video events must be attached before rendering in the DOM
+    this.attachVideoEvents(container);
     container.append(this.video);
     // not sure why this is here and not in constructor
 
-    this.attachVideoEvents(container);
     return container;
   }
 
@@ -68,11 +70,11 @@ class VideoEditor {
     };
     // this.handleLoadedMetaData();
     this.video.addEventListener('durationchange', this.handleDurationChange);
-    /** addEventListener 'loadedmetadata' doesn't seem to be working in safari, this works however: */
-    this.video.onloadedmetadata = this.handleLoadedMetaData;
+    this.video.addEventListener('loadedmetadata', this.handleLoadedMetaData);
   }
 
   handleDurationChange(event, container) {
+    console.info(this.video.readyState);
     if (!isFinite(this.video.duration)) {
       console.error('durationchange: duration is infinity', this.video.duration);
       return;
@@ -92,6 +94,14 @@ class VideoEditor {
     this.removeEvents();
   }
 
+  updateVideoContainerDimensions(width, height) {
+    // aspect ratio of device
+    const aspectRatio = height / width;
+    console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
+    const videoContainer = this.video.closest('.video-container');
+    videoContainer.style.paddingBottom = `${aspectRatio * 100}%`;
+  }
+
   removeEvents() {
     this.video.removeEventListener('durationchange', this.handleDurationChange);
     this.video.onloadedmetadata = null;
@@ -107,9 +117,12 @@ class VideoEditor {
      * to play the  entire length of the video.
      */
     console.info('loadedmetadata');
-    this.video.currentTime = 1e101;
 
-    this.appendCropOverlay();
+    this.video.currentTime = 1e101;
+    const { videoWidth, videoHeight } = this.video;
+
+    this.updateVideoContainerDimensions(videoWidth, videoHeight);
+    this.crop && this.appendCropOverlay();
   }
 
   // renderVideoEditor(container) {
