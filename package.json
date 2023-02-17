@@ -28,6 +28,7 @@
   "dependencies": {
     "@aslamhus/fileselect": "^2.3.2",
     "autoprefixer": "^10.4.13",
+    "croppie": "^2.6.5",
     "css-loader": "^6.7.3",
     "gsap": "npm:@gsap/member@^3.11.4",
     "html-webpack-plugin": "^5.5.0",

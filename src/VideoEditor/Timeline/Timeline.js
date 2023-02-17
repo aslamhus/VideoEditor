@@ -1,7 +1,8 @@
 import PlayHead from './PlayHead/PlayHead.js';
 import Controls from './Controls/Controls.js';
 import RangeSelector from './RangeSelector/RangeSelector.js';
-
+import Croppie from 'croppie';
+import '../../../node_modules/croppie/croppie.css';
 import './timeline.css';
 
 class Timeline {
@@ -16,7 +17,7 @@ class Timeline {
     this.frameInterval = this.duration / this.frameTotalLimit;
 
     this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
-    this.cropAspectRatio = this.crop && this.crop.height / this.crop.width;
+    this.cropAspectRatio = this.crop.height / this.crop.width;
     this.timeline = null;
     this.playHead = new PlayHead({
       className: 'play-head',
@@ -56,7 +57,21 @@ class Timeline {
         }
       },
       onCropToggle: ({ target, toggle }) => {
-        console.log('crop video', target, toggle);
+        try {
+          const canvas = document.createElement('canvas');
+          // set the resolution
+          canvas.width = this.video.videoWidth;
+          canvas.height = this.video.videoHeight;
+          // console.log('frameHeight, Width', frameHeight, frameWidth);
+          const vidContainer = document.querySelector('.video-container');
+          const { width, height } = vidContainer.getBoundingClientRect();
+          canvas.style.width = width + 'px';
+          canvas.style.height = height + 'px';
+          canvas.getContext('2d').drawImage(this.video, 0, 0);
+          canvas.toBlob(this.handleCrop.bind(this), 'image/jpg', 100);
+        } catch (error) {
+          console.error(error);
+        }
       },
     });
   }
@@ -129,6 +144,53 @@ class Timeline {
     this.playHead.toggleAnimate(false);
   }
 
+  handleCrop(blob) {
+    /**
+     * Pressing timeline should redraw crop with current zoom, position etc
+     */
+    console.log('blob!!!', blob);
+    const urlObject = URL.createObjectURL(blob);
+
+    const vidContainer = document.querySelector('.video-container');
+    const cropContainer = document.createElement('div');
+    cropContainer.className = 'crop-container';
+    cropContainer.style.position = 'absolute';
+    cropContainer.style.left = 0;
+    cropContainer.style.top = 0;
+    cropContainer.style.zIndex = 3;
+    cropContainer.style.width = '100%';
+    cropContainer.style.height = '100%';
+    vidContainer.append(cropContainer);
+
+    if (!vidContainer) {
+      throw new Error('crop toggle could not find element');
+    }
+    const { width, height } = vidContainer.getBoundingClientRect();
+    console.log('vidContainer width,height', width, height);
+    const [x, y, cropWidth, cropHeight] = this.computeCrop({ width, height });
+    console.log('cropDimensions', [x, y, cropWidth, cropHeight]);
+    const el = cropContainer;
+    var croppie = new Croppie(el, {
+      viewport: { width: cropWidth, height: cropHeight },
+      boundary: { width, height },
+      showZoomer: true,
+      // enableOrientation: true,
+      // enableResize: true,
+    });
+    console.log('src', this.video.src);
+
+    croppie.bind({
+      url: urlObject,
+      // zoom: 1,
+      // orientation: 1,
+    });
+    //on button click
+    croppie.result('blob').then(function (blob) {
+      // do something with cropped blob
+      console.log('blob');
+    });
+  }
+
   /**
    * find the x and y position where Canvas should start drawing from
    * in order to correct a frame with the correct dimensions.
@@ -136,25 +198,46 @@ class Timeline {
    * The video is centered horizontally in a div that hides the video
    * overflowing the frame
    */
-  calculateVideoCrop() {
-    const video = { width: this.video.videoWidth, height: this.video.videoHeight };
-    if (this.crop.width == video.width && this.crop.height == video.height) {
-      return [0, 0, video.width, video.height];
+  computeCrop({ width, height }) {
+    if (this.crop.width == width && this.crop.height == height) {
+      return [0, 0, width, height];
     }
 
     // const cropWidth = 279.59;
-    let ratio;
-    if (this.crop.height > this.crop.width) {
-      // portrait
-      ratio = video.height / this.crop.height;
+    const sourceAspect = width / height;
+    let ratio, anchor, cropHeight, cropWidth;
+    let cropType;
+    if (this.cropAspectRatio > 1) {
+      cropType = 'landscape';
+    } else if (this.cropAspectRatio < 1) {
+      cropType = 'portrait';
     } else {
-      ratio = video.width / this.crop.width;
+      cropType = 'square';
     }
-    const cropHeight = this.crop.height * ratio;
-    const cropWidth = cropHeight / this.cropAspectRatio;
-    const x = (video.width - cropWidth) / 2;
-    const y = (video.height - cropHeight) / 2;
-    console.log(' crop', [x, y, cropWidth, cropHeight]);
+    switch (cropType) {
+      case 'portrait':
+        anchor = this.cropAspectRatio < sourceAspect ? 'width' : 'height';
+      case 'square':
+      case 'landscape':
+        anchor = this.cropAspectRatio > sourceAspect ? 'width' : 'height';
+        break;
+    }
+    if (anchor == 'height') {
+      cropHeight = height;
+      cropWidth = cropHeight / this.cropAspectRatio;
+    } else {
+      cropWidth = width;
+      cropHeight = cropWidth * this.cropAspectRatio;
+    }
+    console.log('this.cropAspectRatio', this.cropAspectRatio);
+    console.log('crop', this.crop);
+    console.log('cropType', cropType);
+    console.log('anchor', anchor);
+    const x = (width - cropWidth) / 2;
+    const y = (height - cropHeight) / 2;
+    console.log(`container width: ${width}, height: ${height}`);
+    console.log(`cropWidth: ${cropWidth}, cropHeight: ${cropHeight}`);
+    console.log(`x: ${x}, y: ${y}`);
     return [x, y, cropWidth, cropHeight];
   }
 
@@ -168,13 +251,21 @@ class Timeline {
       const canvas = frameContainer.querySelector('canvas');
       // set canvas canvas aspect ratio
       const frameHeight = this.getTimelineElement().getBoundingClientRect().height;
+      // if landscape divide, if portrait multiple
+
       const frameWidth = frameHeight / this.cropAspectRatio;
+
       canvas.width = frameWidth;
       canvas.height = frameHeight;
-      // console.log('frameHeight, Width', frameHeight, frameWidth);
       canvas.style.width = frameWidth + 'px';
+
+      console.log('frameWidth', frameHeight / this.cropAspectRatio);
+      console.log('frameHeight', frameHeight);
       framesContainer.append(frameContainer);
-      this.drawFrame(canvas);
+      const videoDimensions = { width: this.video.videoWidth, height: this.video.videoHeight };
+      const sourceCoordinates = this.computeCrop(videoDimensions);
+      this.drawFrame(canvas, sourceCoordinates);
+
       canvas.style.width = '';
       // console.log(
       //   `countFrames ${countFrames}, frame limit ${this.frameTotalLimit}, timeIndex ${this.video.currentTime}, duration: ${this.video.duration}`
@@ -216,10 +307,20 @@ class Timeline {
    * Draw frame on canvas
    *
    * @param {HTMLCanvasElement} frame
+   * @param {Array<Number>} sourceRect - optional source coordinates
+   * @property {Number} sourceRect[] - The x-axis coordinate of the top left corner of the
+   * sub-rectangle of the source image to draw into the destination context.
+   * @property {Number} sourceRect[] - The y-axis coordinate of the top left corner of the
+   * sub-rectangle of the source image to draw into the destination context.
+   * @property {Number} sourceRect[] - The width of the sub-rectangle of the source image
+   * to draw into the destination context.
+   *  @property {Number} sourceRect[] - The height of the sub-rectangle of the source image
+   * to draw into the destination context.
    */
-  drawFrame(frame) {
+  drawFrame(frame, sourceRect) {
+    const [sX, sY, sWidth, sHeight] = sourceRect;
     const frameBounds = frame.getBoundingClientRect();
-    const [sX, sY, sWidth, sHeight] = this.calculateVideoCrop();
+    console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
     frame
       .getContext('2d')
       .drawImage(this.video, sX, sY, sWidth, sHeight, 0, 0, frameBounds.width, frameBounds.height);

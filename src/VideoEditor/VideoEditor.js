@@ -34,10 +34,7 @@ class VideoEditor {
   appendCropOverlay() {
     const container = this.video.closest('.video-container');
     const viewBox = { width: this.video.videoWidth, height: this.video.videoHeight };
-    console.log('crop', this.crop);
-    console.log('viewBox', viewBox);
     const svgOverlay = createCropSVG(this.crop, viewBox);
-
     container.append(svgOverlay);
   }
 
