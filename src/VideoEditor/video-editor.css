@@ -39,7 +39,15 @@
 }
 .video-container {
   position: relative;
+  /* overflow: hidden; */
+}
+.video-wrap {
+  position: relative;
   overflow: hidden;
+}
+.video-wrap,
+.video-wrap video {
+  transform-origin: 50% 50%;
 }
 .video-container svg {
   position: absolute;
@@ -47,6 +55,4 @@
   top: 0;
   z-index: 2;
   opacity: 1;
-}
-.video-container video {
 }

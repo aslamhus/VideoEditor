@@ -45,6 +45,10 @@
 .control-btn.control-btn-active i {
   color: var(--control-btn-focus-i);
 }
+.control-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
 
 @media (min-device-width: 360px) {
   .control-btn {

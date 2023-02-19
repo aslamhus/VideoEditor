@@ -16,10 +16,21 @@ class Controls {
     this.cropBtn = new ControlButton({
       className: 'crop-btn',
       iconClassName: 'fa fa-crop',
-      onToggle: onCropToggle,
+      onToggle: ({ target, toggle }) => {
+        this.toggleControlButtons({ target, toggle });
+        onCropToggle({ target, toggle });
+      },
       title: 'Crop video',
     });
     this.controlElements = [this.playBtn, this.trimBtn, this.cropBtn];
+  }
+
+  toggleControlButtons({ target, toggle }) {
+    this.controlElements.forEach((controlBtn) => {
+      if (controlBtn.getElement().className != target.className) {
+        toggle ? controlBtn.disable() : controlBtn.enable();
+      }
+    });
   }
 
   createControls() {

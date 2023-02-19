@@ -18,6 +18,10 @@ class ControlButton {
     this.toggle();
   }
 
+  getElement() {
+    return this.btn;
+  }
+
   disable() {
     this.btn.disabled = true;
   }

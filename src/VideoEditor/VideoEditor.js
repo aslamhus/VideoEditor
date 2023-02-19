@@ -31,6 +31,18 @@ class VideoEditor {
     return this.videoEditorContainer;
   }
 
+  createCropContainer() {
+    const cropContainer = document.createElement('div');
+    cropContainer.className = 'crop-container';
+    cropContainer.style.position = 'absolute';
+    cropContainer.style.left = 0;
+    cropContainer.style.top = 0;
+    cropContainer.style.zIndex = 3;
+    cropContainer.style.width = '100%';
+    cropContainer.style.height = '100%';
+    return cropContainer;
+  }
+
   appendCropOverlay() {
     const container = this.video.closest('.video-container');
     const viewBox = { width: this.video.videoWidth, height: this.video.videoHeight };
@@ -39,8 +51,10 @@ class VideoEditor {
   }
 
   createVideo() {
-    const container = document.createElement('div');
-    container.className = 'video-container';
+    const vidContainer = document.createElement('div');
+    vidContainer.className = 'video-container';
+    const vidWrap = document.createElement('div');
+    vidWrap.className = 'video-wrap';
     this.video = document.createElement('video');
     this.video.id = 'video-preview';
     this.video.className = 'preview';
@@ -53,11 +67,13 @@ class VideoEditor {
     this.video.controls = false;
     this.video.playbackRate = 16;
     // video events must be attached before rendering in the DOM
-    this.attachVideoEvents(container);
-    container.append(this.video);
+    this.attachVideoEvents(vidContainer);
+    vidWrap.append(this.video);
+    vidContainer.append(vidWrap);
+    vidContainer.append(this.createCropContainer());
     // not sure why this is here and not in constructor
 
-    return container;
+    return vidContainer;
   }
 
   attachVideoEvents(container) {
@@ -95,8 +111,8 @@ class VideoEditor {
     // aspect ratio of device
     const aspectRatio = height / width;
     console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
-    const videoContainer = this.video.closest('.video-container');
-    videoContainer.style.paddingBottom = `${aspectRatio * 100}%`;
+    const vidWrap = this.video.closest('.video-wrap');
+    vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
   }
 
   removeEvents() {
