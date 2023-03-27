@@ -62,10 +62,6 @@ class Timeline {
             this.cropper.show();
           } else {
             this.cropVideo({
-              styles: this.cropper.getTransformStyles(),
-              data: this.cropper.getCropData(),
-              delta: this.cropper.getCropDelta(),
-              initial: this.cropper.getInitialValues(),
               relativeTransform: this.cropper.getRelativeTransformStyle(),
             });
             this.cropper.hide();
@@ -195,9 +191,22 @@ class Timeline {
 
   cropVideo({ styles, data, delta, initial, relativeTransform }) {
     const vidWrap = this.video.closest('.video-wrap');
-    const { x, y, scale } = relativeTransform;
-    this.video.style.transform = `translate(${x}px, ${y}px)`;
-    vidWrap.style.transform = `scale(${scale})`;
+    console.log('--------- Received Values');
+    let { x, y, scale, transformOrigin, deltaX } = relativeTransform;
+    console.log('scale', scale);
+    x = x * scale;
+    console.log('deltaX', deltaX);
+    console.log('x should equal deltaX', x);
+    const [originX, originY] = transformOrigin;
+    const adj = {};
+    console.log('transformOrigin', transformOrigin);
+    // adjustments will be 0 if scale = 1
+    adj.x = parseFloat(originX) * (1 - scale);
+    adj.y = parseFloat(originY) * (1 - scale);
+    this.video.style.transform = `translate(${x - adj.x}px, ${y - adj.y}px) scale(${scale})`;
+    // this.video.style.transform = `translate(${x}px, ${y}px)`;
+    // vidWrap.style.transform = `scale(${scale})`;
+    // console.log('styles', styles);
 
     /**
      *

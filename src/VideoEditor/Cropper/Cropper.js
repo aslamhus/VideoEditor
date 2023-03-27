@@ -1,4 +1,5 @@
-import Croppie from 'croppie';
+// import Croppie from '../../../node_modules/croppie/croppie.js';
+import Croppie from './croppie-test.js';
 import '../../../node_modules/croppie/croppie.css';
 
 /**
@@ -45,112 +46,10 @@ class Cropper {
     this.y = 0;
     this.origin = 0;
     this.getInitialElementValues();
+    this.touchdown = this.touchdown.bind(this);
+    this.touchup = this.touchup.bind(this);
+    this.handleZoomRangeChange = this.handleZoomRangeChange.bind(this);
     this.attachEvents();
-  }
-
-  attachEvents() {
-    this.zoomRangeInput.addEventListener('change', this.handleZoomRangeChange.bind(this));
-    window.addEventListener('pointerdown', this.touchdown.bind(this));
-    window.addEventListener('pointerup', this.touchup.bind(this));
-  }
-
-  /**
-   *
-   * @returns {Array} - [x,y]
-   */
-  getTransformCoordinates(el) {
-    const img = el.querySelector('img');
-    const matrix = new WebKitCSSMatrix(img.style.transform);
-    return [matrix.m41, matrix.m42];
-  }
-
-  handleZoomRangeChange(event) {
-    const {
-      target: { value },
-    } = event;
-    if (!this.initialValues?.zoom) {
-      this.initialValues.zoom = value;
-      const img = this.el.querySelector('img');
-      this.origin = this.getTransformOrigin(img.style.transformOrigin);
-    }
-    this.zoom = value;
-  }
-
-  touchdown(event) {
-    if (!this.initialValues.x) {
-      const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
-      this.initialValues.x = x;
-      this.initialValues.y = y;
-    }
-  }
-
-  getTransformOrigin(transformOrigin) {
-    return transformOrigin.replace(/px/gi, '').split(' ');
-  }
-
-  touchup(event) {
-    // const [x, y] = this.getTransformCoordinates(this.el);
-    const img = this.el.querySelector('img');
-    const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
-    this.x = x;
-    this.y = y;
-    this.origin = this.getTransformOrigin(img.style.transformOrigin);
-    // const [originX, originY] = this.origin;
-    // const [imgX, imgY] = this.getTransformCoordinates(this.el);
-    // const minusOrigin = { x: Number(originX) + imgX, y: Number(originY) + imgY };
-    // console.log('minusOrigin', minusOrigin);
-    console.log('----------');
-    console.log('current transform origin', this.origin);
-    console.log('current zoom', this.zoom);
-    console.log('current x,y', x, y);
-  }
-
-  getZoomRangeValue() {
-    return this.zoomRangeInput.value;
-  }
-
-  handleCrop(blob) {
-    //on button click
-    this.croppie.result('blob').then(function (blob) {
-      // do something with cropped blob
-      console.log('blob');
-    });
-  }
-
-  handleUpdate(event) {
-    const {
-      detail: { points, zoom, orientation },
-    } = event;
-    if (!this.initialValues) {
-      // this.initialValues = { points, zoom, orientation };
-      // console.log('initial', { points, zoom });
-    } else {
-      // console.log('update', { points, zoom });
-    }
-    // this.getInitialValues();
-  }
-
-  /**
-   *
-   * @param {string} src - src url
-   */
-  updateSrc(src) {
-    const { points, zoom, orientation } = this.croppie.get();
-    this.croppie.bind({
-      url: src,
-      points,
-      zoom,
-    });
-  }
-
-  show() {
-    this.el.style.display = '';
-    this.hidden = false;
-  }
-
-  hide() {
-    this.el.style.display = 'none';
-    this.hidden = true;
   }
 
   getTransformStyles() {
@@ -177,27 +76,22 @@ class Cropper {
     return width / el.offsetWidth;
   }
 
-  destroy() {
-    this.croppie.destroy();
-  }
-
   getRelativeTransformStyle() {
     // get relative zoom
+    console.log('---------- crop finished');
     const ratio = this.elementValues.zoom / this.initialValues.zoom;
-    const delta = this.getCropDelta();
-    const relativeScale = ((delta.zoomDelta || 0) + Number(this.initialValues.zoom)) * ratio;
-    // get relative x and y
-    const x = delta.xDelta;
-    const y = delta.yDelta;
-    // const relativeX =
-    console.log('relativeScale', relativeScale);
-    // console.log('--------- ---------');
-    // console.log('initial x', this.initialValues.x);
-    // console.log('element x', this.elementValues.x);
-    // console.log('current x', this.x);
-    // console.log('deltax,deltay', x, y);
+    const { xDelta, yDelta, zoomDelta: zoom } = this.getCropDelta();
+    const relativeScale = ((zoom || 0) + Number(this.initialValues.zoom)) * ratio;
 
-    return { x, y, scale: relativeScale };
+    return {
+      x: this.x,
+      y: this.y,
+      deltaX: xDelta,
+      deltaY: yDelta,
+      relativeScale,
+      scale: this.zoom,
+      transformOrigin: this.origin,
+    };
   }
 
   getCropDelta() {
@@ -206,7 +100,12 @@ class Cropper {
       xDelta: this.x - this.initialValues.x,
       yDelta: this.y - this.initialValues.y,
     };
+    // console.log('delta', delta);
     return delta;
+  }
+
+  getTransformOrigin(transformOrigin) {
+    return transformOrigin.replace(/px/gi, '').split(' ');
   }
 
   /**
@@ -216,6 +115,133 @@ class Cropper {
    */
   getResult() {
     return this.croppie.result();
+  }
+
+  getZoomRangeValue() {
+    return this.zoomRangeInput.value;
+  }
+
+  /**
+   *
+   * @returns {Array} - [x,y]
+   */
+  getTransformCoordinates(el) {
+    const img = el.querySelector('img');
+    const matrix = new WebKitCSSMatrix(img.style.transform);
+    return [matrix.m41, matrix.m42];
+  }
+
+  /* events */
+
+  attachEvents() {
+    this.zoomRangeInput.addEventListener('change', this.handleZoomRangeChange);
+    window.addEventListener('pointerdown', this.touchdown);
+    window.addEventListener('pointerup', this.touchup);
+  }
+
+  removeEvents() {
+    this.zoomRangeInput.removeEventListener('change', this.handleZoomRangeChange);
+    window.removeEventListener('pointerdown', this.touchdown);
+    window.removeEventListener('pointerup', this.touchup);
+  }
+
+  handleCrop(blob) {
+    this.croppie.result('blob').then(function (blob) {
+      console.log('blob');
+    });
+  }
+
+  handleUpdate(event) {
+    const {
+      detail: { points, zoom, orientation },
+    } = event;
+  }
+  handleZoomRangeChange(event) {
+    const {
+      target: { value },
+    } = event;
+    if (!this.initialValues?.zoom) {
+      this.initialValues.zoom = value;
+      const img = this.el.querySelector('img');
+      this.origin = this.getTransformOrigin(img.style.transformOrigin);
+    }
+    this.zoom = value;
+  }
+
+  touchdown(event) {
+    if (!this.initialValues.x) {
+      const [x, y] = this.getTransformCoordinates(this.el);
+      // const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
+      this.initialValues.x = x;
+      this.initialValues.y = y;
+      console.log('initialValues', x, y);
+    }
+  }
+
+  /**
+   *
+   * ******* HERE WE SET CURRENT SHIT
+   *
+   * Touchup
+   *
+   * set current values (only after establishing baseline)
+   *
+   * @param {Event} event
+   */
+  touchup(event) {
+    const { target } = event;
+    if (target.closest('.cropper') == null) {
+      event.preventDefault();
+      return false;
+    }
+    // const [x, y] = this.getTransformCoordinates(this.el);
+    const img = this.el.querySelector('img');
+    // const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
+    const [x, y] = this.getTransformCoordinates(this.el);
+    this.x = x;
+    this.y = y;
+    this.origin = this.getTransformOrigin(img.style.transformOrigin);
+    // const [originX, originY] = this.origin;
+    // const [imgX, imgY] = this.getTransformCoordinates(this.el);
+    // const minusOrigin = { x: Number(originX) + imgX, y: Number(originY) + imgY };
+    // console.log('minusOrigin', minusOrigin);
+    console.log('---------- touchup');
+    // console.log('current transform origin', this.origin);
+    // console.log('current zoom', this.zoom);
+    console.log('current x', x);
+    console.log('deltaX', this.getCropDelta().xDelta);
+
+    // pc = preview
+    // console.log('adjX', `(${center.x} - ${pc.x}) * (1 - ${scale});`);
+  }
+
+  /**
+   *
+   * @param {string} src - src url
+   */
+  updateSrc(src) {
+    const { points, zoom, orientation } = this.croppie.get();
+    this.croppie.bind({
+      url: src,
+      points,
+      zoom,
+    });
+  }
+
+  show() {
+    this.attachEvents();
+    this.el.style.display = '';
+    this.hidden = false;
+  }
+
+  hide() {
+    this.removeEvents();
+    this.el.style.display = 'none';
+    this.hidden = true;
+  }
+
+  destroy() {
+    this.croppie.destroy();
   }
 }
 
