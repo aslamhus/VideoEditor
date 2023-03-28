@@ -2,7 +2,7 @@ import Timeline from './Timeline/Timeline.js';
 
 import { createCropSVG } from './utils/svg-crop-overlay';
 import './video-editor.css';
-import '@fontawesome/css/font-awesome.min.css';
+// import '@fontawesome/css/font-awesome.min.css';
 
 class VideoEditor {
   /**
@@ -130,6 +130,7 @@ class VideoEditor {
      * to play the  entire length of the video.
      */
     console.info('loadedmetadata');
+    console.log('SETTING VIDEO TIME TO INIFNITY');
 
     this.video.currentTime = 1e101;
     const { videoWidth, videoHeight } = this.video;

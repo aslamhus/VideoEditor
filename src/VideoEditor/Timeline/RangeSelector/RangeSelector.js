@@ -317,9 +317,10 @@ class RangeSelector {
   /*** VIDEO EVENTS ***/
 
   handlePlay(event) {
-    const currentTime = this.video.currentTime.toFixed(this.timeIndexPrecision);
-    const outTime = this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision);
+    const currentTime = parseFloat(this.video.currentTime.toFixed(this.timeIndexPrecision));
+    const outTime = parseFloat(this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
     if (currentTime >= outTime) {
+      console.log(`currentTime ${currentTime}, outTime ${outTime}`);
       console.error('video playhead over range limit, returning playhead to inTime');
       this.playHead.toggleAnimate(false);
       this.video.currentTime = this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision);

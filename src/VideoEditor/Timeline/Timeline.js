@@ -91,18 +91,21 @@ class Timeline {
   }
 
   handleTimelineMouseDown(event) {
+    console.log('timeline mousedown', this.video.currentTime);
     event.preventDefault();
     const { offsetX, clientX, layerX, target, currentTarget } = event;
     /**
      * If cropper is enabled,
      * update the crop source
      */
-    if (!this.cropper.hidden) {
+    if (!this.cropper?.hidden) {
       this.getCurrentVideoFrameUrlObject().then((url) => {
         this.cropper.updateSrc(url);
       });
     }
+
     /**
+     *
      * If the range selector is enabled,
      * only allow click/touch inside range
      *  */
@@ -245,6 +248,7 @@ class Timeline {
 
   getCurrentVideoFrameUrlObject() {
     return new Promise((resolve) => {
+      return;
       const canvas = document.createElement('canvas');
       // set the resolution
       canvas.width = this.video.videoWidth;
@@ -269,7 +273,12 @@ class Timeline {
     let countFrames = 0;
     this.video.currentTime = 0;
     const framesContainer = this.createFramesContainer();
-
+    console.log('start time', this.video.currentTime);
+    const handleCanPlay = () => {
+      console.log('can play -> add seeked handler', this.video.currentTime);
+      this.video.currentTime = 0.5;
+      this.video.addEventListener('seeked', renderFrameOnSeek);
+    };
     const renderFrameOnSeek = (event) => {
       const frameContainer = this.createFrame(this.video.currentTime);
       const canvas = frameContainer.querySelector('canvas');
@@ -289,7 +298,6 @@ class Timeline {
       const videoDimensions = { width: this.video.videoWidth, height: this.video.videoHeight };
       const sourceCoordinates = this.computeCrop(videoDimensions);
       this.drawFrame(canvas, sourceCoordinates);
-
       canvas.style.width = '';
       // console.log(
       //   `countFrames ${countFrames}, frame limit ${this.frameTotalLimit}, timeIndex ${this.video.currentTime}, duration: ${this.video.duration}`
@@ -304,8 +312,13 @@ class Timeline {
       //     `frame interval: ${this.frameInterval}, video duration: ${this.video.duration}`
       //   );
       // }
+      // seek to next frame interval
+      const newFrameIndex = parseInt(countFrames + 1) * this.frameInterval;
 
-      const newFrameIndex = this.video.currentTime + this.frameInterval;
+      console.log(
+        `currentTime ${this.video.currentTime}, countFrames ${countFrames}, frameIndex ${newFrameIndex}`
+      );
+      console.log('newFrameIndex', newFrameIndex);
       if (countFrames < this.frameTotalLimit - 1) {
         this.video.currentTime = newFrameIndex;
       } else {
@@ -314,17 +327,19 @@ class Timeline {
           'color:green'
         );
         this.video.removeEventListener('seeked', renderFrameOnSeek);
+        this.video.removeEventListener('canplay', handleCanPlay);
         const myEvent = new Event('timelineReady');
         this.timeline.dispatchEvent(myEvent);
       }
       countFrames++;
     };
+
     // attach on seek event
-    this.video.addEventListener('seeked', renderFrameOnSeek);
+    this.video.addEventListener('canplay', handleCanPlay);
+
     // add frames container
     this.timeline.append(framesContainer);
     // begin rendering frames
-    this.video.currentTime += this.frameInterval;
   }
 
   /**
@@ -344,7 +359,7 @@ class Timeline {
   drawFrame(frame, sourceRect) {
     const [sX, sY, sWidth, sHeight] = sourceRect;
     const frameBounds = frame.getBoundingClientRect();
-    console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
+    // console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
     frame
       .getContext('2d')
       .drawImage(this.video, sX, sY, sWidth, sHeight, 0, 0, frameBounds.width, frameBounds.height);
