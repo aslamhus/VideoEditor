@@ -8,6 +8,7 @@ export default {
 
   output: {
     path: path.resolve(__dirname, '../dist/'),
+    publicPath: 'auto',
   },
   module: {
     rules: [
@@ -18,6 +19,13 @@ export default {
         },
       },
       { test: /\.m?js/, type: 'javascript/auto' },
+      {
+        test: /\.(ttf|eot|woff2|woff)/,
+        generator: {
+          //If emitting file, the file path is
+          filename: 'fonts/[hash][ext]',
+        },
+      },
 
       {
         test: /\.(scss|css)$/,

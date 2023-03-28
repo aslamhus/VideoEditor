@@ -4,6 +4,9 @@ import { createCropSVG } from './utils/svg-crop-overlay';
 import './video-editor.css';
 // import '@fontawesome/css/font-awesome.min.css';
 
+/**
+ * To do: find moment to revoke object url of video src
+ */
 class VideoEditor {
   /**
    *
@@ -58,7 +61,12 @@ class VideoEditor {
     this.video = document.createElement('video');
     this.video.id = 'video-preview';
     this.video.className = 'preview';
-    this.video.src = this.videoSrc;
+    let src = this.videoSrc;
+    if (this.videoSrc instanceof Blob) {
+      console.log('BLOBATHON!!!');
+      src = URL.createObjectURL(this.videoSrc);
+    }
+    this.video.src = src;
     this.video.autoplay = false;
     this.video.setAttribute('playsinline', 'true');
     this.video.setAttribute('webkit-playsinline', 'true');

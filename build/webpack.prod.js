@@ -6,4 +6,19 @@ export default merge(common, {
   entry: {
     VideoEditor: './src/VideoEditor/VideoEditor.js',
   },
+  output: {
+    filename: 'VideoEditor.js',
+    library: {
+      // name: 'VideoEditor',
+      type: 'module',
+      // type: 'var',
+      // export: 'default',
+    },
+
+    publicPath: 'auto',
+    clean: true,
+  },
+  experiments: {
+    outputModule: true,
+  },
 });

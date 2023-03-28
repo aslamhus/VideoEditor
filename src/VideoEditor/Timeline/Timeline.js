@@ -91,15 +91,15 @@ class Timeline {
   }
 
   handleTimelineMouseDown(event) {
-    console.log('timeline mousedown', this.video.currentTime);
     event.preventDefault();
     const { offsetX, clientX, layerX, target, currentTarget } = event;
     /**
      * If cropper is enabled,
      * update the crop source
      */
-    if (!this.cropper?.hidden) {
+    if (this.cropper && !this.cropper.hidden) {
       this.getCurrentVideoFrameUrlObject().then((url) => {
+        console.log('this.cropper', this.cropper);
         this.cropper.updateSrc(url);
       });
     }
@@ -127,7 +127,6 @@ class Timeline {
 
   handleTimelineMouseUp(event) {
     event.preventDefault();
-    console.log('mouseup');
     clearInterval(this.pressed);
     const { target } = event;
     if (!this.rangeSelector.hidden && !target.closest('.range-selector')) return;
@@ -248,7 +247,6 @@ class Timeline {
 
   getCurrentVideoFrameUrlObject() {
     return new Promise((resolve) => {
-      return;
       const canvas = document.createElement('canvas');
       // set the resolution
       canvas.width = this.video.videoWidth;
@@ -259,9 +257,11 @@ class Timeline {
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
       canvas.getContext('2d').drawImage(this.video, 0, 0);
+
       canvas.toBlob(
         (blob) => {
-          resolve(URL.createObjectURL(blob));
+          const urlObject = URL.createObjectURL(blob);
+          resolve(urlObject);
         },
         'image/jpg',
         100
@@ -315,10 +315,10 @@ class Timeline {
       // seek to next frame interval
       const newFrameIndex = parseInt(countFrames + 1) * this.frameInterval;
 
-      console.log(
-        `currentTime ${this.video.currentTime}, countFrames ${countFrames}, frameIndex ${newFrameIndex}`
-      );
-      console.log('newFrameIndex', newFrameIndex);
+      // console.log(
+      //   `currentTime ${this.video.currentTime}, countFrames ${countFrames}, frameIndex ${newFrameIndex}`
+      // );
+      // console.log('newFrameIndex', newFrameIndex);
       if (countFrames < this.frameTotalLimit - 1) {
         this.video.currentTime = newFrameIndex;
       } else {
@@ -366,7 +366,10 @@ class Timeline {
   }
 
   async initCropper() {
-    const src = await this.getCurrentVideoFrameUrlObject();
+    console.log('init cropper');
+    const src = await this.getCurrentVideoFrameUrlObject().catch((error) => {
+      console.error('cropper faied to init', error);
+    });
     const vidContainer = document.querySelector('.video-container');
     const cropContainer = vidContainer.querySelector('.crop-container');
     const { width: containerWidth, height: containerHeight } = vidContainer.getBoundingClientRect();
@@ -377,8 +380,6 @@ class Timeline {
 
     const viewport = { width: cropWidth, height: cropHeight };
     const boundary = { width: containerWidth, height: containerHeight };
-    console.log('viewport', viewport);
-    console.log('boundary', boundary);
     this.cropper = new Cropper({ src, el: cropContainer, viewport, boundary });
   }
 
