@@ -5,7 +5,6 @@ class Controls {
   constructor({ video, onPlayToggle, onTrimToggle, onPlayClick, onCropToggle }) {
     this.video = video;
     this.controls = null;
-
     this.playBtn = new PlayButton({ video, onPlayToggle, onPlayClick });
     this.trimBtn = new ControlButton({
       className: 'trim-btn',

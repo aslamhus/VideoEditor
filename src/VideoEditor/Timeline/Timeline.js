@@ -16,6 +16,7 @@ class Timeline {
     this.frameInterval = this.duration / this.frameTotalLimit;
     this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
     this.cropAspectRatio = this.crop.height / this.crop.width;
+    // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
     this.playHead = new PlayHead({
@@ -63,11 +64,10 @@ class Timeline {
           } else {
             this.cropVideo({
               styles: this.cropper.getTransformStyles(),
-              data: this.cropper.getCropData(),
-              delta: this.cropper.getCropDelta(),
-              initial: this.cropper.getInitialValues(),
-
-              relativeTransform: this.cropper.getRelativeTransformStyle(),
+              // data: this.cropper.getCropData(),
+              // delta: this.cropper.getCropDelta(),
+              // initial: this.cropper.getInitialValues(),
+              // relativeTransform: this.cropper.getRelativeTransformStyle(),
             });
             this.cropper.hide();
           }
@@ -156,7 +156,7 @@ class Timeline {
 
   /**
    * find the x and y position where Canvas should start drawing from
-   * in order to correct a frame with the correct dimensions.
+   * in order to draw a frame with the correct dimensions.
    *
    * The video is centered horizontally in a div that hides the video
    * overflowing the frame
@@ -183,6 +183,8 @@ class Timeline {
         anchor = this.cropAspectRatio > sourceAspect ? 'width' : 'height';
         break;
     }
+    // console.log('crop aspect ratio', this.cropAspectRatio);
+    // console.log('croptype', cropType);
     if (anchor == 'height') {
       cropHeight = height;
       cropWidth = cropHeight / this.cropAspectRatio;
@@ -195,82 +197,32 @@ class Timeline {
     return [x, y, cropWidth, cropHeight];
   }
 
+  /**
+   * Get crop
+   *
+   * @returns {object} - {w,h,x,y,scale}
+   */
+  getCrop() {
+    const {
+      points,
+      points: [aX, aY, bX, bY],
+      zoom,
+    } = this.cropper.getResult();
+    console.log('points', points);
+    // points : [topLeftX, topLeftY, bottomRightX, bottomRightY]
+    // document.body.append(result);
+    // const crOverlayBounds = document.querySelector('.cr-overlay').getBoundingClientRect();
+    // const crViewport = document.querySelector('.cr-overlay').getBoundingClientRect();
+    const w = bX - aX;
+    const h = bY - aY;
+    const x = aX;
+    const y = aY;
+    return { w, h, x, y, scale: zoom.toFixed(3) };
+  }
+
   cropVideo({ styles, data, delta, initial, relativeTransform }) {
-    const vidWrap = this.video.closest('.video-wrap');
-    console.log('style', styles);
-    // console.log('data', data);
-    console.log('--------------- CROP ----------');
-    console.log('initial', initial);
-    console.log('delta', delta);
-    console.log('relativeTransform', relativeTransform);
-    let { x, y, scale, transformOrigin, deltaX } = relativeTransform;
-    x = x * scale;
-    // console.log('x should equal deltaX', x);
-    // const [originX, originY] = transformOrigin;
-    // const adj = {};
-    // adjustments will be 0 if scale = 1
-    // adj.x = parseFloat(originX) * (1 - scale);
-    // adj.y = parseFloat(originY) * (1 - scale);
-    const newScale = 1 + delta.zoomDelta / parseFloat(initial.zoom);
-    // console.log('newScale', newScale);
-    const matrix = new WebKitCSSMatrix(this.video.style.transform);
-    const { m41: videoX, m42: videoY } = matrix;
-
-    const newX = delta.xDelta + videoX;
-
-    const newY = delta.yDelta + videoY;
-
-    console.log(`newX::: deltaX ${delta.xDelta}, videoX ${videoX} = ${newX}`);
-    // apply
-    console.log(`newScale::: 1 + ${delta.zoomDelta} / ${initial.zoom} = ${newScale}`);
-    // this.video.style.transform = `scale(${newScale}) translate(${newX}px,${newY}px)`;
-    // this.video.style.setProperty('transform', `translate3d(${newX}px, 0, 0) scale(${newScale})`);
     this.video.style.transform = styles.transform;
     this.video.style.transformOrigin = styles.transformOrigin;
-    setTimeout(() => {
-      console.log('video new transform', this.video.style.transform);
-    }, 500);
-
-    // this.video.style.transform = `translateX(${Math.random() * 10}px)`;
-
-    // this.video.style.transform = `translate(${x - adj.x}px, ${y - adj.y}px) scale(${scale})`;
-    // this.video.style.transform = `translate(${x}px, ${y}px)`;
-    // vidWrap.style.transform = `scale(${scale})`;
-    // console.log('styles', styles);
-
-    /**
-     *
-     * Day 2
-     *
-     * Initial zoom is calculate from boundary
-     *
-     * i.e. cr-boundary is 600 x 337.5
-     * img resolution is 1920 x 1080
-     * calculate orientation of boundary and img
-     * assuming both rectangles have same aspect ratio
-     * anchor is height.
-     * 337.5 / 1080 = 0.3125
-     *
-     * scale of 1 = 0.3125
-     * increase of x = increase of 0.0875
-     *
-     * 1 + x = 0.3125 +
-     *
-     *
-     * ----
-     *
-     *
-     * You  need to start again.
-     *
-     * Figure out the conversion for:
-     * 1) Transform origin (centering scale values) -> how does it translate to your system
-     * 2) Transform scale (we have already done this)
-     * 3) Transform x, y (this needs to be based on transform origin)
-     * x/y coordinates are working. Zoom, however is causing
-     * x / y coordinates to change in croppie. This gives
-     * incorrect x / y coordinates for crop conversion.
-     *
-     */
   }
 
   getCurrentVideoFrameUrlObject() {
@@ -301,9 +253,7 @@ class Timeline {
     let countFrames = 0;
     this.video.currentTime = 0;
     const framesContainer = this.createFramesContainer();
-    console.log('start time', this.video.currentTime);
     const handleCanPlay = () => {
-      console.log('can play -> add seeked handler', this.video.currentTime);
       this.video.currentTime = 0.5;
       this.video.addEventListener('seeked', renderFrameOnSeek);
     };
@@ -313,40 +263,18 @@ class Timeline {
       // set canvas canvas aspect ratio
       const frameHeight = this.getTimelineElement().getBoundingClientRect().height;
       // if landscape divide, if portrait multiple
-
       const frameWidth = frameHeight / this.cropAspectRatio;
-
       canvas.width = frameWidth;
       canvas.height = frameHeight;
       canvas.style.width = frameWidth + 'px';
-
-      // console.log('frameWidth', frameHeight / this.cropAspectRatio);
-      // console.log('frameHeight', frameHeight);
       framesContainer.append(frameContainer);
       const videoDimensions = { width: this.video.videoWidth, height: this.video.videoHeight };
       const sourceCoordinates = this.computeCrop(videoDimensions);
       this.drawFrame(canvas, sourceCoordinates);
       canvas.style.width = '';
-      // console.log(
-      //   `countFrames ${countFrames}, frame limit ${this.frameTotalLimit}, timeIndex ${this.video.currentTime}, duration: ${this.video.duration}`
-      // );
-      // if (countFrames > this.frameTotalLimit - 1) {
-      //   console.error(
-      //     'exceedeed total frame limit: countFrames, frameTimeIndex',
-      //     countFrames,
-      //     this.video.currentTime
-      //   );
-      //   console.info(
-      //     `frame interval: ${this.frameInterval}, video duration: ${this.video.duration}`
-      //   );
-      // }
-      // seek to next frame interval
+
       const newFrameIndex = parseInt(countFrames + 1) * this.frameInterval;
 
-      // console.log(
-      //   `currentTime ${this.video.currentTime}, countFrames ${countFrames}, frameIndex ${newFrameIndex}`
-      // );
-      // console.log('newFrameIndex', newFrameIndex);
       if (countFrames < this.frameTotalLimit - 1) {
         this.video.currentTime = newFrameIndex;
       } else {
@@ -394,7 +322,6 @@ class Timeline {
   }
 
   async initCropper() {
-    console.log('init cropper');
     this.video.style.width = 'auto';
     const src = await this.getCurrentVideoFrameUrlObject().catch((error) => {
       console.error('cropper faied to init', error);
@@ -406,7 +333,9 @@ class Timeline {
       width: containerWidth,
       height: containerHeight,
     });
-
+    console.log(`cropWidth ${cropWidth} cropheight ${cropHeight}`);
+    // viewport not working for landscape - check computerCrop method.
+    // const viewport = { width: cropWidth, height: cropHeight };
     const viewport = { width: cropWidth, height: cropHeight };
     const boundary = { width: containerWidth, height: containerHeight };
     this.cropper = new Cropper({ src, el: cropContainer, viewport, boundary });

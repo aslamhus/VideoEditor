@@ -153,6 +153,16 @@ class VideoEditor {
   //   oldVideo.parentElement.insertBefore(this.createVideoEditor(), oldVideo);
   // }
 
+  saveVideo() {
+    const crop = this.timeline.getCrop();
+    console.log('crop', crop);
+    // const in = this.timeline.rangeSelector;
+    const inMarker = this.timeline.rangeSelector.inMarker.getTimeIndex();
+    const outMarker = this.timeline.rangeSelector.outMarker.getTimeIndex();
+    // get crop, time in / out
+    return { crop, time: { in: inMarker, out: outMarker } };
+  }
+
   render(container) {
     container.append(this.createVideoEditor());
   }

@@ -1,5 +1,7 @@
 /** Controls **/
 .video-editor-controls {
+  position: relative;
+  z-index: 99999;
   margin-top: 1.5rem;
   display: flex;
   flex-direction: row;

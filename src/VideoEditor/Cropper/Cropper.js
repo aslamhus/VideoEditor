@@ -231,13 +231,6 @@ class Cropper {
     });
   }
 
-  show() {
-    this.resetInitialValues();
-    this.attachEvents();
-    this.el.style.display = '';
-    this.hidden = false;
-  }
-
   resetInitialValues() {
     // this.initialValues = { x: null, y: null, zoom: null };
     const [x, y] = this.getTransformCoordinates(this.el);
@@ -251,12 +244,23 @@ class Cropper {
 
   hide() {
     this.removeEvents();
-    this.el.style.display = 'none';
+    this.el.style.visibility = 'hidden';
     this.hidden = true;
+  }
+
+  show() {
+    this.resetInitialValues();
+    this.attachEvents();
+    this.el.style.visibility = 'visible';
+    this.hidden = false;
   }
 
   destroy() {
     this.croppie.destroy();
+  }
+
+  getResult() {
+    return this.croppie.get();
   }
 }
 

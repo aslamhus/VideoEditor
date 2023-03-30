@@ -41,9 +41,13 @@
   position: relative;
   /* overflow: hidden; */
 }
+.video-wrap,
+.video-editor-container {
+  /* overflow: visible !important; */
+  overflow: hidden;
+}
 .video-wrap {
   position: relative;
-  overflow: hidden;
 }
 .video-wrap,
 .video-wrap video {
