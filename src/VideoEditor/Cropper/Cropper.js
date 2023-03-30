@@ -37,7 +37,7 @@ class Cropper {
     });
     this.el = el;
     this.elementValues = { x: null, y: null, zoom: null };
-    this.initialValues = { x: null, y: null, zoom: null };
+
     this.zoomRangeInput = el.querySelector('input[type=range]');
     this.img = el.querySelector('img');
     this.hidden = false;
@@ -45,11 +45,14 @@ class Cropper {
     this.x = 0;
     this.y = 0;
     this.origin = 0;
-    this.getInitialElementValues();
+    // this.getInitialElementValues();
     this.touchdown = this.touchdown.bind(this);
     this.touchup = this.touchup.bind(this);
     this.handleZoomRangeChange = this.handleZoomRangeChange.bind(this);
     this.attachEvents();
+    this.initialValues = { x: null, y: null, zoom: null };
+
+    // this.resetInitialValues();
   }
 
   getTransformStyles() {
@@ -78,7 +81,7 @@ class Cropper {
 
   getRelativeTransformStyle() {
     // get relative zoom
-    console.log('---------- crop finished');
+    // console.log('---------- crop finished');
     const ratio = this.elementValues.zoom / this.initialValues.zoom;
     const { xDelta, yDelta, zoomDelta: zoom } = this.getCropDelta();
     const relativeScale = ((zoom || 0) + Number(this.initialValues.zoom)) * ratio;
@@ -96,9 +99,9 @@ class Cropper {
 
   getCropDelta() {
     const delta = {
-      zoomDelta: this.zoom - this.initialValues.zoom,
-      xDelta: this.x - this.initialValues.x,
-      yDelta: this.y - this.initialValues.y,
+      zoomDelta: this.zoom ? this.zoom - this.initialValues.zoom : 0,
+      xDelta: this.x ? this.x - this.initialValues.x : 0,
+      yDelta: this.y ? this.y - this.initialValues.y : 0,
     };
     // console.log('delta', delta);
     return delta;
@@ -174,7 +177,7 @@ class Cropper {
       // const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
       this.initialValues.x = x;
       this.initialValues.y = y;
-      console.log('initialValues', x, y);
+      // console.log('initialValues', x, y);
     }
   }
 
@@ -205,11 +208,11 @@ class Cropper {
     // const [imgX, imgY] = this.getTransformCoordinates(this.el);
     // const minusOrigin = { x: Number(originX) + imgX, y: Number(originY) + imgY };
     // console.log('minusOrigin', minusOrigin);
-    console.log('---------- touchup');
+    // console.log('---------- touchup');
     // console.log('current transform origin', this.origin);
     // console.log('current zoom', this.zoom);
-    console.log('current x', x);
-    console.log('deltaX', this.getCropDelta().xDelta);
+    // console.log('current x', x);
+    // console.log('deltaX', this.getCropDelta().xDelta);
 
     // pc = preview
     // console.log('adjX', `(${center.x} - ${pc.x}) * (1 - ${scale});`);
@@ -229,9 +232,21 @@ class Cropper {
   }
 
   show() {
+    this.resetInitialValues();
     this.attachEvents();
     this.el.style.display = '';
     this.hidden = false;
+  }
+
+  resetInitialValues() {
+    // this.initialValues = { x: null, y: null, zoom: null };
+    const [x, y] = this.getTransformCoordinates(this.el);
+    // const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
+    this.initialValues.x = x;
+    this.initialValues.y = y;
+    this.x = x;
+    this.y = y;
+    // this.initialValues.zoom = this.zoomRangeInput.value;
   }
 
   hide() {

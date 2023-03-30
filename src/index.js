@@ -7,13 +7,13 @@ let renderDiv;
 window.onload = async () => {
   renderDiv = document.getElementById('render');
   const uploadBtn = document.querySelector('button');
-  // const video = document.querySelector('video');
+  const video = document.querySelector('video');
   const url =
     'https://res.cloudinary.com/dmxpkxal2/video/upload/v1672906170/test-video-transformation1672906153322.mp4';
 
-  let videoBlob = await fetch(url).then((r) => r.blob());
-  console.log('videoBlob', videoBlob);
-  const editor = new VideoEditor({ videoSrc: videoBlob, crop });
+  // let videoBlob = await fetch(url).then((r) => r.blob());
+  // console.log('videoBlob', videoBlob);
+  const editor = new VideoEditor({ videoSrc: video.src, crop });
   editor.render(renderDiv);
   uploadBtn.onclick = handleUploadBtnClick;
 };

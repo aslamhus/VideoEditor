@@ -62,6 +62,11 @@ class Timeline {
             this.cropper.show();
           } else {
             this.cropVideo({
+              styles: this.cropper.getTransformStyles(),
+              data: this.cropper.getCropData(),
+              delta: this.cropper.getCropDelta(),
+              initial: this.cropper.getInitialValues(),
+
               relativeTransform: this.cropper.getRelativeTransformStyle(),
             });
             this.cropper.hide();
@@ -99,7 +104,6 @@ class Timeline {
      */
     if (this.cropper && !this.cropper.hidden) {
       this.getCurrentVideoFrameUrlObject().then((url) => {
-        console.log('this.cropper', this.cropper);
         this.cropper.updateSrc(url);
       });
     }
@@ -193,19 +197,43 @@ class Timeline {
 
   cropVideo({ styles, data, delta, initial, relativeTransform }) {
     const vidWrap = this.video.closest('.video-wrap');
-    console.log('--------- Received Values');
+    console.log('style', styles);
+    // console.log('data', data);
+    console.log('--------------- CROP ----------');
+    console.log('initial', initial);
+    console.log('delta', delta);
+    console.log('relativeTransform', relativeTransform);
     let { x, y, scale, transformOrigin, deltaX } = relativeTransform;
-    console.log('scale', scale);
     x = x * scale;
-    console.log('deltaX', deltaX);
-    console.log('x should equal deltaX', x);
-    const [originX, originY] = transformOrigin;
-    const adj = {};
-    console.log('transformOrigin', transformOrigin);
+    // console.log('x should equal deltaX', x);
+    // const [originX, originY] = transformOrigin;
+    // const adj = {};
     // adjustments will be 0 if scale = 1
-    adj.x = parseFloat(originX) * (1 - scale);
-    adj.y = parseFloat(originY) * (1 - scale);
-    this.video.style.transform = `translate(${x - adj.x}px, ${y - adj.y}px) scale(${scale})`;
+    // adj.x = parseFloat(originX) * (1 - scale);
+    // adj.y = parseFloat(originY) * (1 - scale);
+    const newScale = 1 + delta.zoomDelta / parseFloat(initial.zoom);
+    // console.log('newScale', newScale);
+    const matrix = new WebKitCSSMatrix(this.video.style.transform);
+    const { m41: videoX, m42: videoY } = matrix;
+
+    const newX = delta.xDelta + videoX;
+
+    const newY = delta.yDelta + videoY;
+
+    console.log(`newX::: deltaX ${delta.xDelta}, videoX ${videoX} = ${newX}`);
+    // apply
+    console.log(`newScale::: 1 + ${delta.zoomDelta} / ${initial.zoom} = ${newScale}`);
+    // this.video.style.transform = `scale(${newScale}) translate(${newX}px,${newY}px)`;
+    // this.video.style.setProperty('transform', `translate3d(${newX}px, 0, 0) scale(${newScale})`);
+    this.video.style.transform = styles.transform;
+    this.video.style.transformOrigin = styles.transformOrigin;
+    setTimeout(() => {
+      console.log('video new transform', this.video.style.transform);
+    }, 500);
+
+    // this.video.style.transform = `translateX(${Math.random() * 10}px)`;
+
+    // this.video.style.transform = `translate(${x - adj.x}px, ${y - adj.y}px) scale(${scale})`;
     // this.video.style.transform = `translate(${x}px, ${y}px)`;
     // vidWrap.style.transform = `scale(${scale})`;
     // console.log('styles', styles);
@@ -367,6 +395,7 @@ class Timeline {
 
   async initCropper() {
     console.log('init cropper');
+    this.video.style.width = 'auto';
     const src = await this.getCurrentVideoFrameUrlObject().catch((error) => {
       console.error('cropper faied to init', error);
     });
