@@ -60,7 +60,10 @@ class Timeline {
           this.initCropper();
         } else {
           if (toggle) {
-            this.cropper.show();
+            this.getCurrentVideoFrameUrlObject().then((url) => {
+              this.cropper.updateSrc(url);
+              this.cropper.show();
+            });
           } else {
             this.cropVideo({
               styles: this.cropper.getTransformStyles(),
@@ -91,22 +94,31 @@ class Timeline {
   attachTimelineEvents() {
     this.timeline.addEventListener('mousedown', this.handleTimelineMouseDown.bind(this));
     this.timeline.addEventListener('mouseup', this.handleTimelineMouseUp.bind(this));
+    this.video.addEventListener('timeupdate', this.timeupdate.bind(this));
     this.video.addEventListener('pause', this.handlePause.bind(this));
     this.video.addEventListener('playing', this.handlePlaying.bind(this));
+  }
+
+  timeupdate() {
+    /**
+     * If cropper is enabled,
+     * update the crop source
+     */
+    requestAnimationFrame(() => {
+      if (this.cropper && !this.cropper.hidden) {
+        this.getCurrentVideoFrameUrlObject().then((url) => {
+          this.cropper.updateSrc(url);
+          // const img = document.createElement('img');
+          // img.src = url;
+          // document.body.append(img);
+        });
+      }
+    });
   }
 
   handleTimelineMouseDown(event) {
     event.preventDefault();
     const { offsetX, clientX, layerX, target, currentTarget } = event;
-    /**
-     * If cropper is enabled,
-     * update the crop source
-     */
-    if (this.cropper && !this.cropper.hidden) {
-      this.getCurrentVideoFrameUrlObject().then((url) => {
-        this.cropper.updateSrc(url);
-      });
-    }
 
     /**
      *
@@ -236,8 +248,8 @@ class Timeline {
       const { width, height } = vidContainer.getBoundingClientRect();
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
+      canvas.style.border = '1px solid red';
       canvas.getContext('2d').drawImage(this.video, 0, 0);
-
       canvas.toBlob(
         (blob) => {
           const urlObject = URL.createObjectURL(blob);

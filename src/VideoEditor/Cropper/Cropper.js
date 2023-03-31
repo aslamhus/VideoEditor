@@ -219,12 +219,14 @@ class Cropper {
   }
 
   /**
-   *
+   * Update src
    * @param {string} src - src url
+   * @returns {Promise} - returns a promise that resolves when the croppie src has been loaded
    */
   updateSrc(src) {
     const { points, zoom, orientation } = this.croppie.get();
-    this.croppie.bind({
+
+    return this.croppie.bind({
       url: src,
       points,
       zoom,
