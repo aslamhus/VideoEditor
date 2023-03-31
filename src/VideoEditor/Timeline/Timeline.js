@@ -215,6 +215,7 @@ class Timeline {
    * @returns {object} - {w,h,x,y,scale}
    */
   getCrop() {
+    if (!this.cropper) return {};
     const {
       points,
       points: [aX, aY, bX, bY],
