@@ -3,6 +3,7 @@ import './timestamp.css';
 class Timestamp {
   constructor() {
     this.timestamp = null;
+    this.fadeOutTime = 0.5;
   }
 
   show() {
@@ -42,6 +43,7 @@ class Timestamp {
   createTimestampElement() {
     this.timestamp = document.createElement('div');
     this.timestamp.className = 'timestamp';
+    this.timestamp.style.transition = `opacity ${this.fadeOutTime}s ease`;
     const p = document.createElement('p');
     this.timestamp.append(p);
     return this.timestamp;
