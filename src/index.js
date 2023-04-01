@@ -6,10 +6,10 @@ const testUrls = {
   aslam:
     'https://res.cloudinary.com/dmxpkxal2/video/upload/v1672906170/test-video-transformation1672906153322.mp4',
 };
-const crop = { width: 5, height: 3 };
+const crop = { width: 6, height: 3 };
 let maxHeight = 300;
 let renderDiv, vidEditor;
-const url = testUrls.ira;
+const url = testUrls.aslam;
 
 window.onload = async () => {
   renderDiv = document.getElementById('render');

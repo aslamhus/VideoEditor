@@ -15,7 +15,7 @@ class Timeline {
     this.frameTotalLimit = frameTotalLimit; // eventually will be timeline width divided by frame width
     this.frameInterval = this.duration / this.frameTotalLimit;
     this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
-    this.cropAspectRatio = this.crop.height / this.crop.width;
+    this.cropAspectRatio = this.crop.width / this.crop.height;
     // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
@@ -180,25 +180,34 @@ class Timeline {
     const sourceAspect = width / height;
     let anchor, cropHeight, cropWidth;
     let cropType = this.getCropType(this.cropAspectRatio);
+    console.log('crop aspect ratio', this.cropAspectRatio);
+    console.log('croptype', cropType);
     switch (cropType) {
       case 'portrait':
+        // where a portrait crop aspect ratio is less than the video's aspect
         anchor = this.cropAspectRatio < sourceAspect ? 'width' : 'height';
       case 'square':
       case 'landscape':
+        // were a landscape crop aspect ratio is greater than the video's aspect
         anchor = this.cropAspectRatio > sourceAspect ? 'width' : 'height';
         break;
     }
-    console.log('crop aspect ratio', this.cropAspectRatio);
-    console.log('croptype', cropType);
+    console.log('anchor', anchor);
     if (anchor == 'height') {
       cropHeight = height;
-      cropWidth = cropHeight / this.cropAspectRatio;
+      cropWidth = cropHeight * this.cropAspectRatio;
     } else {
       cropWidth = width;
-      cropHeight = cropWidth * this.cropAspectRatio;
+      cropHeight = cropWidth / this.cropAspectRatio;
     }
-    const x = (width - cropWidth) / 2;
-    const y = (height - cropHeight) / 2;
+
+    console.log(`sourceWidth ${width} / sourceHeight ${height}`);
+    console.log(`cropWidth ${cropWidth} / cropHeight ${cropHeight}`);
+    let x = (width - cropWidth) / 2;
+    // if (x < 0) x = 0;
+    let y = (height - cropHeight) / 2;
+    // if( y < 0) y = 0;
+    console.log('x, y', x, y);
     return [x, y, cropWidth, cropHeight];
   }
 
@@ -281,7 +290,7 @@ class Timeline {
       // set canvas canvas aspect ratio
       const frameHeight = this.getTimelineElement().getBoundingClientRect().height;
       // if landscape divide, if portrait multiple
-      const frameWidth = frameHeight / this.cropAspectRatio;
+      const frameWidth = frameHeight * this.cropAspectRatio;
       canvas.width = frameWidth;
       canvas.height = frameHeight;
       canvas.style.width = frameWidth + 'px';
@@ -333,7 +342,7 @@ class Timeline {
   drawFrame(frame, sourceRect) {
     const [sX, sY, sWidth, sHeight] = sourceRect;
     const frameBounds = frame.getBoundingClientRect();
-    // console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
+    console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
     frame
       .getContext('2d')
       .drawImage(this.video, sX, sY, sWidth, sHeight, 0, 0, frameBounds.width, frameBounds.height);
