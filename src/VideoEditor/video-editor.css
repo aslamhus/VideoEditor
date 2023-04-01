@@ -39,7 +39,10 @@
 }
 .video-container {
   position: relative;
-  /* overflow: hidden; */
+
+  overflow: hidden;
+
+  margin: 0 auto;
 }
 .video-wrap,
 .video-editor-container {
@@ -48,6 +51,7 @@
 }
 .video-wrap {
   position: relative;
+  /* max-height: 200px; */
 }
 .video-wrap,
 .video-wrap video {

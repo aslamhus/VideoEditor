@@ -14,7 +14,7 @@ class VideoEditor {
    * @property {Blob|String} videoSrc
    * @property {Object}  crop - the width and height of video crop
    */
-  constructor({ videoSrc, crop }) {
+  constructor({ videoSrc, crop, maxHeight = 300 }) {
     if (!(videoSrc instanceof Blob) && typeof videoSrc != 'string') {
       throw new TypeError('video src must be a Blob or url');
     }
@@ -23,7 +23,7 @@ class VideoEditor {
     this.video = null;
     this.videoEditorContainer = null;
     this.timeline = null;
-
+    this.maxHeight = maxHeight;
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
   }
 
@@ -120,6 +120,17 @@ class VideoEditor {
     const aspectRatio = height / width;
     console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
     const vidWrap = this.video.closest('.video-wrap');
+
+    const vidContainer = this.video.closest('.video-container');
+    const vidBounds = this.video.getBoundingClientRect();
+    console.log('vidBounds', vidBounds);
+    if (vidBounds.height > this.maxHeight) {
+      // find width based on maxHeight of video.
+      let vidMaxWidth;
+      vidMaxWidth = 300 / aspectRatio;
+      console.log('vidMaxWidth', vidMaxWidth);
+      vidContainer.style.width = `${vidMaxWidth}px`;
+    }
     vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
   }
 

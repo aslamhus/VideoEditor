@@ -1,11 +1,15 @@
 import VideoEditor from './VideoEditor/VideoEditor';
 import { FileSelect } from '@aslamhus/fileselect';
 
-const crop = { width: 3, height: 5 };
+const testUrls = {
+  ira: 'https://res.cloudinary.com/dmxpkxal2/video/upload/v1675975714/test-video-transformation1675975616404.mp4',
+  aslam:
+    'https://res.cloudinary.com/dmxpkxal2/video/upload/v1672906170/test-video-transformation1672906153322.mp4',
+};
+const crop = { width: 5, height: 3 };
 
 let renderDiv, vidEditor;
-const url =
-  'https://res.cloudinary.com/dmxpkxal2/video/upload/v1672906170/test-video-transformation1672906153322.mp4';
+const url = testUrls.ira;
 
 window.onload = async () => {
   renderDiv = document.getElementById('render');
