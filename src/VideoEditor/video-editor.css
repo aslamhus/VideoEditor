@@ -40,8 +40,6 @@
 .video-container {
   position: relative;
 
-  overflow: hidden;
-
   margin: 0 auto;
 }
 .video-wrap,
