@@ -179,14 +179,7 @@ class Timeline {
     }
     const sourceAspect = width / height;
     let anchor, cropHeight, cropWidth;
-    let cropType;
-    if (this.cropAspectRatio > 1) {
-      cropType = 'landscape';
-    } else if (this.cropAspectRatio < 1) {
-      cropType = 'portrait';
-    } else {
-      cropType = 'square';
-    }
+    let cropType = this.getCropType(this.cropAspectRatio);
     switch (cropType) {
       case 'portrait':
         anchor = this.cropAspectRatio < sourceAspect ? 'width' : 'height';
@@ -195,8 +188,8 @@ class Timeline {
         anchor = this.cropAspectRatio > sourceAspect ? 'width' : 'height';
         break;
     }
-    // console.log('crop aspect ratio', this.cropAspectRatio);
-    // console.log('croptype', cropType);
+    console.log('crop aspect ratio', this.cropAspectRatio);
+    console.log('croptype', cropType);
     if (anchor == 'height') {
       cropHeight = height;
       cropWidth = cropHeight / this.cropAspectRatio;
@@ -207,6 +200,18 @@ class Timeline {
     const x = (width - cropWidth) / 2;
     const y = (height - cropHeight) / 2;
     return [x, y, cropWidth, cropHeight];
+  }
+
+  getCropType(aspectRatio) {
+    let cropType;
+    if (aspectRatio > 1) {
+      cropType = 'landscape';
+    } else if (aspectRatio < 1) {
+      cropType = 'portrait';
+    } else {
+      cropType = 'square';
+    }
+    return cropType;
   }
 
   /**
