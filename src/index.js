@@ -7,7 +7,7 @@ const testUrls = {
     'https://res.cloudinary.com/dmxpkxal2/video/upload/v1672906170/test-video-transformation1672906153322.mp4',
 };
 const crop = { width: 5, height: 3 };
-
+let maxHeight = 300;
 let renderDiv, vidEditor;
 const url = testUrls.ira;
 
@@ -19,7 +19,7 @@ window.onload = async () => {
 
   let videoBlob = await fetch(url).then((r) => r.blob());
   // console.log('videoBlob', videoBlob);
-  vidEditor = new VideoEditor({ videoSrc: videoBlob, crop });
+  vidEditor = new VideoEditor({ videoSrc: videoBlob, crop, maxHeight });
   vidEditor.render(renderDiv);
   uploadBtn.onclick = handleUploadBtnClick;
   saveBtn.onclick = handleSaveBtnClick;
@@ -31,7 +31,7 @@ function handleUploadBtnClick(event) {
   new FileSelect('video/*').select().then((files) => {
     const [videoFile] = files;
     const blob = URL.createObjectURL(videoFile);
-    vidEditor = new VideoEditor({ videoSrc: blob, crop });
+    vidEditor = new VideoEditor({ videoSrc: blob, crop, maxHeight });
     vidEditor.render(renderDiv);
   });
 }

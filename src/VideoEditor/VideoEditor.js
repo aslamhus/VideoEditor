@@ -14,7 +14,7 @@ class VideoEditor {
    * @property {Blob|String} videoSrc
    * @property {Object}  crop - the width and height of video crop
    */
-  constructor({ videoSrc, crop, maxHeight = 300 }) {
+  constructor({ videoSrc, crop, maxHeight }) {
     if (!(videoSrc instanceof Blob) && typeof videoSrc != 'string') {
       throw new TypeError('video src must be a Blob or url');
     }
@@ -23,7 +23,7 @@ class VideoEditor {
     this.video = null;
     this.videoEditorContainer = null;
     this.timeline = null;
-    this.maxHeight = maxHeight;
+    this.maxHeight = maxHeight || 300;
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
   }
 
@@ -118,17 +118,14 @@ class VideoEditor {
   updateVideoContainerDimensions(width, height) {
     // aspect ratio of device
     const aspectRatio = height / width;
-    console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
+    // console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
     const vidWrap = this.video.closest('.video-wrap');
-
     const vidContainer = this.video.closest('.video-container');
     const vidBounds = this.video.getBoundingClientRect();
-    console.log('vidBounds', vidBounds);
     if (vidBounds.height > this.maxHeight) {
       // find width based on maxHeight of video.
       let vidMaxWidth;
-      vidMaxWidth = 300 / aspectRatio;
-      console.log('vidMaxWidth', vidMaxWidth);
+      vidMaxWidth = this.maxHeight / aspectRatio;
       vidContainer.style.width = `${vidMaxWidth}px`;
     }
     vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
@@ -149,7 +146,6 @@ class VideoEditor {
      * to play the  entire length of the video.
      */
     console.info('loadedmetadata');
-    console.log('SETTING VIDEO TIME TO INIFNITY');
 
     this.video.currentTime = 1e101;
     const { videoWidth, videoHeight } = this.video;
@@ -166,7 +162,6 @@ class VideoEditor {
 
   saveVideo() {
     const crop = this.timeline.getCrop();
-    console.log('crop', crop);
     // const in = this.timeline.rangeSelector;
     const inMarker = this.timeline.rangeSelector.inMarker.getTimeIndex();
     const outMarker = this.timeline.rangeSelector.outMarker.getTimeIndex();
