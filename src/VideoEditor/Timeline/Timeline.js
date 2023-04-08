@@ -5,7 +5,8 @@ import Cropper from '../Cropper/Cropper.js';
 import './timeline.css';
 
 class Timeline {
-  constructor({ video, duration, frameTotalLimit = 10, crop }) {
+  constructor({ video, duration, frameTotalLimit = 10, crop, transformations, onReady }) {
+    console.log('transformations', transformations);
     this.video = video;
     // video
     if (!isFinite(duration)) {
@@ -16,6 +17,8 @@ class Timeline {
     this.frameInterval = this.duration / this.frameTotalLimit;
     this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
     this.cropAspectRatio = this.crop.width / this.crop.height;
+    this.transformations = transformations;
+    this.onReady = onReady;
     // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
@@ -34,6 +37,10 @@ class Timeline {
       getTimelineElement: this.getTimelineElement.bind(this),
       getVideoDuration: this.getVideoDuration.bind(this),
       setVideoTimeIndex: this.setVideoTimeIndex.bind(this),
+      initialMarkers: {
+        in: this.transformations?.time?.in || 0,
+        out: this.transformations?.time?.out || null,
+      },
     });
 
     this.controls = new Controls({
@@ -56,24 +63,13 @@ class Timeline {
         }
       },
       onCropToggle: async ({ target, toggle }) => {
-        if (!this.cropper) {
-          this.initCropper();
+        if (toggle) {
+          this.getCurrentVideoFrameUrlObject().then((url) => {
+            this.cropper.updateSrc(url);
+            this.cropper.show();
+          });
         } else {
-          if (toggle) {
-            this.getCurrentVideoFrameUrlObject().then((url) => {
-              this.cropper.updateSrc(url);
-              this.cropper.show();
-            });
-          } else {
-            this.cropVideo({
-              styles: this.cropper.getTransformStyles(),
-              // data: this.cropper.getCropData(),
-              // delta: this.cropper.getCropDelta(),
-              // initial: this.cropper.getInitialValues(),
-              // relativeTransform: this.cropper.getRelativeTransformStyle(),
-            });
-            this.cropper.hide();
-          }
+          this.applyCrop();
         }
       },
     });
@@ -166,6 +162,17 @@ class Timeline {
     this.playHead.toggleAnimate(false);
   }
 
+  applyCrop() {
+    this.cropVideo({
+      styles: this.cropper.getTransformStyles(),
+      // data: this.cropper.getCropData(),
+      // delta: this.cropper.getCropDelta(),
+      // initial: this.cropper.getInitialValues(),
+      // relativeTransform: this.cropper.getRelativeTransformStyle(),
+    });
+    this.cropper.hide();
+  }
+
   /**
    * find the x and y position where Canvas should start drawing from
    * in order to draw a frame with the correct dimensions.
@@ -180,8 +187,6 @@ class Timeline {
     const sourceAspect = width / height;
     let anchor, cropHeight, cropWidth;
     let cropType = this.getCropType(this.cropAspectRatio);
-    console.log('crop aspect ratio', this.cropAspectRatio);
-    console.log('croptype', cropType);
     switch (cropType) {
       case 'portrait':
         // where a portrait crop aspect ratio is less than the video's aspect
@@ -192,7 +197,6 @@ class Timeline {
         anchor = this.cropAspectRatio > sourceAspect ? 'width' : 'height';
         break;
     }
-    console.log('anchor', anchor);
     if (anchor == 'height') {
       cropHeight = height;
       cropWidth = cropHeight * this.cropAspectRatio;
@@ -201,13 +205,8 @@ class Timeline {
       cropHeight = cropWidth / this.cropAspectRatio;
     }
 
-    console.log(`sourceWidth ${width} / sourceHeight ${height}`);
-    console.log(`cropWidth ${cropWidth} / cropHeight ${cropHeight}`);
     let x = (width - cropWidth) / 2;
-    // if (x < 0) x = 0;
     let y = (height - cropHeight) / 2;
-    // if( y < 0) y = 0;
-    console.log('x, y', x, y);
     return [x, y, cropWidth, cropHeight];
   }
 
@@ -311,8 +310,7 @@ class Timeline {
         );
         this.video.removeEventListener('seeked', renderFrameOnSeek);
         this.video.removeEventListener('canplay', handleCanPlay);
-        const myEvent = new Event('timelineReady');
-        this.timeline.dispatchEvent(myEvent);
+        this.handleTimelineReady();
       }
       countFrames++;
     };
@@ -342,13 +340,44 @@ class Timeline {
   drawFrame(frame, sourceRect) {
     const [sX, sY, sWidth, sHeight] = sourceRect;
     const frameBounds = frame.getBoundingClientRect();
-    console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
+    // console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
     frame
       .getContext('2d')
       .drawImage(this.video, sX, sY, sWidth, sHeight, 0, 0, frameBounds.width, frameBounds.height);
   }
 
-  async initCropper() {
+  /**
+   * When the timline frames have been rendered
+   * initialize cropper, then fire timelineReady event.
+   */
+  async handleTimelineReady() {
+    console.log('HANDLETIMELINE READY');
+    await this.initCropper(this.transformations?.crop);
+
+    setTimeout(() => {
+      this.applyCrop();
+      if (this.onReady instanceof Function) {
+        this.onReady();
+      }
+
+      this.timeline.dispatchEvent(new Event('timelineReady'));
+    }, 500);
+
+    // this.
+  }
+
+  async initCropper(initialCrop) {
+    let points, scale;
+    if (initialCrop) {
+      const { x, y, w, h } = initialCrop;
+      points = [
+        parseFloat(x),
+        parseFloat(y),
+        parseFloat(w) + parseFloat(x),
+        parseFloat(h) + parseFloat(y),
+      ];
+      scale = parseFloat(initialCrop?.scale);
+    }
     this.video.style.width = 'auto';
     const src = await this.getCurrentVideoFrameUrlObject().catch((error) => {
       console.error('cropper faied to init', error);
@@ -360,12 +389,11 @@ class Timeline {
       width: containerWidth,
       height: containerHeight,
     });
-    console.log(`cropWidth ${cropWidth} cropheight ${cropHeight}`);
     // viewport not working for landscape - check computerCrop method.
     // const viewport = { width: cropWidth, height: cropHeight };
     const viewport = { width: cropWidth, height: cropHeight };
     const boundary = { width: containerWidth, height: containerHeight };
-    this.cropper = new Cropper({ src, el: cropContainer, viewport, boundary });
+    this.cropper = new Cropper({ src, el: cropContainer, viewport, boundary, points, scale });
   }
 
   createFramesContainer() {

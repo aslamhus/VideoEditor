@@ -1,12 +1,23 @@
 import Marker from './Marker/Marker.js';
 import { cloneAllCanvasFrames } from './utils.js';
 import { getTranslateX } from '../../utils.js';
+import CustomHTMLElement from '../../../HTMLElement/HTMLElement.js';
 import './range-selector.css';
 
-class RangeSelector {
-  constructor({ video, playHead, getTimelineElement, getVideoDuration, setVideoTimeIndex }) {
+class RangeSelector extends CustomHTMLElement {
+  constructor({
+    video,
+    playHead,
+    getTimelineElement,
+    getVideoDuration,
+    setVideoTimeIndex,
+
+    initialMarkers,
+  }) {
+    super();
     // dragging
     // this.debugEl = document.querySelector('#debug');
+    this.initialMarkers = initialMarkers;
     this.video = video;
     this.getVideoDuration = getVideoDuration;
     this.timeIndexPrecision = 3;
@@ -18,26 +29,28 @@ class RangeSelector {
     this.currentMarker = null;
     this.rangeSelector = null;
     this.selectedFrames = null;
-    this.hidden = true;
+    this.hidden = false;
+    console.log('initialMarkers', initialMarkers);
     this.inMarker = new Marker({
       className: 'in-marker',
       name: 'in',
       anchor: 'right',
-      initialIndex: 0,
+      // initialIndex: initialMarkers?.in || 0,
       getVideoDuration,
       getTimelineElement,
     });
-    console.info('video duration', video.duration);
     this.outMarker = new Marker({
       className: 'out-marker',
       name: 'out',
       anchor: 'left',
       direction: 'negative',
-      initialIndex: this.video.duration,
+      // initialIndex: initialMarkers?.out || this.video.duration,
       getVideoDuration,
       getTimelineElement,
     });
     this.playHead = playHead;
+    //
+    this.onRender = this.onRender.bind(this);
   }
 
   setCurrentMarker(target) {
@@ -45,19 +58,18 @@ class RangeSelector {
       const classList = target.classList;
       if (classList.contains('in-marker')) {
         this.currentMarker = this.inMarker;
-        return;
       } else if (classList.contains('out-marker')) {
         this.currentMarker = this.outMarker;
-        return;
       } else if (classList.contains('play-head')) {
         this.currentMarker = this.playHead;
-        return;
       }
     } else if (target instanceof Marker) {
       this.currentMarker = target;
-      return;
+    } else {
+      this.currentMarker = null;
     }
-    this.currentMarker = null;
+    console.log('dragStart -> this.currentMarker', this.currentMarker);
+    return;
   }
 
   /**
@@ -174,6 +186,18 @@ class RangeSelector {
     this.video.addEventListener('timeupdate', this.handleTimeUpdate.bind(this));
     this.video.addEventListener('play', this.handlePlay.bind(this));
     this.renderFramesClone();
+    if (this.initialMarkers?.in) {
+      this.inMarker.setPositionByTimeIndex(this.initialMarkers.in);
+      console.log('inmarker x', this.inMarker.getX());
+      this.updateMarkerPosition(this.inMarker, this.initialMarkers.in);
+    }
+
+    if (this.initialMarkers?.out) {
+      this.outMarker.setPositionByTimeIndex(this.initialMarkers.out);
+      console.log('outmarker x', this.outMarker.getX());
+      this.updateMarkerPosition(this.outMarker, this.initialMarkers.out);
+    }
+    this.show();
   }
 
   /**
@@ -187,12 +211,28 @@ class RangeSelector {
       throw new Error('Failed to set range selector, current marker is unknown');
     }
     const { target: markerElement } = event;
+    console.log('handleDrag -> currentMarker', this.currentMarker);
+    const timeIndex = this.currentMarker.getTimeIndexFromCurrentPosition();
+    this.updateMarkerPosition(this.currentMarker, timeIndex);
+    this.video.currentTime = timeIndex;
+
+    /**
+     * Though timeUpdate event will automatically adjust the playhead position,
+     * we do it here to avoid any ui delays
+     */
+    this.playHead.hide();
+    // this.playHead.setPercentPosition(timeIndex / this.video.duration, false);
+    return true;
+  }
+
+  updateMarkerPosition(marker, timeIndex) {
+    console.log('UPDATE MOTHERUCKER', timeIndex, marker);
     const timelineWidth = this.getTimelineWidth();
     const inPos = this.inMarker.getX();
     const outPos = timelineWidth + this.outMarker.getX();
     const rangeWidth = outPos - inPos;
 
-    console.log(`handleDrag inX ${inPos}, outX ${outPos} rangeWidth ${rangeWidth}`);
+    // console.log(`handleDrag inX ${inPos}, outX ${outPos} rangeWidth ${rangeWidth}`);
     /*
      * Set the range width.
      * To keep the range selector responsive, we calculate its width
@@ -207,41 +247,32 @@ class RangeSelector {
      * adjust the x position of the range selector
      * when dragging the in marker
      */
-    if (this.currentMarker.is('in')) {
+    if (marker.is('in')) {
       const rangeX = parseInt(this.inMarker.getX());
       this.setRangeSelectorXPos(rangeX);
     }
-
     /**
      * Find time index from the current marker
      * and update the video time, as well as the marker timestamp
      */
-    const timeIndex = this.currentMarker.getTimeIndexFromCurrentPosition();
-    this.currentMarker.setTimeIndex(timeIndex);
-    this.video.currentTime = timeIndex;
+    marker.setTimeIndex(timeIndex);
+
     /**
      * Selected frames container is anchored to the left, which means when
      * the left marker is advanced, the frames will stay in their correct position.
      * The right marker, however, will move all the frames alone with the range selector,
      * so we need to adjust the frame clone's translateX position to compensate.
      */
-    if (this.currentMarker.is('in')) {
+    if (marker.is('in')) {
       const translateX = parseInt(this.inMarker.getX()) * -1;
       this.setSelectedFramesX(translateX);
     }
-
-    /**
-     * Though timeUpdate event will automatically adjust the playhead position,
-     * we do it here to avoid any ui delays
-     */
-    this.playHead.hide();
-    // this.playHead.setPercentPosition(timeIndex / this.video.duration, false);
-    return true;
   }
 
   handleDragEnd(event) {
     const currentMarker = this.currentMarker;
     this.playHead.toggleAnimate(false);
+    console.log('currentMarker', currentMarker);
     this.movePlayheadToMarkerPosition();
 
     setTimeout(() => {
@@ -275,7 +306,11 @@ class RangeSelector {
 
   handleDragStart(event) {
     const { target: markerElement } = event;
-    if (!markerElement.closest('.marker') || !markerElement.classList.contains('marker')) {
+    if (
+      !markerElement ||
+      !markerElement.closest('.marker') ||
+      !markerElement.classList.contains('marker')
+    ) {
       throw new Error('Failed to select marker');
     }
     this.video.pause();
@@ -334,6 +369,7 @@ class RangeSelector {
     // move these to onPlay event
     const isPlaying = !this.video.paused;
     const inTime = Number(this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
+
     const outTime = Number(this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
     const currentTime = Number(this.video.currentTime.toFixed(this.timeIndexPrecision));
     if (outTime - inTime < 0.1) {
@@ -405,8 +441,14 @@ class RangeSelector {
     this.getTimelineElement().querySelector('.range-selector').append(this.createFramesClone());
   }
 
+  // onRender() {
+  //   console.log('RangeSelector has rendered', this.initialMarkers);
+
+  // }
+
   render(container) {
     const rsContainer = this.createRangeSelectorContainer();
+    super.render(rsContainer, container);
     const rs = this.createRangeSelector();
     rsContainer.append(rs);
     this.inMarker.render(rsContainer);

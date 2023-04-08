@@ -30,6 +30,7 @@ class Marker extends HTMLElement {
     this.percentageX = 0;
     this.direction = direction;
     this.timestamp = new Timestamp();
+    console.log('time index', this.timeIndex);
     // draggable argument defaults to false but can be object of draggable options
     this.draggable = draggable;
   }
@@ -95,7 +96,10 @@ class Marker extends HTMLElement {
 
   getXPositionFromTimeIndex(timeIndex) {
     const timelineWidth = this.getTimelineElement().getBoundingClientRect().width;
+    console.log('timelineWidth', timelineWidth);
     const percentElapsed = timeIndex / this.getVideoDuration();
+    console.log('video duration', this.getVideoDuration());
+    console.log('percentElapsed (timeIndex/videoDuration)', percentElapsed);
     return timelineWidth * percentElapsed;
   }
 
@@ -110,7 +114,7 @@ class Marker extends HTMLElement {
         `time index not set or is invalid for marker ${name}: ${this.timeIndex}. Please initialize your marker with a timeIndex`
       );
     }
-    return this.timeIndex;
+    return this.timeIndex || 0;
   }
 
   setTimeIndex(timeIndex) {
@@ -133,7 +137,6 @@ class Marker extends HTMLElement {
 
   setXPosition(x) {
     let translateX = x;
-
     if (this.draggable instanceof Draggable) {
       gsap.set(this.marker, { x: translateX });
       this.draggable.update();
@@ -147,9 +150,13 @@ class Marker extends HTMLElement {
     let x = this.getXPositionFromTimeIndex(timeIndex);
     if (this.direction == 'negative') {
       // for out marker, or any marker that advances towards negative coordinates
-      x = this.getTimelineElement().getBoundingClientRect().width - x;
+      x = (this.getTimelineElement().getBoundingClientRect().width - x) * -1;
     }
+
+    console.log('getXPositionFromTimeIndex', x);
     this.setXPosition(x);
+
+    console.log('set x position ', this.name, x);
     this.setTimeIndex(timeIndex);
   }
 
@@ -206,7 +213,15 @@ class Marker extends HTMLElement {
     return this.marker;
   }
 
-  onRender() {}
+  // onRender() {
+  //   if (this.timeIndex) {
+  //     console.log('render bitches');
+  //     setTimeout(() => {
+  //       console.log(this.name + ' - set initial marker to time index', this.timeIndex);
+  //       this.setPositionByTimeIndex(this.timeIndex);
+  //     }, 1000);
+  //   }
+  // }
 
   render(container) {
     // initializes and gives marker access to super onRender method

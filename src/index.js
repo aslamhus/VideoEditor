@@ -19,7 +19,16 @@ window.onload = async () => {
 
   let videoBlob = await fetch(url).then((r) => r.blob());
   // console.log('videoBlob', videoBlob);
-  vidEditor = new VideoEditor({ videoSrc: videoBlob, crop, maxHeight });
+  vidEditor = new VideoEditor({
+    videoSrc: videoBlob,
+    crop,
+    maxHeight,
+    transformations: {
+      // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
+      crop: { h: 173, scale: '1.500', w: 343, x: '308', y: '153' },
+      time: { in: 12, out: 50 },
+    },
+  });
   vidEditor.render(renderDiv);
   uploadBtn.onclick = handleUploadBtnClick;
   saveBtn.onclick = handleSaveBtnClick;

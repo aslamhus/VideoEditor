@@ -10,16 +10,19 @@ import './video-editor.css';
 class VideoEditor {
   /**
    *
-   * @param {Object} param0
-   * @property {Blob|String} videoSrc
-   * @property {Object}  crop - the width and height of video crop
+   * @param {object} param0
+   * @property {Blob|string} videoSrc
+   * @property {object}  crop - the width and height of video crop
+   * @property {object}  [transformations] - { crop : { w, h, x, y}, time { in, out }}
+   * @property {number}  [maxHeight] - the max height of the video editor, default is 300
    */
-  constructor({ videoSrc, crop, maxHeight }) {
+  constructor({ videoSrc, crop, transformations, maxHeight }) {
     if (!(videoSrc instanceof Blob) && typeof videoSrc != 'string') {
       throw new TypeError('video src must be a Blob or url');
     }
     this.videoSrc = videoSrc;
     this.crop = crop;
+    this.transformations = transformations;
     this.video = null;
     this.videoEditorContainer = null;
     this.timeline = null;
@@ -30,6 +33,7 @@ class VideoEditor {
   createVideoEditor() {
     this.videoEditorContainer = document.createElement('div');
     this.videoEditorContainer.className = 'video-editor-container';
+    this.videoEditorContainer.style.opacity = 0;
     this.videoEditorContainer.append(this.createVideo());
     return this.videoEditorContainer;
   }
@@ -105,11 +109,14 @@ class VideoEditor {
     this.video.currentTime = 0;
     this.video.playbackRate = 1;
     console.info('%cRender Timeline', 'color:green');
+
     this.timeline = new Timeline({
       video: this.video,
       duration: this.video.duration,
       frameInterval: 10,
       crop: this.crop,
+      transformations: this.transformations,
+      onReady: this.show.bind(this),
     });
     this.timeline.render(this.videoEditorContainer);
     this.removeEvents();
@@ -134,6 +141,10 @@ class VideoEditor {
   removeEvents() {
     this.video.removeEventListener('durationchange', this.handleDurationChange);
     this.video.onloadedmetadata = null;
+  }
+
+  show() {
+    this.videoEditorContainer.style.opacity = 1;
   }
 
   handleLoadedMetaData(event) {

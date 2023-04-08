@@ -17,10 +17,11 @@ import '../../../node_modules/croppie/croppie.css';
  */
 
 class Cropper {
-  constructor({ src, el, viewport, boundary }) {
+  constructor({ src, el, viewport, boundary, points, scale }) {
     if (!el) {
       throw new TypeError('Cropper element cannot be null');
     }
+    console.log('points', points, scale);
 
     el.addEventListener('update', this.handleUpdate.bind(this));
     this.croppie = new Croppie(el, {
@@ -33,6 +34,8 @@ class Cropper {
     });
     this.croppie.bind({
       url: src,
+      points,
+      zoom: scale,
       // orientation: 1,
     });
     this.el = el;
