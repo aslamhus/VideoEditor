@@ -1,0 +1,26 @@
+.video-editor-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.video-editor-loader div {
+  margin: 0 auto;
+  position: relative;
+  top: 0;
+  width: 50px;
+  height: 50px;
+  border: 4px solid dodgerblue;
+  border-color: dodgerblue dodgerblue dodgerblue transparent;
+  border-radius: 50%;
+  animation: rotate 1s linear reverse infinite;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

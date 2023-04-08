@@ -1,4 +1,4 @@
-.video-editor-container {
+.video-editor-wrapper {
   /** color scheme **/
 
   /** frames **/
@@ -26,6 +26,9 @@
   --control-btn-focus-bg: dodgerblue;
   --control-btn-focus-i: rgb(255, 255, 255);
   --control-btn-active-icon: rgb(16, 78, 141);
+}
+.video-editor-wrapper {
+  position: relative;
 }
 .video-editor-container {
   position: relative;

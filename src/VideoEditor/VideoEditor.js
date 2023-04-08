@@ -1,6 +1,6 @@
 import Timeline from './Timeline/Timeline.js';
-
 import { createCropSVG } from './utils/svg-crop-overlay';
+import Loader from './Loader/Loader.js';
 import './video-editor.css';
 // import '@fontawesome/css/font-awesome.min.css';
 
@@ -27,15 +27,19 @@ class VideoEditor {
     this.videoEditorContainer = null;
     this.timeline = null;
     this.maxHeight = maxHeight || 300;
+    this.loader = new Loader({ message: 'Loading video' });
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
   }
 
   createVideoEditor() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'video-editor-wrapper';
     this.videoEditorContainer = document.createElement('div');
-    this.videoEditorContainer.className = 'video-editor-container';
     this.videoEditorContainer.style.opacity = 0;
+    this.videoEditorContainer.className = 'video-editor-container';
     this.videoEditorContainer.append(this.createVideo());
-    return this.videoEditorContainer;
+    wrapper.append(this.videoEditorContainer);
+    return wrapper;
   }
 
   createCropContainer() {
@@ -145,6 +149,7 @@ class VideoEditor {
 
   show() {
     this.videoEditorContainer.style.opacity = 1;
+    this.loader.hide();
   }
 
   handleLoadedMetaData(event) {
@@ -181,7 +186,9 @@ class VideoEditor {
   }
 
   render(container) {
-    container.append(this.createVideoEditor());
+    const videoEditor = this.createVideoEditor();
+    this.loader.render(videoEditor);
+    container.append(videoEditor);
   }
 }
 
