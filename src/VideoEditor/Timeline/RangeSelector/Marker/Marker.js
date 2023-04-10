@@ -30,7 +30,6 @@ class Marker extends HTMLElement {
     this.percentageX = 0;
     this.direction = direction;
     this.timestamp = new Timestamp();
-    console.log('time index', this.timeIndex);
     // draggable argument defaults to false but can be object of draggable options
     this.draggable = draggable;
   }
@@ -96,10 +95,10 @@ class Marker extends HTMLElement {
 
   getXPositionFromTimeIndex(timeIndex) {
     const timelineWidth = this.getTimelineElement().getBoundingClientRect().width;
-    console.log('timelineWidth', timelineWidth);
+    // console.log('timelineWidth', timelineWidth);
     const percentElapsed = timeIndex / this.getVideoDuration();
-    console.log('video duration', this.getVideoDuration());
-    console.log('percentElapsed (timeIndex/videoDuration)', percentElapsed);
+    // console.log('video duration', this.getVideoDuration());
+    // console.log('percentElapsed (timeIndex/videoDuration)', percentElapsed);
     return timelineWidth * percentElapsed;
   }
 
@@ -153,10 +152,10 @@ class Marker extends HTMLElement {
       x = (this.getTimelineElement().getBoundingClientRect().width - x) * -1;
     }
 
-    console.log('getXPositionFromTimeIndex', x);
+    // console.log('getXPositionFromTimeIndex', x);
     this.setXPosition(x);
 
-    console.log('set x position ', this.name, x);
+    // console.log('set x position ', this.name, x);
     this.setTimeIndex(timeIndex);
   }
 
