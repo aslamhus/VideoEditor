@@ -233,11 +233,6 @@ class Timeline {
       points: [aX, aY, bX, bY],
       zoom,
     } = this.cropper.getResult();
-    console.log('points', points);
-    // points : [topLeftX, topLeftY, bottomRightX, bottomRightY]
-    // document.body.append(result);
-    // const crOverlayBounds = document.querySelector('.cr-overlay').getBoundingClientRect();
-    // const crViewport = document.querySelector('.cr-overlay').getBoundingClientRect();
     const w = bX - aX;
     const h = bY - aY;
     const x = aX;
