@@ -29,6 +29,8 @@
 }
 .video-editor-wrapper {
   position: relative;
+  width: 100%;
+  min-height: 300px;
 }
 .video-editor-container {
   position: relative;

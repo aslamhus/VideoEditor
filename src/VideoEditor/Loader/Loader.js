@@ -21,6 +21,10 @@ class Loader {
     this.loader.style.display = 'none';
   }
 
+  updateMessage(message) {
+    this.loader.querySelector('p').textContent = message;
+  }
+
   render(container) {
     container.append(this.createLoader());
   }

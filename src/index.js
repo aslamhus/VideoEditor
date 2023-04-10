@@ -17,10 +17,10 @@ window.onload = async () => {
   const saveBtn = document.querySelector('#save-btn');
   // const video = document.querySelector('video');
 
-  let videoBlob = await fetch(url).then((r) => r.blob());
+  // let videoBlob = await fetch(url).then((r) => r.blob());
   // console.log('videoBlob', videoBlob);
   vidEditor = new VideoEditor({
-    videoSrc: videoBlob,
+    src: url,
     crop,
     maxHeight,
     transformations: {

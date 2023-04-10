@@ -1,6 +1,7 @@
 import Timeline from './Timeline/Timeline.js';
 import { createCropSVG } from './utils/svg-crop-overlay';
 import Loader from './Loader/Loader.js';
+import axios from 'axios';
 import './video-editor.css';
 // import '@fontawesome/css/font-awesome.min.css';
 
@@ -15,12 +16,13 @@ class VideoEditor {
    * @property {object}  crop - the width and height of video crop
    * @property {object}  [transformations] - { crop : { w, h, x, y}, time { in, out }}
    * @property {number}  [maxHeight] - the max height of the video editor, default is 300
+   * @property {Function}  [onError] - the max height of the video editor, default is 300
    */
-  constructor({ videoSrc, crop, transformations, maxHeight }) {
-    if (!(videoSrc instanceof Blob) && typeof videoSrc != 'string') {
-      throw new TypeError('video src must be a Blob or url');
+  constructor({ src, crop, transformations, maxHeight, onError }) {
+    if (!(src instanceof Blob) && typeof src != 'string') {
+      throw new TypeError('video src must be a Blob or url, found ' + typeof src);
     }
-    this.videoSrc = videoSrc;
+    this.videoSrc = src;
     this.crop = crop;
     this.transformations = transformations;
     this.video = null;
@@ -29,17 +31,23 @@ class VideoEditor {
     this.maxHeight = maxHeight || 300;
     this.loader = new Loader({ message: 'Loading video' });
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
+    this.onError = onError;
   }
 
-  createVideoEditor() {
+  createWrapper() {
     const wrapper = document.createElement('div');
     wrapper.className = 'video-editor-wrapper';
+    return wrapper;
+  }
+
+  async createVideoEditor() {
     this.videoEditorContainer = document.createElement('div');
     this.videoEditorContainer.style.opacity = 0;
     this.videoEditorContainer.className = 'video-editor-container';
-    this.videoEditorContainer.append(this.createVideo());
-    wrapper.append(this.videoEditorContainer);
-    return wrapper;
+    this.videoEditorContainer.append(await this.createVideo());
+
+    this.loader.updateMessage('Initializing video editor');
+    return this.videoEditorContainer;
   }
 
   createCropContainer() {
@@ -61,7 +69,7 @@ class VideoEditor {
     container.append(svgOverlay);
   }
 
-  createVideo() {
+  async createVideo() {
     const vidContainer = document.createElement('div');
     vidContainer.className = 'video-container';
     const vidWrap = document.createElement('div');
@@ -69,11 +77,8 @@ class VideoEditor {
     this.video = document.createElement('video');
     this.video.id = 'video-preview';
     this.video.className = 'preview';
-    let src = this.videoSrc;
-    if (this.videoSrc instanceof Blob) {
-      console.log('BLOBATHON!!!');
-      src = URL.createObjectURL(this.videoSrc);
-    }
+    const src = await this.getVideoBlob();
+    console.log('src', src);
     this.video.src = src;
     this.video.autoplay = false;
     this.video.setAttribute('playsinline', 'true');
@@ -90,6 +95,25 @@ class VideoEditor {
     // not sure why this is here and not in constructor
 
     return vidContainer;
+  }
+
+  handleVideoDownloadProgress(progressEvent) {
+    const progress = parseInt(progressEvent.progress * 100);
+    this.loader.updateMessage(`Loading video ${progress}%`);
+  }
+
+  async getVideoBlob() {
+    let blob;
+    if (!(this.videoSrc instanceof Blob)) {
+      this.loader.updateMessage('Loading video');
+      blob = await axios(this.videoSrc, {
+        onDownloadProgress: this.handleVideoDownloadProgress.bind(this),
+        responseType: 'blob',
+      }).then((res) => res?.data);
+    }
+    console.log('blob', blob);
+    blob = URL.createObjectURL(blob);
+    return blob;
   }
 
   attachVideoEvents(container) {
@@ -185,10 +209,11 @@ class VideoEditor {
     return { crop, time: { in: inMarker, out: outMarker } };
   }
 
-  render(container) {
-    const videoEditor = this.createVideoEditor();
-    this.loader.render(videoEditor);
-    container.append(videoEditor);
+  async render(container) {
+    const wrapper = this.createWrapper();
+    this.loader.render(wrapper);
+    container.append(wrapper);
+    wrapper.append(await this.createVideoEditor());
   }
 }
 
