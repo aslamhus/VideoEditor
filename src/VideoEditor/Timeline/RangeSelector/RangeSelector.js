@@ -30,7 +30,6 @@ class RangeSelector extends CustomHTMLElement {
     this.rangeSelector = null;
     this.selectedFrames = null;
     this.hidden = false;
-    console.log('initialMarkers', initialMarkers);
     this.inMarker = new Marker({
       className: 'in-marker',
       name: 'in',
@@ -68,7 +67,7 @@ class RangeSelector extends CustomHTMLElement {
     } else {
       this.currentMarker = null;
     }
-    console.log('dragStart -> this.currentMarker', this.currentMarker);
+    // console.log('dragStart -> this.currentMarker', this.currentMarker);
     return;
   }
 
@@ -188,13 +187,13 @@ class RangeSelector extends CustomHTMLElement {
     this.renderFramesClone();
     if (this.initialMarkers?.in) {
       this.inMarker.setPositionByTimeIndex(this.initialMarkers.in);
-      console.log('inmarker x', this.inMarker.getX());
+      // console.log('inmarker x', this.inMarker.getX());
       this.updateMarkerPosition(this.inMarker, this.initialMarkers.in);
     }
 
     if (this.initialMarkers?.out) {
       this.outMarker.setPositionByTimeIndex(this.initialMarkers.out);
-      console.log('outmarker x', this.outMarker.getX());
+      // console.log('outmarker x', this.outMarker.getX());
       this.updateMarkerPosition(this.outMarker, this.initialMarkers.out);
     }
     this.show();
@@ -211,7 +210,7 @@ class RangeSelector extends CustomHTMLElement {
       throw new Error('Failed to set range selector, current marker is unknown');
     }
     const { target: markerElement } = event;
-    console.log('handleDrag -> currentMarker', this.currentMarker);
+    // console.log('handleDrag -> currentMarker', this.currentMarker);
     const timeIndex = this.currentMarker.getTimeIndexFromCurrentPosition();
     this.updateMarkerPosition(this.currentMarker, timeIndex);
     this.video.currentTime = timeIndex;
@@ -226,7 +225,6 @@ class RangeSelector extends CustomHTMLElement {
   }
 
   updateMarkerPosition(marker, timeIndex) {
-    console.log('UPDATE MOTHERUCKER', timeIndex, marker);
     const timelineWidth = this.getTimelineWidth();
     const inPos = this.inMarker.getX();
     const outPos = timelineWidth + this.outMarker.getX();
@@ -272,7 +270,7 @@ class RangeSelector extends CustomHTMLElement {
   handleDragEnd(event) {
     const currentMarker = this.currentMarker;
     this.playHead.toggleAnimate(false);
-    console.log('currentMarker', currentMarker);
+    // console.log('currentMarker', currentMarker);
     this.movePlayheadToMarkerPosition();
 
     setTimeout(() => {
@@ -355,8 +353,8 @@ class RangeSelector extends CustomHTMLElement {
     const currentTime = parseFloat(this.video.currentTime.toFixed(this.timeIndexPrecision));
     const outTime = parseFloat(this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
     if (currentTime >= outTime) {
-      console.log(`currentTime ${currentTime}, outTime ${outTime}`);
-      console.error('video playhead over range limit, returning playhead to inTime');
+      // console.log(`currentTime ${currentTime}, outTime ${outTime}`);
+      // console.error('video playhead over range limit, returning playhead to inTime');
       this.playHead.toggleAnimate(false);
       this.video.currentTime = this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision);
     }
@@ -384,7 +382,7 @@ class RangeSelector extends CustomHTMLElement {
     }
     if (currentTime > outTime) {
       console.error(`video playhead ${currentTime} is over upper range limit:  ${outTime}`);
-      console.log('animation time', this.playHead.getAnimationTime());
+      // console.log('animation time', this.playHead.getAnimationTime());
       const playHeadIndex = this.playHead.getTimeIndexFromCurrentPosition().toFixed(3);
       const remainingTime = outTime - playHeadIndex;
       this.playHead.marker.style.transition = `transform ${remainingTime}s linear`;
