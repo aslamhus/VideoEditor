@@ -21,12 +21,16 @@ window.onload = async () => {
   // console.log('videoBlob', videoBlob);
   vidEditor = new VideoEditor({
     src: url,
+    // src: {},
     crop,
     maxHeight,
     transformations: {
       // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
       crop: { h: 173, scale: '1.500', w: 343, x: '308', y: '153' },
       time: { in: 12, out: 50 },
+    },
+    onError: (error) => {
+      console.error(error);
     },
   });
   vidEditor.render(renderDiv);

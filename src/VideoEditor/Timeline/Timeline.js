@@ -6,7 +6,6 @@ import './timeline.css';
 
 class Timeline {
   constructor({ video, duration, frameTotalLimit = 10, crop, transformations, onReady }) {
-    console.log('transformations', transformations);
     this.video = video;
     // video
     if (!isFinite(duration)) {

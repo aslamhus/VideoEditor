@@ -19,9 +19,6 @@ class VideoEditor {
    * @property {Function}  [onError] - the max height of the video editor, default is 300
    */
   constructor({ src, crop, transformations, maxHeight, onError }) {
-    if (!(src instanceof Blob) && typeof src != 'string') {
-      throw new TypeError('video src must be a Blob or url, found ' + typeof src);
-    }
     this.videoSrc = src;
     this.crop = crop;
     this.transformations = transformations;
@@ -44,8 +41,9 @@ class VideoEditor {
     this.videoEditorContainer = document.createElement('div');
     this.videoEditorContainer.style.opacity = 0;
     this.videoEditorContainer.className = 'video-editor-container';
-    this.videoEditorContainer.append(await this.createVideo());
 
+    this.loader.updateMessage('Loading video');
+    this.videoEditorContainer.append(await this.createVideo());
     this.loader.updateMessage('Initializing video editor');
     return this.videoEditorContainer;
   }
@@ -78,7 +76,6 @@ class VideoEditor {
     this.video.id = 'video-preview';
     this.video.className = 'preview';
     const src = await this.getVideoBlob();
-    console.log('src', src);
     this.video.src = src;
     this.video.autoplay = false;
     this.video.setAttribute('playsinline', 'true');
@@ -104,14 +101,15 @@ class VideoEditor {
 
   async getVideoBlob() {
     let blob;
+    if (!(this.videoSrc instanceof Blob) && typeof this.videoSrc != 'string') {
+      throw new TypeError('video src must be a Blob or url, found ' + typeof src);
+    }
     if (!(this.videoSrc instanceof Blob)) {
-      this.loader.updateMessage('Loading video');
       blob = await axios(this.videoSrc, {
         onDownloadProgress: this.handleVideoDownloadProgress.bind(this),
         responseType: 'blob',
       }).then((res) => res?.data);
     }
-    console.log('blob', blob);
     blob = URL.createObjectURL(blob);
     return blob;
   }
@@ -145,6 +143,7 @@ class VideoEditor {
       crop: this.crop,
       transformations: this.transformations,
       onReady: this.show.bind(this),
+      onError: this.onError,
     });
     this.timeline.render(this.videoEditorContainer);
     this.removeEvents();
@@ -194,6 +193,13 @@ class VideoEditor {
     this.crop && this.appendCropOverlay();
   }
 
+  handleError(error) {
+    console.error(error);
+    if (this.onError instanceof Function) {
+      this.onError(error);
+    }
+  }
+
   // renderVideoEditor(container) {
   //   const oldVideo = container.querySelector('video');
   //   oldVideo.style.display = 'none';
@@ -210,10 +216,14 @@ class VideoEditor {
   }
 
   async render(container) {
-    const wrapper = this.createWrapper();
-    this.loader.render(wrapper);
-    container.append(wrapper);
-    wrapper.append(await this.createVideoEditor());
+    try {
+      const wrapper = this.createWrapper();
+      this.loader.render(wrapper);
+      container.append(wrapper);
+      wrapper.append(await this.createVideoEditor());
+    } catch (error) {
+      this.handleError(error);
+    }
   }
 }
 
