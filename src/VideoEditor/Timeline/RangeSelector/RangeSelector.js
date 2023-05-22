@@ -34,7 +34,7 @@ class RangeSelector extends CustomHTMLElement {
       className: 'in-marker',
       name: 'in',
       anchor: 'right',
-      // initialIndex: initialMarkers?.in || 0,
+      initialIndex: initialMarkers?.in || 0,
       getVideoDuration,
       getTimelineElement,
     });
@@ -43,7 +43,7 @@ class RangeSelector extends CustomHTMLElement {
       name: 'out',
       anchor: 'left',
       direction: 'negative',
-      // initialIndex: initialMarkers?.out || this.video.duration,
+      initialIndex: initialMarkers?.out || this.video.duration,
       getVideoDuration,
       getTimelineElement,
     });

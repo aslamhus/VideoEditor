@@ -24,11 +24,11 @@ window.onload = async () => {
     // src: {},
     crop,
     maxHeight,
-    transformations: {
-      // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
-      crop: { h: 173, scale: '1.500', w: 343, x: '308', y: '153' },
-      time: { in: 12, out: 50 },
-    },
+    // transformations: {
+    //   // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
+    //   crop: { h: 173, scale: '1.500', w: 343, x: '308', y: '153' },
+    //   time: { in: 12, out: 50 },
+    // },
     onError: (error) => {
       console.error(error);
     },
@@ -52,7 +52,8 @@ function handleUploadBtnClick(event) {
 async function handleSaveBtnClick(event) {
   event.preventDefault();
   const transform = vidEditor.saveVideo();
-  const result = await cloudinaryTransform(transform);
+  console.log('transform', transform);
+  // const result = await cloudinaryTransform(transform);
 }
 
 async function cloudinaryTransform(transform) {
