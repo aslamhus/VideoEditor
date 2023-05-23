@@ -21,6 +21,7 @@ class Timeline {
     // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
+    // playhead
     this.playHead = new PlayHead({
       className: 'play-head',
       name: 'play',
@@ -30,6 +31,7 @@ class Timeline {
       getTimelineElement: this.getTimelineElement.bind(this),
       isDraggable: false,
     });
+    // range selector
     this.rangeSelector = new RangeSelector({
       video,
       playHead: this.playHead,
@@ -41,7 +43,7 @@ class Timeline {
         out: this.transformations?.time?.out || null,
       },
     });
-
+    // control buttons
     this.controls = new Controls({
       video,
       onPlayClick: ({ target }) => {
@@ -52,15 +54,15 @@ class Timeline {
           this.video.currentTime = this.video.currentTime + 0.01;
         }
       },
-      onTrimToggle: ({ target, toggle }) => {
-        if (this.rangeSelector.hidden) {
-          this.rangeSelector.show();
-          target.setAttribute('title', 'Reset');
-        } else {
-          target.setAttribute('title', 'Trim video');
-          this.rangeSelector.hide();
-        }
-      },
+      // onTrimToggle: ({ target, toggle }) => {
+      //   if (this.rangeSelector.hidden) {
+      //     this.rangeSelector.show();
+      //     target.setAttribute('title', 'Reset');
+      //   } else {
+      //     target.setAttribute('title', 'Trim video');
+      //     this.rangeSelector.hide();
+      //   }
+      // },
       onCropToggle: async ({ target, toggle }) => {
         if (toggle) {
           this.getCurrentVideoFrameUrlObject().then((url) => {
@@ -346,16 +348,18 @@ class Timeline {
    */
   async handleTimelineReady() {
     console.log('HANDLETIMELINE READY');
-    await this.initCropper(this.transformations?.crop);
+    setTimeout(async () => {
+      await this.initCropper(this.transformations?.crop);
 
-    setTimeout(() => {
-      this.applyCrop();
-      if (this.onReady instanceof Function) {
-        this.onReady();
-      }
+      setTimeout(() => {
+        this.applyCrop();
+        if (this.onReady instanceof Function) {
+          this.onReady();
+        }
 
-      this.timeline.dispatchEvent(new Event('timelineReady'));
-    }, 500);
+        this.timeline.dispatchEvent(new Event('timelineReady'));
+      }, 500);
+    }, 50);
 
     // this.
   }

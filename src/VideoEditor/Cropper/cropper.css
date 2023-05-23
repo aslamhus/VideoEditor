@@ -1,0 +1,29 @@
+.cr-slider-wrap {
+  /* background: gray; */
+}
+.cr-slider {
+}
+
+.cr-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+
+  background: var(--crop-slider-thumb-color); /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.cr-slider::-moz-range-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+
+  background: var(--crop-slider-thumb-color); /* Green background */
+  cursor: pointer; /* Cursor on hover */
+}
+
+.cr-slider::-webkit-slider-runnable-track {
+  background: var(--crop-slider-runnable-track);
+}
+
+.cr-slider::-moz-slider-runnable-track {
+  background: var(--crop-slider-runnable-track);
+}

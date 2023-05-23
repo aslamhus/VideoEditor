@@ -1,7 +1,7 @@
 /** Controls **/
 .video-editor-controls {
   position: relative;
-  margin-top: 1.5rem;
+  margin-top: 0rem;
   display: flex;
   flex-direction: row;
   justify-content: center;

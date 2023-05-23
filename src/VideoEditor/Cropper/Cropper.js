@@ -1,6 +1,8 @@
 // import Croppie from '../../../node_modules/croppie/croppie.js';
 import Croppie from './croppie-test.js';
 import 'croppie/croppie.css';
+// custom cropper styles
+import './cropper.css';
 
 /**
  * Crop steps

@@ -2,14 +2,13 @@ import VideoEditor from './VideoEditor/VideoEditor';
 import { FileSelect } from '@aslamhus/fileselect';
 
 const testUrls = {
-  ira: 'https://res.cloudinary.com/dmxpkxal2/video/upload/v1675975714/test-video-transformation1675975616404.mp4',
-  aslam:
-    'https://res.cloudinary.com/dmxpkxal2/video/upload/v1672906170/test-video-transformation1672906153322.mp4',
+  wally:
+    'https://res.cloudinary.com/dmxpkxal2/video/upload/v1684432443/covid-19-grief-project/7bc86818-591a-4061-bc5b-67ffb79c462e/memory-c958d848-2071-4210-a360-ce35715fb988.mp4',
 };
-const crop = { width: 6, height: 3 };
+const crop = { width: 4, height: 5 };
 let maxHeight = 300;
 let renderDiv, vidEditor;
-const url = testUrls.aslam;
+const url = testUrls.wally;
 
 window.onload = async () => {
   renderDiv = document.getElementById('render');
@@ -30,7 +29,7 @@ window.onload = async () => {
     //   time: { in: 12, out: 50 },
     // },
     onError: (error) => {
-      console.error(error);
+      console.error('onError', error);
     },
   });
   vidEditor.render(renderDiv);

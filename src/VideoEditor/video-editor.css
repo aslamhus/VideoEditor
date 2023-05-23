@@ -1,36 +1,49 @@
 .video-editor-wrapper {
   /** color scheme **/
-
+  --overall-color: #d4d4d5;
+  --highlight-color: gold;
+  --video-wrapper-bg: #222324;
+  /** video container **/
+  --video-container-border-size: 0px;
+  --video-container-border-color: rgb(100, 100, 100);
   /** frames **/
-  --frame-bg: rgb(111, 111, 111);
+  --frame-bg: rgb(128, 128, 128);
   --frame-border-size: 2px;
   --frame-border-style: solid;
   --frame-border-color: rgb(58, 58, 58);
   /** range select **/
   --range-selector-border-size: 4px;
-  --range-selector-border-color: rgb(243, 71, 19);
+  --range-selector-border-color: var(--highlight-color);
   /** markers **/
   --marker-border-size: 7px;
   /** marker width MUST be greater than (marker-border-size * 2) **/
-  --marker-width: 30px;
-  --marker-border-color: rgb(243, 71, 19);
-  --marker-bg-color: rgb(255, 122, 33);
+  --marker-width: 20px;
+  --marker-border-color: var(--highlight-color);
+  --marker-bg-color: var(--highlight-color);
+  --in-out-marker-grab-color: rgb(35, 35, 35);
   /** playhead **/
-  --play-head-width: 2px;
+  --play-head-width: 1.5px;
   --play-head-color: white;
+  /** crop slider **/
+  --crop-slider-thumb-color: var(--highlight-color);
+  --crop-slider-runnable-track: var(--overall-color);
   /** control button **/
-  --control-btn: dodgerblue;
-  --control-btn-i: rgb(17, 86, 155);
-  --control-btn-hover: rgb(24, 114, 204);
-  --control-btn-hover-i: white;
-  --control-btn-focus-bg: dodgerblue;
-  --control-btn-focus-i: rgb(255, 255, 255);
-  --control-btn-active-icon: rgb(16, 78, 141);
+  --control-btn: var(--overall-color);
+  --control-btn-bg: rgba(0, 0, 0, 0.2);
+  --control-btn-i: var(--overall-color);
+  --control-btn-hover: var(--highlight-color);
+  --control-btn-border-radius: 50%;
+  --control-btn-hover-i: var(--highlight-color);
+  --control-btn-focus-i: var(--highlight-color);
+  --control-btn-focus-bg: rgba(0, 0, 0, 0.5);
+  --control-btn-active: var(--highlight-color);
+  --control-btn-active-icon: var(--highlight-color);
 }
 .video-editor-wrapper {
   position: relative;
-  width: 100%;
-  min-height: 300px;
+  min-width: 450px;
+  min-height: 450px;
+  background: var(--video-wrapper-bg);
 }
 .video-editor-container {
   position: relative;
@@ -47,6 +60,7 @@
   position: relative;
 
   margin: 0 auto;
+  box-shadow: 0px 0px 0px var(--video-container-border-size) var(--video-container-border-color);
 }
 .video-wrap,
 .video-editor-container {
@@ -61,6 +75,7 @@
 .video-wrap video {
   transform-origin: 50% 50%;
 }
+
 .video-container svg {
   position: absolute;
   left: 0;

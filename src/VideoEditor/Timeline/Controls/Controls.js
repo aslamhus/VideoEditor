@@ -6,12 +6,12 @@ class Controls {
     this.video = video;
     this.controls = null;
     this.playBtn = new PlayButton({ video, onPlayToggle, onPlayClick });
-    this.trimBtn = new ControlButton({
-      className: 'trim-btn',
-      iconClassName: 'fa fa-scissors',
-      onToggle: onTrimToggle,
-      title: 'Trim video',
-    });
+    // this.trimBtn = new ControlButton({
+    //   className: 'trim-btn',
+    //   iconClassName: 'fa fa-scissors',
+    //   onToggle: onTrimToggle,
+    //   title: 'Trim video',
+    // });
     this.cropBtn = new ControlButton({
       className: 'crop-btn',
       iconClassName: 'fa fa-crop',
@@ -21,7 +21,7 @@ class Controls {
       },
       title: 'Crop video',
     });
-    this.controlElements = [this.playBtn, this.trimBtn, this.cropBtn];
+    this.controlElements = [this.playBtn, this.cropBtn];
   }
 
   toggleControlButtons({ target, toggle }) {

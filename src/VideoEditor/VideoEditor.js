@@ -16,7 +16,8 @@ class VideoEditor {
    * @property {object}  crop - the width and height of video crop
    * @property {object}  [transformations] - { crop : { w, h, x, y}, time { in, out }}
    * @property {number}  [maxHeight] - the max height of the video editor, default is 300
-   * @property {Function}  [onError] - the max height of the video editor, default is 300
+   * @property {Function}  [onError] - error callback. If the error type is AxiosError, the error will contain
+   * status and statusText properties.
    */
   constructor({ src, crop, transformations, maxHeight, onError, onReady }) {
     this.videoSrc = src;
@@ -30,7 +31,6 @@ class VideoEditor {
     this.onError = onError;
     this.onReady = onReady;
     // bind
-
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
     this.handleAxiosError = this.handleAxiosError.bind(this);
   }
@@ -88,6 +88,7 @@ class VideoEditor {
     this.video.preload = 'metadata';
     this.video.controls = false;
     this.video.playbackRate = 16;
+    this.video.style.width = '100%';
     // video events must be attached before rendering in the DOM
     this.attachVideoEvents(vidContainer);
     vidWrap.append(this.video);
@@ -105,7 +106,6 @@ class VideoEditor {
 
   async getVideoBlob() {
     let blob;
-    console.log('get video blob');
     if (!(this.videoSrc instanceof Blob) && typeof this.videoSrc != 'string') {
       throw new TypeError('video src must be a Blob or url, found ' + typeof src);
     }
@@ -115,7 +115,6 @@ class VideoEditor {
         responseType: 'blob',
       })
         .then((res) => {
-          console.log('axios res', res);
           return res?.data;
         })
         .catch(this.handleAxiosError);
@@ -218,24 +217,21 @@ class VideoEditor {
 
   handleAxiosError(error) {
     // show error message
-    this.loader.showError(`There was an error loading the video`);
+    const displayErrorMessage = `There was an error loading the video`;
+    this.loader.showError(displayErrorMessage);
     // generate custom axios error
-    const axiosError = new Error('Fetch video error: ');
-    const { response, message } = error;
+    const axiosError = new Error(displayErrorMessage);
+    const { response, message } = error || {};
     axiosError.message = message;
-    if (response?.statusText) {
-      axiosError.message = `${customErr.message}: ${response.statusText}`;
+    if (response?.status) {
+      axiosError.message = `${axiosError.message}: ${response.statusText}`;
+      axiosError.statusText = response?.statusText;
+
+      axiosError.status = response?.status;
     }
     axiosError.name = 'AxiosError';
-
     this.handleError(axiosError);
   }
-
-  // renderVideoEditor(container) {
-  //   const oldVideo = container.querySelector('video');
-  //   oldVideo.style.display = 'none';
-  //   oldVideo.parentElement.insertBefore(this.createVideoEditor(), oldVideo);
-  // }
 
   saveVideo() {
     const crop = this.timeline.getCrop();

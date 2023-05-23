@@ -50,3 +50,21 @@
   content: '';
   background: transparent !important;
 }
+
+/** in marker and out marker customizations **/
+/** you can find the css for the markers in the Marker component **/
+
+.in-marker::after,
+.out-marker::after {
+  content: '';
+  width: 5px;
+  height: 50%;
+  border-radius: 10px;
+  background-color: var(--in-out-marker-grab-color);
+  font-size: 20px;
+  font-weight: bold;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}

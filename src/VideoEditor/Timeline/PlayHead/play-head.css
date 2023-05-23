@@ -18,3 +18,33 @@
   /** background: black; **/
   /* transition: transform 0.25s linear; */
 }
+.play-head::before {
+  content: '';
+  /* width: calc(var(--play-head-width) * 4); */
+  border-top: calc(var(--play-head-width) * 4) solid var(--play-head-color);
+  border-right: calc(var(--play-head-width) * 4) solid transparent;
+  border-bottom: calc(var(--play-head-width) * 4) solid transparent;
+  border-left: calc(var(--play-head-width) * 4) solid transparent;
+  width: 0;
+  height: 5px;
+  background: transparent;
+  position: absolute;
+  /* top: calc(var(--play-head-width) * -1); */
+  top: 0;
+  transform: translate(-50%, calc(var(--play-head-width) * -2));
+}
+.play-head::after {
+  content: '';
+  /* width: calc(var(--play-head-width) * 4); */
+  border-top: calc(var(--play-head-width) * 4) solid transparent;
+  border-right: calc(var(--play-head-width) * 4) solid transparent;
+  border-bottom: calc(var(--play-head-width) * 4) solid var(--play-head-color);
+  border-left: calc(var(--play-head-width) * 4) solid transparent;
+  width: 0;
+  height: 5px;
+  background: transparent;
+  position: absolute;
+  /* top: calc(var(--play-head-width) * -1); */
+  bottom: 0;
+  transform: translate(-50%, calc(var(--play-head-width) * 2));
+}
