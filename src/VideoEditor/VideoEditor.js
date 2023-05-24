@@ -13,15 +13,21 @@ import './video-editor.css';
 class VideoEditor {
   /**
    *
-   * @param {object} param0
+   * @typedef {constructor} constructor
    * @property {Blob|string} videoSrc
    * @property {object}  crop - the width and height of video crop
    * @property {object}  [transformations] - { crop : { w, h, x, y}, time { in, out }}
    * @property {number}  [maxHeight] - the max height of the video editor, default is 300
    * @property {Function}  [onError] - error callback. If the error type is AxiosError, the error will contain
    * status and statusText properties.
+   * @property {Function}  [onReady] - onReady callback
+   * @property {Function} [onSave] - onSave callback. Fired when save button is clicked. Returns transformations and time indices.
    */
-  constructor({ src, crop, transformations, maxHeight, onError, onReady }) {
+
+  /**
+   * @param {constructor} constructor
+   */
+  constructor({ src, crop, transformations, maxHeight, onError, onReady, onSave }) {
     this.videoSrc = src;
     this.crop = crop;
     this.transformations = transformations;
@@ -31,6 +37,7 @@ class VideoEditor {
     this.maxHeight = maxHeight || 300;
     this.onError = onError;
     this.onReady = onReady;
+    this.onSave = onSave;
 
     this.loader = new Loader({ message: 'Loading video' });
     this.menuBar = new MenuBar({
@@ -75,9 +82,7 @@ class VideoEditor {
           title: 'Save',
           className: 'save-button',
           fontAwesomeIcon: 'fa fa-check',
-          onClick: () => {
-            console.log('save');
-          },
+          onClick: this.handleSaveButtonClick.bind(this),
         },
       ],
     });
@@ -283,6 +288,13 @@ class VideoEditor {
     }
     axiosError.name = 'AxiosError';
     this.handleError(axiosError);
+  }
+
+  handleSaveButtonClick(event) {
+    if (this.onSave instanceof Function) {
+      const transformations = this.saveVideo();
+      this.onSave(transformations);
+    }
   }
 
   saveVideo() {
