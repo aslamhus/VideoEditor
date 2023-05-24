@@ -12,16 +12,28 @@ class Controls {
     //   onToggle: onTrimToggle,
     //   title: 'Trim video',
     // });
-    this.cropBtn = new ControlButton({
-      className: 'crop-btn',
-      iconClassName: 'fa fa-crop',
-      onToggle: ({ target, toggle }) => {
-        this.toggleControlButtons({ target, toggle });
-        onCropToggle({ target, toggle });
-      },
-      title: 'Crop video',
+    // this.cropBtn = new ControlButton({
+    //   className: 'crop-btn',
+    //   iconClassName: 'fa fa-crop',
+    //   onToggle: ({ target, toggle }) => {
+    //     this.toggleControlButtons({ target, toggle });
+    //     onCropToggle({ target, toggle });
+    //   },
+    //   title: 'Crop video',
+    // });
+    this.controlElements = [this.playBtn];
+  }
+
+  disableControlButtons() {
+    this.controlElements.forEach((controlBtn) => {
+      controlBtn.getElement().disabled = true;
     });
-    this.controlElements = [this.playBtn, this.cropBtn];
+  }
+
+  enableControlButtons() {
+    this.controlElements.forEach((controlBtn) => {
+      controlBtn.getElement().disabled = false;
+    });
   }
 
   toggleControlButtons({ target, toggle }) {

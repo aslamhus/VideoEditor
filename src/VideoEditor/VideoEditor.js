@@ -1,9 +1,11 @@
+import MenuBar from './MenuBar/MenuBar.js';
 import Timeline from './Timeline/Timeline.js';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
 import axios from 'axios';
+
+import '@fontawesome/css/font-awesome.min.css';
 import './video-editor.css';
-// import '@fontawesome/css/font-awesome.min.css';
 
 /**
  * To do: find moment to revoke object url of video src
@@ -27,9 +29,58 @@ class VideoEditor {
     this.videoEditorContainer = null;
     this.timeline = null;
     this.maxHeight = maxHeight || 300;
-    this.loader = new Loader({ message: 'Loading video' });
     this.onError = onError;
     this.onReady = onReady;
+
+    this.loader = new Loader({ message: 'Loading video' });
+    this.menuBar = new MenuBar({
+      inlineStartButtons: [
+        {
+          label: '?',
+          title: 'Help',
+          className: 'help-button',
+          onClick: () => {
+            console.log('????');
+          },
+        },
+      ],
+      inlineEndButtons: [
+        {
+          label: 'Crop',
+          title: 'Crop',
+          toggle: true,
+          className: 'crop-button',
+          fontAwesomeIcon: 'fa fa-crop',
+          onClick: (event, toggleState) => {
+            const { currentTarget } = event;
+            this.timeline.handleToggleCropper(toggleState);
+            console.log('toggle crop', toggleState);
+            const span = currentTarget.querySelector('span');
+            const icon = currentTarget.querySelector('i');
+            if (toggleState) {
+              span.innerText = 'Done';
+              icon.style.display = 'none';
+              this.timeline.controls.disableControlButtons();
+              this.timeline.disable();
+            } else {
+              span.innerText = 'Crop';
+              icon.style.display = '';
+              this.timeline.controls.enableControlButtons();
+              this.timeline.enable();
+            }
+          },
+        },
+        {
+          label: 'Save',
+          title: 'Save',
+          className: 'save-button',
+          fontAwesomeIcon: 'fa fa-check',
+          onClick: () => {
+            console.log('save');
+          },
+        },
+      ],
+    });
     // bind
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
     this.handleAxiosError = this.handleAxiosError.bind(this);
@@ -47,6 +98,7 @@ class VideoEditor {
     this.videoEditorContainer.className = 'video-editor-container';
 
     this.loader.updateMessage('Loading video');
+    // video element
     this.videoEditorContainer.append(await this.createVideo());
     this.loader.updateMessage('Initializing video editor');
     return this.videoEditorContainer;
@@ -245,8 +297,15 @@ class VideoEditor {
   async render(container) {
     try {
       const wrapper = this.createWrapper();
+      //  menu bar
+
+      //  loader
       this.loader.render(wrapper);
       container.append(wrapper);
+
+      // menu bar
+      this.menuBar.render(wrapper);
+      //  video editor
       const videoEditor = await this.createVideoEditor();
       wrapper.append(videoEditor);
     } catch (error) {

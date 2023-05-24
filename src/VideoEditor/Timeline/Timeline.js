@@ -63,17 +63,26 @@ class Timeline {
       //     this.rangeSelector.hide();
       //   }
       // },
-      onCropToggle: async ({ target, toggle }) => {
-        if (toggle) {
-          this.getCurrentVideoFrameUrlObject().then((url) => {
-            this.cropper.updateSrc(url);
-            this.cropper.show();
-          });
-        } else {
-          this.applyCrop();
-        }
-      },
     });
+  }
+
+  async handleToggleCropper(toggle) {
+    if (toggle) {
+      this.getCurrentVideoFrameUrlObject().then((url) => {
+        this.cropper.updateSrc(url);
+        this.cropper.show();
+      });
+    } else {
+      this.applyCrop();
+    }
+  }
+
+  enable() {
+    this.timeline.classList.remove('disabled');
+  }
+
+  disable() {
+    this.timeline.classList.add('disabled');
   }
 
   setVideoTimeIndex(timeIndex) {

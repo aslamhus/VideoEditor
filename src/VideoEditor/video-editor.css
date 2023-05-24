@@ -3,9 +3,18 @@
   --overall-color: #d4d4d5;
   --highlight-color: gold;
   --video-wrapper-bg: #222324;
+  /** text **/
+  --loading-text-color: rgb(198, 198, 198);
   /** video container **/
   --video-container-border-size: 0px;
   --video-container-border-color: rgb(100, 100, 100);
+  /** menu bar **/
+  --menu-bar-btn-bg: transparent;
+  --menu-bar-btn-border-color: gray;
+  --menu-bar-btn-text: white;
+  --menu-bar-btn-bg-hover: var(--highlight-color);
+  --menu-bar-btn-text-hover: black;
+  --menu-bar-btn-border-color-hover: transparent;
   /** frames **/
   --frame-bg: rgb(128, 128, 128);
   --frame-border-size: 2px;

@@ -1,0 +1,29 @@
+.menu-bar-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.menu-bar-button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--menu-bar-btn-border-color);
+  margin: 4px;
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--menu-bar-btn-bg);
+  color: var(--menu-bar-btn-text);
+  text-transform: uppercase;
+}
+.menu-bar-button i {
+  margin-left: 7px;
+  font-size: 18px;
+}
+
+.menu-bar-button:hover,
+.menu-bar-button.toggled {
+  background: var(--menu-bar-btn-bg-hover);
+  color: var(--menu-bar-btn-text-hover);
+
+  border-color: var(--menu-bar-btn-border-color-hover);
+  cursor: pointer;
+}

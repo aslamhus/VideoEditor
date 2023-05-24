@@ -8,8 +8,8 @@
 }
 
 /** play/pause btn **/
-.play i {
-  margin-left: 7px;
+.play-btn i {
+  margin-left: 3px;
 }
 .pause i {
   color: blue;

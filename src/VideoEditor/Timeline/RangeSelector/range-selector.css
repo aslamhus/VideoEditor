@@ -8,6 +8,7 @@
   -webkit-box-sizing: border-box;
   visibility: hidden;
 }
+
 .range-selector-container::before {
   content: '';
   position: absolute;
