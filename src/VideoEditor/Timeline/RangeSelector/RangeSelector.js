@@ -2,9 +2,14 @@ import Marker from './Marker/Marker.js';
 import { cloneAllCanvasFrames } from './utils.js';
 import { getTranslateX } from '../../utils.js';
 import CustomHTMLElement from '../../../HTMLElement/HTMLElement.js';
+
+import { gsap } from 'gsap';
+import { Draggable } from 'gsap/Draggable';
+//without this line, PixiPlugin and MotionPathPlugin may get dropped by your bundler (tree shaking)...
+gsap.registerPlugin(Draggable);
 import './range-selector.css';
 
-class RangeSelector extends CustomHTMLElement {
+class RangeSelector {
   constructor({
     video,
     playHead,
@@ -14,9 +19,6 @@ class RangeSelector extends CustomHTMLElement {
 
     initialMarkers,
   }) {
-    super();
-    // dragging
-    // this.debugEl = document.querySelector('#debug');
     this.initialMarkers = initialMarkers;
     this.video = video;
     this.getVideoDuration = getVideoDuration;
@@ -49,7 +51,6 @@ class RangeSelector extends CustomHTMLElement {
     });
     this.playHead = playHead;
     //
-    this.onRender = this.onRender.bind(this);
   }
 
   setCurrentMarker(target) {
@@ -135,11 +136,12 @@ class RangeSelector extends CustomHTMLElement {
   }
 
   attachDraggableEvents(timeline) {
+    // attach in marker and out marker draggable options
     const handleDrag = this.handleDrag.bind(this);
     const handleDragStart = this.handleDragStart.bind(this);
     const handleDragConstraint = this.handleDragConstraint.bind(this);
     const timelineContainer = this.getTimelineElement().closest('.timeline-container');
-    const options = {
+    const markerOptions = {
       type: 'x',
       inertia: true,
       bounds: timelineContainer,
@@ -164,10 +166,21 @@ class RangeSelector extends CustomHTMLElement {
         }
       },
     };
-    this.inMarker.setDraggable(options);
-    this.outMarker.setDraggable(options);
-
-    window.addEventListener('resize', this.handleWindowResizeDragPositions.bind(this));
+    this.inMarker.setDraggable(markerOptions);
+    this.outMarker.setDraggable(markerOptions);
+    // attach range selector draggable options
+    const rangeSelectorOptions = {
+      type: 'x',
+      inertia: true,
+      bounds: timelineContainer,
+      onDragEnd: () => {},
+      onDragStart: () => {},
+      onDrag: () => {},
+    };
+    // this.draggable = Draggable.create(this.rangeSelector, {
+    //   ...rangeSelectorOptions,
+    // })[0];
+    // window.addEventListener('resize', this.handleWindowResizeDragPositions.bind(this));
   }
 
   /**
@@ -187,6 +200,7 @@ class RangeSelector extends CustomHTMLElement {
     this.renderFramesClone();
     if (this.initialMarkers?.in) {
       this.inMarker.setPositionByTimeIndex(this.initialMarkers.in);
+      this.video.currentTime = this.initialMarkers.in;
       // console.log('inmarker x', this.inMarker.getX());
       this.updateMarkerPosition(this.inMarker, this.initialMarkers.in);
     }
@@ -269,7 +283,7 @@ class RangeSelector extends CustomHTMLElement {
 
   handleDragEnd(event) {
     const currentMarker = this.currentMarker;
-    this.playHead.toggleAnimate(false);
+    // this.playHead.toggleAnimate(false);
     // console.log('currentMarker', currentMarker);
     this.movePlayheadToMarkerPosition();
 
@@ -355,12 +369,12 @@ class RangeSelector extends CustomHTMLElement {
     if (currentTime >= outTime) {
       // console.log(`currentTime ${currentTime}, outTime ${outTime}`);
       // console.error('video playhead over range limit, returning playhead to inTime');
-      this.playHead.toggleAnimate(false);
+      // this.playHead.toggleAnimate(false);
       this.video.currentTime = this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision);
     }
-    window.requestAnimationFrame(() => {
-      this.playHead.toggleAnimate(true);
-    });
+    // window.requestAnimationFrame(() => {
+    //   this.playHead.toggleAnimate(true);
+    // });
   }
 
   handleTimeUpdate(event) {
@@ -370,6 +384,9 @@ class RangeSelector extends CustomHTMLElement {
 
     const outTime = Number(this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
     const currentTime = Number(this.video.currentTime.toFixed(this.timeIndexPrecision));
+
+    // console.log(`currentTime ${currentTime}, inTime ${inTime}`);
+
     if (outTime - inTime < 0.1) {
       console.error('outTime - inTime < 0.1');
       // prevent infinite loop of updating video currenttime to upper and lower limits
@@ -385,7 +402,7 @@ class RangeSelector extends CustomHTMLElement {
       // console.log('animation time', this.playHead.getAnimationTime());
       const playHeadIndex = this.playHead.getTimeIndexFromCurrentPosition().toFixed(3);
       const remainingTime = outTime - playHeadIndex;
-      this.playHead.marker.style.transition = `transform ${remainingTime}s linear`;
+      // this.playHead.marker.style.transition = `transform ${remainingTime}s linear`;
       this.video.currentTime = outTime;
       this.video.pause();
 
@@ -439,14 +456,9 @@ class RangeSelector extends CustomHTMLElement {
     this.getTimelineElement().querySelector('.range-selector').append(this.createFramesClone());
   }
 
-  // onRender() {
-  //   console.log('RangeSelector has rendered', this.initialMarkers);
-
-  // }
-
   render(container) {
     const rsContainer = this.createRangeSelectorContainer();
-    super.render(rsContainer, container);
+    // super.render(rsContainer, container);
     const rs = this.createRangeSelector();
     rsContainer.append(rs);
     this.inMarker.render(rsContainer);

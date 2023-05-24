@@ -13,7 +13,7 @@ const url = testUrls.wally;
 window.onload = async () => {
   renderDiv = document.getElementById('render');
   const uploadBtn = document.querySelector('button');
-  const saveBtn = document.querySelector('#save-btn');
+  // const saveBtn = document.querySelector('#save-btn');
   // const video = document.querySelector('video');
 
   // let videoBlob = await fetch(url).then((r) => r.blob());
@@ -23,18 +23,22 @@ window.onload = async () => {
     // src: {},
     crop,
     maxHeight,
-    // transformations: {
-    //   // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
-    //   crop: { h: 173, scale: '1.500', w: 343, x: '308', y: '153' },
-    //   time: { in: 12, out: 50 },
-    // },
+    transformations: {
+      // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
+      // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
+      time: { in: 5, out: 10 },
+    },
+
     onError: (error) => {
       console.error('onError', error);
+    },
+    onSave: (transform) => {
+      console.log('save video -> transformations', transform);
     },
   });
   vidEditor.render(renderDiv);
   uploadBtn.onclick = handleUploadBtnClick;
-  saveBtn.onclick = handleSaveBtnClick;
+  // saveBtn.onclick = handleSaveBtnClick;
 };
 
 function handleUploadBtnClick(event) {
@@ -48,12 +52,12 @@ function handleUploadBtnClick(event) {
   });
 }
 
-async function handleSaveBtnClick(event) {
-  event.preventDefault();
-  const transform = vidEditor.saveVideo();
-  console.log('transform', transform);
-  // const result = await cloudinaryTransform(transform);
-}
+// async function handleSaveBtnClick(event) {
+//   event.preventDefault();
+//   const transform = vidEditor.saveVideo();
+//   console.log('transform', transform);
+//   // const result = await cloudinaryTransform(transform);
+// }
 
 async function cloudinaryTransform(transform) {
   console.log('transform', transform);

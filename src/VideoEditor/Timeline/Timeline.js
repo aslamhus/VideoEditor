@@ -54,15 +54,6 @@ class Timeline {
           this.video.currentTime = this.video.currentTime + 0.01;
         }
       },
-      // onTrimToggle: ({ target, toggle }) => {
-      //   if (this.rangeSelector.hidden) {
-      //     this.rangeSelector.show();
-      //     target.setAttribute('title', 'Reset');
-      //   } else {
-      //     target.setAttribute('title', 'Trim video');
-      //     this.rangeSelector.hide();
-      //   }
-      // },
     });
   }
 
