@@ -6,6 +6,7 @@ import axios from 'axios';
 
 import '@fontawesome/css/font-awesome.min.css';
 import './video-editor.css';
+import InfoBar from './InfoBar/InfoBar.js';
 
 /**
  * To do: find moment to revoke object url of video src
@@ -58,24 +59,7 @@ class VideoEditor {
           toggle: true,
           className: 'crop-button',
           fontAwesomeIcon: 'fa fa-crop',
-          onClick: (event, toggleState) => {
-            const { currentTarget } = event;
-            this.timeline.handleToggleCropper(toggleState);
-            console.log('toggle crop', toggleState);
-            const span = currentTarget.querySelector('span');
-            const icon = currentTarget.querySelector('i');
-            if (toggleState) {
-              span.innerText = 'Done';
-              icon.style.display = 'none';
-              this.timeline.controls.disableControlButtons();
-              this.timeline.disable();
-            } else {
-              span.innerText = 'Crop';
-              icon.style.display = '';
-              this.timeline.controls.enableControlButtons();
-              this.timeline.enable();
-            }
-          },
+          onClick: this.handleToggleCrop.bind(this),
         },
         {
           label: 'Save',
@@ -190,7 +174,16 @@ class VideoEditor {
     this.video.addEventListener('loadedmetadata', this.handleLoadedMetaData);
   }
 
-  handleDurationChange(event, container) {
+  /**
+   * handle duration change
+   *
+   * Renders timeline and info when we have the duration.
+   * This event occurs after the initial render and precipitates
+   * the timelineReady event / onReady callback.
+   *
+   * @returns {void}
+   */
+  handleDurationChange() {
     console.info(this.video.readyState);
     if (!isFinite(this.video.duration)) {
       console.error('durationchange: duration is infinity', this.video.duration);
@@ -201,7 +194,6 @@ class VideoEditor {
     this.video.currentTime = 0;
     this.video.playbackRate = 1;
     console.info('%cRender Timeline', 'color:green');
-
     this.timeline = new Timeline({
       video: this.video,
       duration: this.video.duration,
@@ -229,6 +221,24 @@ class VideoEditor {
       vidContainer.style.width = `${vidMaxWidth}px`;
     }
     vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
+  }
+
+  handleToggleCrop(event, toggleState) {
+    const { currentTarget } = event;
+    this.timeline.handleToggleCropper(toggleState);
+    const span = currentTarget.querySelector('span');
+    const icon = currentTarget.querySelector('i');
+    if (toggleState) {
+      span.innerText = 'Done';
+      icon.style.display = 'none';
+      this.timeline.controls.disableControlButtons();
+      this.timeline.disable();
+    } else {
+      span.innerText = 'Crop';
+      icon.style.display = '';
+      this.timeline.controls.enableControlButtons();
+      this.timeline.enable();
+    }
   }
 
   removeEvents() {
@@ -309,12 +319,9 @@ class VideoEditor {
   async render(container) {
     try {
       const wrapper = this.createWrapper();
-      //  menu bar
-
       //  loader
       this.loader.render(wrapper);
       container.append(wrapper);
-
       // menu bar
       this.menuBar.render(wrapper);
       //  video editor
