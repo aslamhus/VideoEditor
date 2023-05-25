@@ -23,6 +23,7 @@
   /** range select **/
   --range-selector-border-size: 4px;
   --range-selector-border-color: var(--highlight-color);
+  --range-selector-dragging-color: rgb(253, 233, 123);
   /** markers **/
   --marker-border-size: 7px;
   /** marker width MUST be greater than (marker-border-size * 2) **/
@@ -47,6 +48,12 @@
   --control-btn-focus-bg: rgba(0, 0, 0, 0.5);
   --control-btn-active: var(--highlight-color);
   --control-btn-active-icon: var(--highlight-color);
+}
+
+.video-editor-wrapper * {
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
 }
 .video-editor-wrapper {
   position: relative;

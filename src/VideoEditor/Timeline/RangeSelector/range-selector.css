@@ -8,6 +8,16 @@
   -webkit-box-sizing: border-box;
   visibility: hidden;
 }
+.range-selector-dragging {
+  opacity: 1;
+  z-index: 9999;
+
+  --range-selector-border-color: var(--range-selector-dragging-color);
+  --marker-border-color: var(--range-selector-dragging-color);
+  --marker-bg-color: var(--range-selector-dragging-color);
+
+  /* box-shadow: 0 0 20px 1px rgba(255, 255, 255, 0.539); */
+}
 
 .range-selector-container::before {
   content: '';

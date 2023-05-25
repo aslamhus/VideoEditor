@@ -7,7 +7,24 @@ import { Draggable } from 'gsap/Draggable';
 gsap.registerPlugin(Draggable);
 import './marker.css';
 
+/**
+ * @typedef {Object} constructor
+ * @property {string} name
+ * @property {string} anchor - right|left
+ * @property {string} className
+ * @property {Function} getTimelineElement
+ * @property {Function} getVideoDuration
+ * @property {string} direction - position|negative
+ * @property {number} initialIndex
+ * @property {Draggable|null} draggable
+ *
+ */
+
 class Marker extends HTMLElement {
+  /**
+   *
+   * @param {constructor} constructor
+   */
   constructor({
     name,
     anchor,
@@ -16,7 +33,7 @@ class Marker extends HTMLElement {
     getVideoDuration,
     direction = 'positive',
     initialIndex,
-    draggable = false,
+    draggable = null,
   }) {
     super();
     this.getTimelineElement = getTimelineElement;
@@ -142,6 +159,9 @@ class Marker extends HTMLElement {
     } else {
       this.marker.style.transform = `translateX(${translateX}px)`;
     }
+    const timeIndex = this.getTimeIndexFromCurrentPosition();
+    console.log('timeIndex', timeIndex);
+    this.setTimeIndex(timeIndex);
     this.x = x;
   }
 

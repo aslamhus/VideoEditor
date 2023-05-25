@@ -89,8 +89,8 @@ class Timeline {
   }
 
   attachTimelineEvents() {
-    this.timeline.addEventListener('mousedown', this.handleTimelineMouseDown.bind(this));
-    this.timeline.addEventListener('mouseup', this.handleTimelineMouseUp.bind(this));
+    this.timeline.addEventListener('mouseup', this.handleTimelineMouseDown.bind(this), false);
+    // this.timeline.addEventListener('mouseup', this.handleTimelineMouseUp.bind(this));
     this.video.addEventListener('timeupdate', this.timeupdate.bind(this));
     this.video.addEventListener('pause', this.handlePause.bind(this));
     this.video.addEventListener('playing', this.handlePlaying.bind(this));
@@ -115,8 +115,15 @@ class Timeline {
 
   handleTimelineMouseDown(event) {
     event.preventDefault();
+    /**
+     * If the range selector is being dragged, do not update the time index
+     */
+    if (this.rangeSelector.isDragging) {
+      this.rangeSelector.isDragging = false;
+      return;
+    }
     const { offsetX, clientX, layerX, target, currentTarget } = event;
-
+    console.info('MOUSEUP');
     /**
      *
      * If the range selector is enabled,
@@ -133,21 +140,21 @@ class Timeline {
      * so that when the mouse is released, the playhead continues
      * to play
      */
-    this.playHead.toggleAnimate(false);
+    // this.playHead.toggleAnimate(false);
     this.setVideoTimeIndex(timeIndex);
     this.video.pause();
   }
 
-  handleTimelineMouseUp(event) {
-    event.preventDefault();
-    clearInterval(this.pressed);
-    const { target } = event;
-    if (!this.rangeSelector.hidden && !target.closest('.range-selector')) return;
-    if (!this.video.paused) {
-      // resume animation
-      // this.playHead.toggleAnimate(true);
-    }
-  }
+  // handleTimelineMouseUp(event) {
+  //   event.preventDefault();
+  //   clearInterval(this.pressed);
+  //   const { target } = event;
+  //   if (!this.rangeSelector.hidden && !target.closest('.range-selector')) return;
+  //   if (!this.video.paused) {
+  //     // resume animation
+  //     // this.playHead.toggleAnimate(true);
+  //   }
+  // }
 
   handlePause(event) {
     console.info('pause');
