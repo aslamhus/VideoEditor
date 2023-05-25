@@ -1,3 +1,4 @@
+import { convertDecimalToTime } from '../../../utils';
 import './timestamp.css';
 
 class Timestamp {
@@ -15,29 +16,7 @@ class Timestamp {
   }
 
   setDecimalTime(decimalTime) {
-    this.timestamp.querySelector('p').textContent = this.convertDecimalToTime(decimalTime);
-  }
-  /**
-   *
-   * @param {Number} timeIndex
-   * @returns {String} - the time in mm : ss
-   */
-  convertDecimalToTime(timeIndex) {
-    let minutes = 0,
-      seconds = 0;
-    if (timeIndex > 60) {
-      minutes = Math.floor(timeIndex / 60);
-      seconds = timeIndex % 60;
-    } else {
-      seconds = timeIndex;
-    }
-
-    seconds = seconds.toFixed(2);
-    //add 0s
-    if (minutes < 10) minutes = `0${minutes}`;
-    if (seconds < 10) seconds = `0${seconds}`;
-
-    return `${minutes}:${seconds}`;
+    this.timestamp.querySelector('p').textContent = convertDecimalToTime(decimalTime);
   }
 
   createTimestampElement() {

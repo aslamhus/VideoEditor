@@ -17,6 +17,7 @@ import './marker.css';
  * @property {string} direction - position|negative
  * @property {number} initialIndex
  * @property {Draggable|null} draggable
+ * @property {Function} [onChange]
  *
  */
 
@@ -34,6 +35,7 @@ class Marker extends HTMLElement {
     direction = 'positive',
     initialIndex,
     draggable = null,
+    onChange,
   }) {
     super();
     this.getTimelineElement = getTimelineElement;
@@ -49,6 +51,9 @@ class Marker extends HTMLElement {
     this.timestamp = new Timestamp();
     // draggable argument defaults to false but can be object of draggable options
     this.draggable = draggable;
+    this.onChange = onChange;
+    // bind
+    this.handleChange = this.handleChange.bind(this);
   }
 
   getMarker() {
@@ -136,10 +141,13 @@ class Marker extends HTMLElement {
   setTimeIndex(timeIndex) {
     this.timeIndex = timeIndex;
     this.timestamp.setDecimalTime(timeIndex);
+    this.handleChange();
   }
 
   setX(x) {
     this.x = x;
+
+    this.handleChange();
   }
 
   setPercentageX(percentX) {
@@ -160,9 +168,9 @@ class Marker extends HTMLElement {
       this.marker.style.transform = `translateX(${translateX}px)`;
     }
     const timeIndex = this.getTimeIndexFromCurrentPosition();
-    console.log('timeIndex', timeIndex);
+    // console.log('timeIndex', timeIndex);
     this.setTimeIndex(timeIndex);
-    this.x = x;
+    this.setX(x);
   }
 
   setPositionByTimeIndex(timeIndex) {
@@ -226,21 +234,17 @@ class Marker extends HTMLElement {
     return this.draggable;
   }
 
+  handleChange() {
+    if (this.onChange instanceof Function) {
+      this.onChange({ timeIndex: this.timeIndex, x: this.x });
+    }
+  }
+
   createMarker() {
     this.marker = document.createElement('div');
     this.marker.className = `${this.className} marker`;
     return this.marker;
   }
-
-  // onRender() {
-  //   if (this.timeIndex) {
-  //     console.log('render bitches');
-  //     setTimeout(() => {
-  //       console.log(this.name + ' - set initial marker to time index', this.timeIndex);
-  //       this.setPositionByTimeIndex(this.timeIndex);
-  //     }, 1000);
-  //   }
-  // }
 
   render(container) {
     // initializes and gives marker access to super onRender method

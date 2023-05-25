@@ -2,13 +2,21 @@ import Marker from '../RangeSelector/Marker/Marker';
 import './play-head.css';
 
 class PlayHead extends Marker {
-  constructor({ name, className, getTimelineElement, getVideoDuration, isDraggable = true }) {
-    super({ name, className, getTimelineElement, getVideoDuration, isDraggable });
+  constructor({
+    name,
+    className,
+    getTimelineElement,
+    getVideoDuration,
+    isDraggable = true,
+    onChange,
+  }) {
+    super({ name, className, getTimelineElement, getVideoDuration, isDraggable, onChange });
   }
 
-  setXPosition(x) {
-    this.marker.style.transform = `translateX(${x}px)`;
-  }
+  // setXPosition(x) {
+  //   this.marker.style.transform = `translateX(${x}px)`;
+
+  // }
 
   getAnimationTime() {
     return this.animationTime;
@@ -36,7 +44,8 @@ class PlayHead extends Marker {
     const containerWidth = width - playHeadWidth;
     let x = containerWidth * percent;
     // console.log(`percent ${percent}, x: ${x}, borderPaddingOffset: ${borderPaddingOffset}`);
-    this.marker.style.transform = `translateX(${x}px)`;
+    // this.marker.style.transform = `translateX(${x}px)`;
+    this.setXPosition(x);
   }
 
   toggleAnimate(shouldAnimate) {

@@ -1,0 +1,13 @@
+.info-bar-container {
+  width: 100%;
+  color: var(--info-bar-text-color);
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  padding: 20px;
+  text-transform: uppercase;
+  margin-top: 16px;
+  font-size: 14px;
+}

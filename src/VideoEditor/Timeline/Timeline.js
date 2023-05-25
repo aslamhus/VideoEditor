@@ -1,10 +1,24 @@
 import PlayHead from './PlayHead/PlayHead.js';
 import Controls from './Controls/Controls.js';
 import RangeSelector from './RangeSelector/RangeSelector.js';
-import Cropper from '../Cropper/Cropper.js';
 import './timeline.css';
+import InfoBar from '../InfoBar/InfoBar.js';
+import Cropper from '../Cropper/Cropper.js';
+import '../types.js';
 
 class Timeline {
+  /**
+   *
+   * @typedef {Object} constructor
+   * @property {HTMLVideoElement} video
+   * @property {number} duration
+   * @property {number} frameTotalLimit - default is 10
+   * @property {Object} crop - the crop ratio
+   * @property {transformations} transformations
+   * @property {Function} onReady
+   *
+   * @param {constructor} constructor
+   */
   constructor({ video, duration, frameTotalLimit = 10, crop, transformations, onReady }) {
     this.video = video;
     // video
@@ -21,6 +35,7 @@ class Timeline {
     // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
+    //
     // playhead
     this.playHead = new PlayHead({
       className: 'play-head',
@@ -42,6 +57,7 @@ class Timeline {
         in: this.transformations?.time?.in || 0,
         out: this.transformations?.time?.out || null,
       },
+      onRangeUpdate: this.handleRangeUpdate.bind(this),
     });
     // control buttons
     this.controls = new Controls({
@@ -54,6 +70,11 @@ class Timeline {
           this.video.currentTime = this.video.currentTime + 0.01;
         }
       },
+    });
+    // info bar
+    this.infoBar = new InfoBar({
+      duration: this.video.duration,
+      currentIndex: this.transformations?.time?.in,
     });
   }
 
@@ -116,10 +137,10 @@ class Timeline {
   handleTimelineMouseDown(event) {
     event.preventDefault();
     /**
-     * If the range selector is being dragged, do not update the time index
+     * If the range selector is being dragged, the mouseup should not fire.
+     * We do ne
      */
     if (this.rangeSelector.isDragging) {
-      this.rangeSelector.isDragging = false;
       return;
     }
     const { offsetX, clientX, layerX, target, currentTarget } = event;
@@ -155,6 +176,15 @@ class Timeline {
   //     // this.playHead.toggleAnimate(true);
   //   }
   // }
+
+  handleRangeUpdate(currentIndex, time) {
+    // get now and duration
+    const now = currentIndex;
+    const duration = parseFloat(time.out - time.in);
+    // set values
+    this.infoBar.setCurrentIndex(now);
+    this.infoBar.setDuration(duration);
+  }
 
   handlePause(event) {
     console.info('pause');
@@ -447,6 +477,7 @@ class Timeline {
     this.renderTimeline(container);
     this.controls.render(container);
     this.renderCanvasFrames();
+    this.infoBar.render(container);
   }
 }
 

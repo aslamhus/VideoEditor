@@ -3,21 +3,24 @@ import Timeline from './Timeline/Timeline.js';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
 import axios from 'axios';
-
-import '@fontawesome/css/font-awesome.min.css';
+import './types.js';
 import './video-editor.css';
-import InfoBar from './InfoBar/InfoBar.js';
+import '@fontawesome/css/font-awesome.min.css';
 
 /**
  * To do: find moment to revoke object url of video src
+
  */
+
 class VideoEditor {
   /**
    *
-   * @typedef {constructor} constructor
+   *
+   *
+   * @typedef {Object} constructor
    * @property {Blob|string} videoSrc
    * @property {object}  crop - the width and height of video crop
-   * @property {object}  [transformations] - { crop : { w, h, x, y}, time { in, out }}
+   * @property {transformations} transformations
    * @property {number}  [maxHeight] - the max height of the video editor, default is 300
    * @property {Function}  [onError] - error callback. If the error type is AxiosError, the error will contain
    * status and statusText properties.
@@ -34,12 +37,12 @@ class VideoEditor {
     this.transformations = transformations;
     this.video = null;
     this.videoEditorContainer = null;
-    this.timeline = null;
     this.maxHeight = maxHeight || 300;
     this.onError = onError;
     this.onReady = onReady;
     this.onSave = onSave;
-
+    // both timeline and info bar are invoked when we know the video duration
+    this.timeline = null;
     this.loader = new Loader({ message: 'Loading video' });
     this.menuBar = new MenuBar({
       inlineStartButtons: [
@@ -177,23 +180,27 @@ class VideoEditor {
   /**
    * handle duration change
    *
-   * Renders timeline and info when we have the duration.
+   * Renders timeline   when we have the duration.
    * This event occurs after the initial render and precipitates
    * the timelineReady event / onReady callback.
+   *
+   * Once we have rendered the timeline we can remove
+   * the event listeners listening for the video duration/metadata.
    *
    * @returns {void}
    */
   handleDurationChange() {
-    console.info(this.video.readyState);
+    // console.info(this.video.readyState);
     if (!isFinite(this.video.duration)) {
       console.error('durationchange: duration is infinity', this.video.duration);
       return;
     }
-    console.info('durationchange', this.video.duration);
+    // console.info('durationchange', this.video.duration);
     this.video.pause();
     this.video.currentTime = 0;
     this.video.playbackRate = 1;
     console.info('%cRender Timeline', 'color:green');
+    // render timeline
     this.timeline = new Timeline({
       video: this.video,
       duration: this.video.duration,
@@ -203,7 +210,10 @@ class VideoEditor {
       onReady: this.handleTimelineReady.bind(this),
       onError: this.onError,
     });
+
     this.timeline.render(this.videoEditorContainer);
+
+    // remove events
     this.removeEvents();
   }
 

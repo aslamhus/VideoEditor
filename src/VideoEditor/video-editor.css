@@ -4,7 +4,9 @@
   --highlight-color: gold;
   --video-wrapper-bg: #222324;
   /** text **/
+  --font-family: arial;
   --loading-text-color: rgb(198, 198, 198);
+  --info-bar-text-color: rgb(170, 170, 170);
   /** video container **/
   --video-container-border-size: 0px;
   --video-container-border-color: rgb(100, 100, 100);
@@ -51,6 +53,7 @@
 }
 
 .video-editor-wrapper * {
+  font-family: var(--font-family);
   user-select: none;
   -moz-user-select: none;
   -webkit-user-select: none;

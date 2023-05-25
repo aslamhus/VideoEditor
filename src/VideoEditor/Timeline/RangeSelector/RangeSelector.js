@@ -19,6 +19,7 @@ class RangeSelector {
    * @property {Function} getVideoDuration
    * @property {Function} setVideoTimeIndex
    * @property {Object} initialMarkers
+   * @property {Function} [onRangeUpdate]
    */
   /**
    *
@@ -30,8 +31,8 @@ class RangeSelector {
     getTimelineElement,
     getVideoDuration,
     setVideoTimeIndex,
-
     initialMarkers,
+    onRangeUpdate,
   }) {
     this.initialMarkers = initialMarkers;
     this.video = video;
@@ -42,12 +43,21 @@ class RangeSelector {
     this.lastInPos = 0;
     this.lastOutPos = 0;
     this.lastRangeSelectorX = 0;
-    // refers to the range selector draggable
+    this.onRangeUpdate = onRangeUpdate;
+    // range
+    this.currentIndex = this.initialMarkers?.in ?? 0;
+    this.inTime = this.currentIndex;
+    this.outTime = this.initialMarker?.out ?? getVideoDuration();
+    // isDragging refers to the range selector draggable
     this.isDragging = false;
     this.currentMarker = null;
     this.rangeSelector = null;
     this.selectedFrames = null;
     this.hidden = false;
+
+    // bind
+    this.handleRangeUpdate = this.handleRangeUpdate.bind(this);
+    // components
     this.inMarker = new Marker({
       className: 'in-marker',
       name: 'in',
@@ -55,6 +65,7 @@ class RangeSelector {
       initialIndex: initialMarkers?.in || 0,
       getVideoDuration,
       getTimelineElement,
+      onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'in', timeIndex, x }),
     });
     this.outMarker = new Marker({
       className: 'out-marker',
@@ -64,10 +75,11 @@ class RangeSelector {
       initialIndex: initialMarkers?.out || this.video.duration,
       getVideoDuration,
       getTimelineElement,
+      onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'out', timeIndex, x }),
     });
     this.playHead = playHead;
-
-    //
+    this.playHead.onChange = ({ timeIndex, x }) =>
+      this.handleRangeUpdate({ marker: 'playhead', timeIndex, x });
   }
 
   setCurrentMarker(target) {
@@ -130,7 +142,6 @@ class RangeSelector {
       offset = this.playHead.getBounds().width;
     }
     const playHeadXPos = parseInt(x) - parseInt(offset);
-    console.log('playehad X', playHeadXPos);
     this.playHead.setXPosition(playHeadXPos);
     this.playHead.show();
   }
@@ -308,6 +319,34 @@ class RangeSelector {
       this.updateMarkerPosition(this.outMarker, this.initialMarkers.out);
     }
     this.show();
+  }
+
+  /**
+   *
+   * Handle range update
+   *
+   * Updates the current index, inTime and outTime for the range selector
+   * and optionally passes the data to the custom callback onRangeUpdate
+   */
+  handleRangeUpdate({ marker, timeIndex, x }) {
+    switch (marker) {
+      case 'in':
+        this.inTime = timeIndex;
+        this.currentIndex = timeIndex;
+        break;
+      case 'out':
+        this.outTime = timeIndex;
+        break;
+      case 'playhead':
+        this.currentIndex = timeIndex;
+        break;
+      default:
+        // do nothing
+        console.error('unknown marker update in handleRangeUpdate');
+    }
+    if (this.onRangeUpdate instanceof Function) {
+      this.onRangeUpdate(this.currentIndex, { in: this.inTime, out: this.outTime });
+    }
   }
 
   /**
