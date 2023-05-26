@@ -212,7 +212,6 @@ class RangeSelector {
     //   this.rangeSelector.style.setProperty('cursor', 'pointer', 'important');
     // };
     this.rangeSelector.onmouseup = () => {
-      console.log('RANGE SELECOTR MOUSE UP');
       this.rangeSelector.style.setProperty('cursor', 'pointer', 'important');
       this.rangeSelector.isDragging = false;
       document.body.style.removeProperty('cursor');
@@ -373,6 +372,7 @@ class RangeSelector {
   handleDragEndRangeSelector(event) {
     this.currentMarker = this.inMarker;
     this.movePlayheadToMarkerPosition();
+    this.isDragging = false;
   }
 
   /**

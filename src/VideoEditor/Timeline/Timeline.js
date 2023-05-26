@@ -135,6 +135,7 @@ class Timeline {
   }
 
   handleTimelineMouseDown(event) {
+    console.log('timeline mousedown');
     event.preventDefault();
     /**
      * If the range selector is being dragged, the mouseup should not fire.
