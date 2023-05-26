@@ -16,10 +16,19 @@ class Timeline {
    * @property {Object} crop - the crop ratio
    * @property {transformations} transformations
    * @property {Function} onReady
+   * @property {Function} onRangeUpdate
    *
    * @param {constructor} constructor
    */
-  constructor({ video, duration, frameTotalLimit = 10, crop, transformations, onReady }) {
+  constructor({
+    video,
+    duration,
+    frameTotalLimit = 10,
+    crop,
+    transformations,
+    onReady,
+    onRangeUpdate,
+  }) {
     this.video = video;
     // video
     if (!isFinite(duration)) {
@@ -31,7 +40,9 @@ class Timeline {
     this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
     this.cropAspectRatio = this.crop.width / this.crop.height;
     this.transformations = transformations;
+    // callbacks
     this.onReady = onReady;
+    this.onRangeUpdate = onRangeUpdate;
     // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
@@ -135,7 +146,6 @@ class Timeline {
   }
 
   handleTimelineMouseDown(event) {
-    console.log('timeline mousedown');
     event.preventDefault();
     /**
      * If the range selector is being dragged, the mouseup should not fire.
@@ -184,6 +194,10 @@ class Timeline {
     // set values
     this.infoBar.setCurrentIndex(now);
     this.infoBar.setDuration(duration);
+    // video editor onRangeUpdate callback
+    if (this.onRangeUpdate instanceof Function) {
+      this.onRangeUpdate(currentIndex, time);
+    }
   }
 
   handlePause(event) {

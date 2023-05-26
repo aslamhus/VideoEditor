@@ -25,13 +25,26 @@ class VideoEditor {
    * @property {Function}  [onError] - error callback. If the error type is AxiosError, the error will contain
    * status and statusText properties.
    * @property {Function}  [onReady] - onReady callback
+   * @property {Function}  [onRangeUpdate] - onRangeUpdate callback
+   * @property {Function}  [onClickHelpButton] - onRangeUpdate callback
    * @property {Function} [onSave] - onSave callback. Fired when save button is clicked. Returns transformations and time indices.
+   *
    */
 
   /**
    * @param {constructor} constructor
    */
-  constructor({ src, crop, transformations, maxHeight, onError, onReady, onSave }) {
+  constructor({
+    src,
+    crop,
+    transformations,
+    maxHeight,
+    onError,
+    onReady,
+    onRangeUpdate,
+    onClickHelpButton,
+    onSave,
+  }) {
     this.videoSrc = src;
     this.crop = crop;
     this.transformations = transformations;
@@ -41,6 +54,7 @@ class VideoEditor {
     this.onError = onError;
     this.onReady = onReady;
     this.onSave = onSave;
+    this.onRangeUpdate = onRangeUpdate;
     // both timeline and info bar are invoked when we know the video duration
     this.timeline = null;
     this.loader = new Loader({ message: 'Loading video' });
@@ -50,9 +64,7 @@ class VideoEditor {
           label: '?',
           title: 'Help',
           className: 'help-button',
-          onClick: () => {
-            console.log('????');
-          },
+          onClick: onClickHelpButton,
         },
       ],
       inlineEndButtons: [
@@ -209,6 +221,7 @@ class VideoEditor {
       transformations: this.transformations,
       onReady: this.handleTimelineReady.bind(this),
       onError: this.onError,
+      onRangeUpdate: this.onRangeUpdate,
     });
 
     this.timeline.render(this.videoEditorContainer);
