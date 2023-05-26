@@ -1,6 +1,6 @@
 /**
  *
- * @param {HTMLElement} el
+ * @param {HTMLElement} el - the target element
  * @param {Function} callback - the callback fired when the presshold event occurs
  * @param {Object} options - { holdDuration : <number> } in millseconds
  */
@@ -12,15 +12,20 @@ export const initPresHoldEvent = (el, callback, options = { holdDuration: 50 }) 
 
   el.addEventListener('presshold', callback, true);
   const handlePress = (event) => {
-    event.preventDefault();
+    const { target } = event;
+    // do not register press if the target is not the target element or a descendant of the target element
+    const isTarget = target.closest(`.${el.className}`) || target.className == el.className;
+    if (!isTarget) {
+      return;
+    }
     originalPointerEvent = event;
     if (!interval) {
       interval = setInterval(timer, 1);
     }
+    event.preventDefault();
   };
 
   const handleEndPress = (event) => {
-    if (event) event.preventDefault();
     clearInterval(interval);
     interval = null;
     count = 0;

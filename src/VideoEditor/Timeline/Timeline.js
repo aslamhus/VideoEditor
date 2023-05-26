@@ -144,7 +144,6 @@ class Timeline {
       return;
     }
     const { offsetX, clientX, layerX, target, currentTarget } = event;
-    console.info('MOUSEUP');
     /**
      *
      * If the range selector is enabled,
