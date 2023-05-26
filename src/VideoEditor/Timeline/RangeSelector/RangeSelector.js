@@ -273,7 +273,6 @@ class RangeSelector {
 
     // press hold event
     const onPressHold = (event) => {
-      console.log('press hold event');
       const { target } = event;
       event.preventDefault();
       event.stopPropagation();
@@ -344,6 +343,7 @@ class RangeSelector {
         // do nothing
         console.error('unknown marker update in handleRangeUpdate');
     }
+    // custom callback
     if (this.onRangeUpdate instanceof Function) {
       this.onRangeUpdate(this.currentIndex, { in: this.inTime, out: this.outTime });
     }
@@ -357,12 +357,17 @@ class RangeSelector {
   handleDragRangeSelector(event, draggable) {
     // get range selector bounds positions
     const [x1, x2] = this.getRangeSelectorXPos();
-    // this.setRangeSelectorXPos(x1);
+    // set in marker position
     this.inMarker.setXPosition(x1);
+    // set out marker position
     const outX = (this.getTimelineElement().getBoundingClientRect().width - x2) * -1;
     this.outMarker.setXPosition(outX);
+    // set selected frames position
     const selectedFramesX = parseInt(x1) * -1;
     this.setSelectedFramesX(selectedFramesX);
+    // update time index
+    const timeIndex = this.inMarker.getTimeIndex();
+    this.video.currentTime = timeIndex;
   }
 
   handleDragEndRangeSelector(event) {
