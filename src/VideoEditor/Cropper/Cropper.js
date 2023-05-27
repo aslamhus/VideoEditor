@@ -26,6 +26,9 @@ class Cropper {
     console.log('points', points, scale);
 
     el.addEventListener('update', this.handleUpdate.bind(this));
+    this.src = src;
+    this.viewport = viewport;
+    this.boundary = boundary;
     this.croppie = new Croppie(el, {
       viewport,
       boundary,
@@ -35,14 +38,18 @@ class Cropper {
       // enableResize: true,
     });
     this.croppie.bind({
-      url: src,
+      url: this.src,
       points,
       zoom: scale,
       // orientation: 1,
     });
     this.el = el;
     this.elementValues = { x: null, y: null, zoom: null };
-
+    // croppie values
+    this.points = null;
+    this.zoom = null;
+    this.orientation = null;
+    //
     this.zoomRangeInput = el.querySelector('input[type=range]');
     this.img = el.querySelector('img');
     this.hidden = false;
@@ -54,6 +61,7 @@ class Cropper {
     this.touchdown = this.touchdown.bind(this);
     this.touchup = this.touchup.bind(this);
     this.handleZoomRangeChange = this.handleZoomRangeChange.bind(this);
+    this.update = this.update.bind(this);
     this.attachEvents();
     this.initialValues = { x: null, y: null, zoom: null };
 
@@ -129,6 +137,10 @@ class Cropper {
     return this.zoomRangeInput.value;
   }
 
+  getZoomRangeMinMax() {
+    return { min: this.zoomRangeInput.min, max: this.zoomRangeInput.max };
+  }
+
   /**
    *
    * @returns {Array} - [x,y]
@@ -163,6 +175,9 @@ class Cropper {
     const {
       detail: { points, zoom, orientation },
     } = event;
+    this.points = points;
+    this.zoom = zoom;
+    this.orientation = orientation;
   }
   handleZoomRangeChange(event) {
     const {
@@ -188,7 +203,6 @@ class Cropper {
 
   /**
    *
-   * ******* HERE WE SET CURRENT SHIT
    *
    * Touchup
    *
@@ -230,12 +244,25 @@ class Cropper {
    */
   updateSrc(src) {
     const { points, zoom, orientation } = this.croppie.get();
-
+    console.log('croppie get', { points, zoom });
+    console.log('saved values', { points: this.points, zoom: this.zoom });
     return this.croppie.bind({
       url: src,
       points,
       zoom,
     });
+  }
+
+  update() {
+    const { points, zoom, orientation } = this.croppie.get();
+
+    console.log('updating croppie', { points, zoom });
+    this.croppie.setZoom(zoom);
+    // return this.croppie.bind({
+    //   url: this.src,
+    //   points,
+    //   zoom,
+    // });
   }
 
   resetInitialValues() {

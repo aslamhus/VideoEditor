@@ -12,7 +12,7 @@ const url = testUrls.wally;
 
 window.onload = async () => {
   renderDiv = document.getElementById('render');
-  const uploadBtn = document.querySelector('button');
+  // const uploadBtn = document.querySelector('button');
   // const saveBtn = document.querySelector('#save-btn');
   // const video = document.querySelector('video');
 
@@ -22,7 +22,7 @@ window.onload = async () => {
     src: url,
     // src: {},
     crop,
-    maxHeight,
+    // maxHeight,
     transformations: {
       // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
       // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
@@ -35,9 +35,15 @@ window.onload = async () => {
     onSave: (transform) => {
       console.log('save video -> transformations', transform);
     },
+    onRangeUpdate: (currentIndex, time) => {
+      // console.log('range update', currentIndex, time);
+    },
+    onClickHelpButton: (event) => {
+      alert('help!');
+    },
   });
   vidEditor.render(renderDiv);
-  uploadBtn.onclick = handleUploadBtnClick;
+  // uploadBtn.onclick = handleUploadBtnClick;
   // saveBtn.onclick = handleSaveBtnClick;
 };
 

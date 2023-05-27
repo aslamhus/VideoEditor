@@ -91,10 +91,16 @@ class Timeline {
 
   async handleToggleCropper(toggle) {
     if (toggle) {
-      this.getCurrentVideoFrameUrlObject().then((url) => {
-        this.cropper.updateSrc(url);
+      if (this.cropper) {
+        this.getCurrentVideoFrameUrlObject().then((url) => {
+          this.cropper.updateSrc(url);
+          this.cropper.show();
+        });
+      } else {
+        console.log('init cropper please');
+        await this.initCropper(this.transformations?.crop);
         this.cropper.show();
-      });
+      }
     } else {
       this.applyCrop();
     }
@@ -293,6 +299,15 @@ class Timeline {
     return { w, h, x, y, scale: zoom.toFixed(3) };
   }
 
+  getTransformations() {
+    const crop = this.getCrop();
+    // const in = this.timeline.rangeSelector;
+    const inMarker = this.rangeSelector.inMarker.getTimeIndex();
+    const outMarker = this.rangeSelector.outMarker.getTimeIndex();
+    // get crop, time in / out
+    return { crop, time: { in: inMarker, out: outMarker } };
+  }
+
   cropVideo({ styles, data, delta, initial, relativeTransform }) {
     this.video.style.transform = styles.transform;
     this.video.style.transformOrigin = styles.transformOrigin;
@@ -416,6 +431,7 @@ class Timeline {
   }
 
   async initCropper(initialCrop) {
+    console.log('init cropper with transformations:', initialCrop);
     let points, scale;
     if (initialCrop) {
       const { x, y, w, h } = initialCrop;
@@ -440,8 +456,11 @@ class Timeline {
     });
     // viewport not working for landscape - check computerCrop method.
     // const viewport = { width: cropWidth, height: cropHeight };
+    // const vpWidth = (cropWidth / containerWidth) * 100;
+    // const vpHeight = (cropHeight / containerHeight) * 100;
+    // console.log('viewport', `${vpWidth.toFixed(2)}%`, `${vpHeight.toFixed(2)}%`);
     const viewport = { width: cropWidth, height: cropHeight };
-    const boundary = { width: containerWidth, height: containerHeight };
+    const boundary = { width: '100%', height: '100%' };
     this.cropper = new Cropper({ src, el: cropContainer, viewport, boundary, points, scale });
   }
 

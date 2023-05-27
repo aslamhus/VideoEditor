@@ -3,6 +3,7 @@ import Timeline from './Timeline/Timeline.js';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
 import axios from 'axios';
+import { decomposeMatrix, getTranslateOrigin } from './utils.js';
 import './types.js';
 import './video-editor.css';
 import '@fontawesome/css/font-awesome.min.css';
@@ -50,7 +51,9 @@ class VideoEditor {
     this.transformations = transformations;
     this.video = null;
     this.videoEditorContainer = null;
-    this.maxHeight = maxHeight || 300;
+    this.maxHeight = maxHeight || null;
+    // the maximum height of the video display as apercent of the window size
+    this.maxHeightPercent = 0.5;
     this.onError = onError;
     this.onReady = onReady;
     this.onSave = onSave;
@@ -88,6 +91,7 @@ class VideoEditor {
     // bind
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
     this.handleAxiosError = this.handleAxiosError.bind(this);
+    this.attachResizeEvent = this.attachResizeEvent.bind(this);
   }
 
   createWrapper() {
@@ -102,6 +106,8 @@ class VideoEditor {
     this.videoEditorContainer.className = 'video-editor-container';
 
     this.loader.updateMessage('Loading video');
+    // menu bar
+    this.menuBar.render(this.videoEditorContainer);
     // video element
     this.videoEditorContainer.append(await this.createVideo());
     this.loader.updateMessage('Initializing video editor');
@@ -175,6 +181,7 @@ class VideoEditor {
         })
         .catch(this.handleAxiosError);
     }
+    if (!blob) return null;
     blob = URL.createObjectURL(blob);
     return blob;
   }
@@ -230,6 +237,24 @@ class VideoEditor {
     this.removeEvents();
   }
 
+  attachResizeEvent() {
+    console.log('ATTACH WINDOW RESIZE EVENT');
+
+    window.addEventListener('resize', (event) => {
+      const { videoWidth, videoHeight } = this.video;
+      const vidContainer = this.video.closest('.video-wrap');
+      // this.previousScale = videoEl.getBoundingClientRect().width / videoEl.offsetWidth;
+      this.previousBounds = vidContainer.getBoundingClientRect();
+      const videoBounds = this.video.getBoundingClientRect();
+      this.previousVidBounds = videoBounds;
+      if (!this.containerToVideoRatio) {
+        this.containerToVideoRatio = this.previousBounds.width / videoBounds.width;
+      }
+      // console.log('previosuScale', getScale(videoEl));
+      this.updateVideoContainerDimensions(videoWidth, videoHeight);
+    });
+  }
+
   updateVideoContainerDimensions(width, height) {
     // aspect ratio of device
     const aspectRatio = height / width;
@@ -237,17 +262,114 @@ class VideoEditor {
     const vidWrap = this.video.closest('.video-wrap');
     const vidContainer = this.video.closest('.video-container');
     const vidBounds = this.video.getBoundingClientRect();
-    if (vidBounds.height > this.maxHeight) {
-      // find width based on maxHeight of video.
-      let vidMaxWidth;
+    let vidMaxWidth;
+    // limit height of video display if maxHeight (in pixels) has been set
+    if (this.maxHeight && vidBounds.height > this.maxHeight) {
+      // find width based on maxHeight of video and apply to vid container
       vidMaxWidth = this.maxHeight / aspectRatio;
-      vidContainer.style.width = `${vidMaxWidth}px`;
+    } else {
+      // limit height of video display if screen size exceeds limit
+      // const editorHeight = editorContainer.getBoundingClientRect().height;
+      // const vidPercentHeight = vidBounds.height / window.innerHeight;
+      // console.log('vidHeight', vidBounds.height);
+      // console.log('vidPercentHeight', vidPercentHeight);
+      // calculate 35% of videoContainer
+
+      // console.log('resize max height percent', vidBounds.height);
+      const maxHeight = window.innerHeight * this.maxHeightPercent;
+      // console.log('maxHeight', maxHeight);
+      vidMaxWidth = maxHeight / aspectRatio;
     }
+    if (vidMaxWidth > window.innerWidth) {
+      vidMaxWidth = window.innerWidth;
+    }
+    // set the width
+
+    vidContainer.style.width = `${vidMaxWidth}px`;
+    /**
+     *
+     */
     vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
+    // get new width
+    requestAnimationFrame(() => {
+      if (this.previousBounds) {
+        const { scaleX, scaleY, translateX, translateY } = decomposeMatrix(this.video);
+        const scaleDiff = vidMaxWidth / this.previousBounds.width;
+        const [originX, originY] = getTranslateOrigin(this.video);
+        const newScale = scaleX * scaleDiff;
+        const vidHeight = vidContainer.getBoundingClientRect().height;
+        const widthDiff = vidMaxWidth - this.previousBounds.width;
+        const heightDiff = vidHeight - this.previousBounds.height;
+        const newTransformOriginValue = `${originX * scaleDiff}px ${originY * scaleDiff}px`;
+        const newX = translateX + widthDiff / 2;
+        const newY = translateY + heightDiff / 2;
+        const newTransformValue = `translate3d(${newX}px, ${newY}px, 0px) scale(${newScale})`;
+        this.video.style.transform = newTransformValue;
+        // this.video.style.transformOrigin = newTransformOriginValue;
+        // update crop
+        if (this.timeline.cropper) {
+          const cropButton = document.querySelector('.crop-button');
+          if (cropButton.classList.contains('toggled')) {
+            cropButton.click();
+          }
+          console.log('previous trans', this.timeline.transformations.crop);
+          this.timeline.transformations = this.timeline.getTransformations();
+
+          console.log('new trans', this.timeline.transformations.crop);
+          this.timeline.cropper.destroy();
+          this.timeline.cropper = null;
+        }
+        return;
+
+        const cropContainer = document.querySelector('.crop-container');
+        const crBoundary = cropContainer.querySelector('.cr-boundary');
+        const crImage = cropContainer.querySelector('img');
+        const crViewport = cropContainer.querySelector('.cr-viewport');
+        const crOverlay = cropContainer.querySelector('.cr-overlay');
+        // set image transform
+        // return;
+        // crImage.style.transform = newTransformValue;
+        // // crImage.style.width = '100%';
+        // // set boundary width to video width
+        // crBoundary.style.width = '100%';
+        // crBoundary.style.height = '100%';
+
+        // this.timeline.cropper.update();
+
+        // return;
+        // set viewport
+        const cropAspectRatio = this.crop.width / this.crop.height;
+        console.log(`cropRatio ${cropAspectRatio}, videoRatio ${aspectRatio}`);
+        let vpWidth, vpHeight;
+        // if (cropAspectRatio > aspectRatio) {
+        vpWidth = vidHeight * cropAspectRatio;
+        vpHeight = vidHeight;
+        // } else {
+        //   vpWidth = vidMaxWidth;
+        //   vpHeight = vidMaxWidth / cropAspectRatio;
+        // }
+
+        crViewport.style.width = `${vpWidth}px`;
+        crViewport.style.height = `${vpHeight}px`;
+        this.timeline.cropper.update();
+
+        console.log('zoomRange', this.timeline.cropper.getZoomRangeMinMax());
+        // set crop overlay
+        // crOverlay.style.width = `${vidMaxWidth}px`;
+        // crOverlay.style.height = `${vidHeight + 5}px`;
+        // const overlayBounds = crOverlay.getBoundingClientRect();
+        // const overlayTop = parseFloat(overlayBounds.top) + 1;
+        // const overlayLeft = parseFloat(overlayBounds.left) + 1;
+        // console.log('overlayTop, left', overlayTop, overlayLeft, widthDiff / 2);
+        // crOverlay.style.top = `${overlayTop}px`;
+        // crOverlay.style.left = `${overlayLeft}px`;
+        // console.log('viewport dimensions', vpWidth, vpHeight);
+      }
+    });
   }
 
   handleToggleCrop(event, toggleState) {
-    const { currentTarget } = event;
+    const { currentTarget } = event || { currentTarget: document.querySelector('.crop-button') };
     this.timeline.handleToggleCropper(toggleState);
     const span = currentTarget.querySelector('span');
     const icon = currentTarget.querySelector('i');
@@ -314,9 +436,12 @@ class VideoEditor {
     const { response, message } = error || {};
     axiosError.message = message;
     if (response?.status) {
-      axiosError.message = `${axiosError.message}: ${response.statusText}`;
+      axiosError.message = axiosError.message;
+      if (response.statusText) {
+        // include statusText
+        axiosError.message = `${axiosError.message} : ${response.statusText}`;
+      }
       axiosError.statusText = response?.statusText;
-
       axiosError.status = response?.status;
     }
     axiosError.name = 'AxiosError';
@@ -325,18 +450,9 @@ class VideoEditor {
 
   handleSaveButtonClick(event) {
     if (this.onSave instanceof Function) {
-      const transformations = this.saveVideo();
+      const transformations = this.timeline.getTransformations();
       this.onSave(transformations);
     }
-  }
-
-  saveVideo() {
-    const crop = this.timeline.getCrop();
-    // const in = this.timeline.rangeSelector;
-    const inMarker = this.timeline.rangeSelector.inMarker.getTimeIndex();
-    const outMarker = this.timeline.rangeSelector.outMarker.getTimeIndex();
-    // get crop, time in / out
-    return { crop, time: { in: inMarker, out: outMarker } };
   }
 
   async render(container) {
@@ -345,11 +461,11 @@ class VideoEditor {
       //  loader
       this.loader.render(wrapper);
       container.append(wrapper);
-      // menu bar
-      this.menuBar.render(wrapper);
       //  video editor
       const videoEditor = await this.createVideoEditor();
       wrapper.append(videoEditor);
+      // attach resize events
+      this.attachResizeEvent();
     } catch (error) {
       this.handleError(error);
     }

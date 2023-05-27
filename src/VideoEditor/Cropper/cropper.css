@@ -27,3 +27,7 @@
 .cr-slider::-moz-slider-runnable-track {
   background: var(--crop-slider-runnable-track);
 }
+
+.cr-overlay {
+  /* background: rgba(250, 0, 0, 0.5); */
+}

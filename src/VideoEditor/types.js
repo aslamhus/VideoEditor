@@ -16,4 +16,8 @@
  * @typedef {Object} transformations
  * @property {crop} crop - the crop values {w,h,x,y}
  * @property {time} time - the trim values { in, out }
+ *
+ *
+ *
+ *
  */

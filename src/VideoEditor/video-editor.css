@@ -51,7 +51,7 @@
   --control-btn-active: var(--highlight-color);
   --control-btn-active-icon: var(--highlight-color);
 }
-
+/** primary ancestor of the editor **/
 .video-editor-wrapper * {
   font-family: var(--font-family);
   user-select: none;
@@ -62,6 +62,8 @@
   position: relative;
   min-width: 450px;
   min-height: 450px;
+  height: 100%;
+  width: 100%;
   background: var(--video-wrapper-bg);
 }
 .video-editor-container {
@@ -75,9 +77,11 @@
   width: 100%;
   background: #f2f2f2;
 }
+/** the container for the video display in the editor **/
 .video-container {
   position: relative;
-
+  /* width: 100%; */
+  /* overflow: hidden; */
   margin: 0 auto;
   box-shadow: 0px 0px 0px var(--video-container-border-size) var(--video-container-border-color);
 }
@@ -86,6 +90,8 @@
   /* overflow: visible !important; */
   overflow: hidden;
 }
+
+/** descendant of video-container, wraps around the HTML5 Video element **/
 .video-wrap {
   position: relative;
   /* max-height: 200px; */
