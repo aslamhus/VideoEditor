@@ -23,7 +23,7 @@ class Timeline {
   constructor({
     video,
     duration,
-    frameTotalLimit = 10,
+    frameTotalLimit = 20,
     crop,
     transformations,
     onReady,

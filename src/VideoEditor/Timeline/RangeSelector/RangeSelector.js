@@ -296,6 +296,7 @@ class RangeSelector {
       timelineContainer.getBoundingClientRect().width -
       parseInt(timelinePadding) * 2 -
       markerWidth * 2;
+    return timelineContainer.querySelector('.frames-container');
     return { left: minX, width: maxX };
   }
   /**
