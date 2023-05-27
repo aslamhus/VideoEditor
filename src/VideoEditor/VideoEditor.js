@@ -236,6 +236,7 @@ class VideoEditor {
       onReady: this.handleTimelineReady.bind(this),
       onError: this.onError,
       onRangeUpdate: this.onRangeUpdate,
+      loader: this.loader,
     });
 
     this.timeline.render(this.videoEditorContainer);

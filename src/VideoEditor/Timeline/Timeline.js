@@ -5,6 +5,7 @@ import './timeline.css';
 import InfoBar from '../InfoBar/InfoBar.js';
 import Cropper from '../Cropper/Cropper.js';
 import '../types.js';
+import Loader from '../Loader/Loader.js';
 
 class Timeline {
   /**
@@ -17,6 +18,7 @@ class Timeline {
    * @property {transformations} transformations
    * @property {Function} onReady
    * @property {Function} onRangeUpdate
+   * @property {Loader} loader
    *
    * @param {constructor} constructor
    */
@@ -28,6 +30,7 @@ class Timeline {
     transformations,
     onReady,
     onRangeUpdate,
+    loader,
   }) {
     this.video = video;
     // video
@@ -40,6 +43,7 @@ class Timeline {
     this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
     this.cropAspectRatio = this.crop.width / this.crop.height;
     this.transformations = transformations;
+    this.loader = loader;
     // callbacks
     this.onReady = onReady;
     this.onRangeUpdate = onRangeUpdate;
@@ -342,6 +346,7 @@ class Timeline {
 
   renderCanvasFrames() {
     console.log('rendering frames');
+    this.loader.updateMessage('Rendering frames');
     let countFrames = 0;
     this.video.currentTime = 0;
     const framesContainer = this.createFramesContainer();
@@ -431,7 +436,8 @@ class Timeline {
       }, 500);
     }, 50);
 
-    // this.
+    // set video back to frame 1
+    this.video.currentTime = 0;
   }
 
   async initCropper(initialCrop) {
