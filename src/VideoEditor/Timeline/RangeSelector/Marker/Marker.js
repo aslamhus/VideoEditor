@@ -171,6 +171,8 @@ class Marker extends HTMLElement {
     // console.log('timeIndex', timeIndex);
     this.setTimeIndex(timeIndex);
     this.setX(x);
+    const percentX = x / this.getTimelineElement().getBoundingClientRect().width;
+    this.setPercentageX(percentX);
   }
 
   setPositionByTimeIndex(timeIndex) {

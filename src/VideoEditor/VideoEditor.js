@@ -238,8 +238,6 @@ class VideoEditor {
   }
 
   attachResizeEvent() {
-    console.log('ATTACH WINDOW RESIZE EVENT');
-
     window.addEventListener('resize', (event) => {
       const { videoWidth, videoHeight } = this.video;
       const vidContainer = this.video.closest('.video-wrap');

@@ -57,6 +57,7 @@ class RangeSelector {
 
     // bind
     this.handleRangeUpdate = this.handleRangeUpdate.bind(this);
+    this.calculateRangeSelectorDragBounds = this.calculateRangeSelectorDragBounds.bind(this);
     // components
     this.inMarker = new Marker({
       className: 'in-marker',
@@ -222,19 +223,12 @@ class RangeSelector {
     // };
     const handleDragRangeSelector = this.handleDragRangeSelector.bind(this);
     const handleDragEndRangeSelector = this.handleDragEndRangeSelector.bind(this);
-    // get range selector bounds
-    const markerWidth = this.inMarker.getBounds().width;
-    const timelinePadding = getComputedStyle(timelineContainer).paddingLeft;
-    const minX = timelineContainer.getBoundingClientRect().x - parseInt(timelinePadding);
-    const maxX =
-      timelineContainer.getBoundingClientRect().width -
-      markerWidth * 2 -
-      parseInt(timelinePadding) * 2;
+
     // set range selecctor options
     const rangeSelectorOptions = {
       type: 'x',
       inertia: true,
-      bounds: { left: minX, width: maxX },
+      bounds: this.calculateRangeSelectorDragBounds(),
       onDragEnd: function (event) {
         handleDragEndRangeSelector(event);
         this.disable();
@@ -242,7 +236,6 @@ class RangeSelector {
       onDragStart: (event) => {
         event.preventDefault();
         this.isDragging = true;
-        console.log('drag start');
         this.playHead.hide();
         this.rangeSelector.parentElement.classList.add('range-selector-dragging');
         document.body.style.setProperty('cursor', 'grabbing', 'important');
@@ -270,6 +263,8 @@ class RangeSelector {
     rsDraggable.vars.zIndexBoost = false;
     rsDraggable.disable();
 
+    this.rsDraggable = rsDraggable;
+
     // press hold event
     const onPressHold = (event) => {
       const { target } = event;
@@ -286,9 +281,23 @@ class RangeSelector {
     });
 
     // rsDraggable.vars.cursor = 'grabbing';
-    // window.addEventListener('resize', this.handleWindowResizeDragPositions.bind(this));
+    window.addEventListener('resize', this.handleWindowResizeDragPositions.bind(this));
   }
 
+  calculateRangeSelectorDragBounds() {
+    // get range selector bounds
+
+    const timelineContainer = this.getTimelineElement().closest('.timeline-container');
+    const markerWidth = this.inMarker.getBounds().width;
+    const timelinePadding = getComputedStyle(timelineContainer).paddingLeft;
+    const minX =
+      timelineContainer.getBoundingClientRect().x - parseInt(timelinePadding) + markerWidth;
+    const maxX =
+      timelineContainer.getBoundingClientRect().width -
+      parseInt(timelinePadding) * 2 -
+      markerWidth * 2;
+    return { left: minX, width: maxX };
+  }
   /**
    * Handle Timeline ready event
    *
@@ -500,12 +509,14 @@ class RangeSelector {
     const inMarkerX = this.inMarker.getPercentageX() * timelineWidth;
     const outMarkerX = this.outMarker.getPercentageX() * timelineWidth;
     const playheadX = this.playHead.getPercentageX() * timelineWidth;
+    console.log('inMarkerX', this.inMarker.getPercentageX());
     this.inMarker.setXPosition(inMarkerX);
     this.outMarker.setXPosition(outMarkerX);
     this.playHead.setXPosition(playheadX);
     // update range selector left position only for in marker
     this.setRangeSelectorXPos(inMarkerX);
     const rangeWidth = timelineWidth + outMarkerX - inMarkerX;
+    //
     // console.log(
     //   `resize inX ${inMarkerX} outX ${timelineWidth + outMarkerX} rangeWidth ${rangeWidth}`
     // );
@@ -521,6 +532,12 @@ class RangeSelector {
       this.selectedFrames.style.height = `${timelineHeight}px`;
       this.setSelectedFramesX(inMarkerX * -1);
     }
+    // update range bounds
+
+    const timelineContainer = this.getTimelineElement().closest('.timeline-container');
+    this.inMarker.draggable.applyBounds(timelineContainer);
+    this.outMarker.draggable.applyBounds(timelineContainer);
+    this.rsDraggable.applyBounds(this.calculateRangeSelectorDragBounds());
   }
 
   /*** VIDEO EVENTS ***/

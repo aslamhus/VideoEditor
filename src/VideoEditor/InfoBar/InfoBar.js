@@ -37,7 +37,6 @@ class InfoBar {
     const durationDiv = document.createElement('div');
     durationDiv.className = 'duration';
     durationDiv.textContent = this.duration;
-    console.log(this.duration, this.currentIndex);
     // structure
     infoBarContainer.append(currentIndexDiv, durationDiv);
     return infoBarContainer;

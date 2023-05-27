@@ -97,7 +97,6 @@ class Timeline {
           this.cropper.show();
         });
       } else {
-        console.log('init cropper please');
         await this.initCropper(this.transformations?.crop);
         this.cropper.show();
       }
@@ -431,7 +430,6 @@ class Timeline {
   }
 
   async initCropper(initialCrop) {
-    console.log('init cropper with transformations:', initialCrop);
     let points, scale;
     if (initialCrop) {
       const { x, y, w, h } = initialCrop;
