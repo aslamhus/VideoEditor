@@ -103,8 +103,9 @@
 
 .video-container svg {
   position: absolute;
-  left: 0;
+  left: 0px;
   top: 0;
   z-index: 2;
-  opacity: 1;
+  opacity: 0.85;
+  width: calc(100% + 1px);
 }

@@ -490,13 +490,17 @@ class RangeSelector {
 
   handleDragStart(event) {
     const { target: markerElement } = event;
+
     if (
       !markerElement ||
       !markerElement.closest('.marker') ||
       !markerElement.classList.contains('marker')
     ) {
+      console.log('markerElement', markerElement);
       throw new Error('Failed to select marker');
     }
+    event.stopPropagation();
+    event.preventDefault();
     this.video.pause();
     this.setCurrentMarker(markerElement);
     this.setLastInAndOutMarkerPositions();

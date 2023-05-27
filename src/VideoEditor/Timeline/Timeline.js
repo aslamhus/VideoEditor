@@ -92,6 +92,8 @@ class Timeline {
   async handleToggleCropper(toggle) {
     if (toggle) {
       if (this.cropper) {
+        document.querySelector('svg').style.visibility = 'hidden';
+        this.video.style.visibility = 'hidden';
         this.getCurrentVideoFrameUrlObject().then((url) => {
           this.cropper.updateSrc(url);
           this.cropper.show();
@@ -101,6 +103,8 @@ class Timeline {
         this.cropper.show();
       }
     } else {
+      this.video.style.visibility = 'visible';
+      document.querySelector('svg').style.visibility = 'visible';
       this.applyCrop();
     }
   }
@@ -337,6 +341,7 @@ class Timeline {
   }
 
   renderCanvasFrames() {
+    console.log('rendering frames');
     let countFrames = 0;
     this.video.currentTime = 0;
     const framesContainer = this.createFramesContainer();

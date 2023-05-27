@@ -23,7 +23,7 @@
 
 .in-marker {
   left: 0;
-  margin-left: calc(var(--marker-width) * -1);
+  margin-left: calc(var(--marker-width) * -1 + 1px);
   /** top: calc(var(--marker-border-size) * -1); **/
   top: 0;
   border-radius: 20px 0px 0px 20px;
@@ -32,7 +32,7 @@
   right: 0;
   /** The +1px is for pixel perfection. Sometimes there is a pixel gap for a reason
   I haven't nailed down yet. It only appears on certain viewport widths **/
-  margin-right: calc(var(--marker-width) * -1);
+  margin-right: calc(var(--marker-width) * -1 + 1px);
   /** top: calc(var(--marker-border-size) * -1); */
   top: 0;
   border-radius: 0 20px 20px 0;

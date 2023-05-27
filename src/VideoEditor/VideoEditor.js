@@ -177,6 +177,12 @@ class VideoEditor {
         responseType: 'blob',
       })
         .then((res) => {
+          console.log('result type', res.data.type, /video/.test(res.data.type));
+          if (res.data.type && !/video/.test(res.data.type)) {
+            throw new Error(
+              'Video src type was invalid. Expected video but found: ' + res.data.type
+            );
+          }
           return res?.data;
         })
         .catch(this.handleAxiosError);
@@ -192,6 +198,7 @@ class VideoEditor {
       handleDuration(event, container);
     };
     // this.handleLoadedMetaData();
+    console.log('attach video events', this.video);
     this.video.addEventListener('durationchange', this.handleDurationChange);
     this.video.addEventListener('loadedmetadata', this.handleLoadedMetaData);
   }
@@ -209,7 +216,7 @@ class VideoEditor {
    * @returns {void}
    */
   handleDurationChange() {
-    // console.info(this.video.readyState);
+    console.info(this.video.readyState);
     if (!isFinite(this.video.duration)) {
       console.error('durationchange: duration is infinity', this.video.duration);
       return;
@@ -462,6 +469,7 @@ class VideoEditor {
       //  video editor
       const videoEditor = await this.createVideoEditor();
       wrapper.append(videoEditor);
+
       // attach resize events
       this.attachResizeEvent();
     } catch (error) {
