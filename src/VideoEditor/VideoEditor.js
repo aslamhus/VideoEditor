@@ -23,10 +23,12 @@ class VideoEditor {
    * @property {object}  crop - the width and height of video crop
    * @property {transformations} transformations
    * @property {number}  [maxHeight] - the max height of the video editor, default is 300
+   * @property {limit}  [limit] - the min and max time range of the video editor
    * @property {Function}  [onError] - error callback. If the error type is AxiosError, the error will contain
    * status and statusText properties.
    * @property {Function}  [onReady] - onReady callback
-   * @property {Function}  [onRangeUpdate] - onRangeUpdate callback
+   * @property {Function}  [onRangeUpdate] - callback when the range is updated
+   * @property {Function}  [onRangeLimit] - callback when the range limit is reached
    * @property {Function}  [onClickHelpButton] - onRangeUpdate callback
    * @property {Function} [onSave] - onSave callback. Fired when save button is clicked. Returns transformations and time indices.
    *
@@ -40,9 +42,11 @@ class VideoEditor {
     crop,
     transformations,
     maxHeight,
+    limit,
     onError,
     onReady,
     onRangeUpdate,
+    onRangeLimit,
     onClickHelpButton,
     onSave,
   }) {
@@ -54,10 +58,12 @@ class VideoEditor {
     this.maxHeight = maxHeight || null;
     // the maximum height of the video display as apercent of the window size
     this.maxHeightPercent = 0.5;
+    this.limit = limit;
     this.onError = onError;
     this.onReady = onReady;
     this.onSave = onSave;
     this.onRangeUpdate = onRangeUpdate;
+    this.onRangeLimit = onRangeLimit;
     // both timeline and info bar are invoked when we know the video duration
     this.timeline = null;
     this.loader = new Loader({ message: 'Loading video' });
@@ -232,10 +238,12 @@ class VideoEditor {
       duration: this.video.duration,
       frameInterval: 10,
       crop: this.crop,
+      limit: this.limit,
       transformations: this.transformations,
       onReady: this.handleTimelineReady.bind(this),
       onError: this.onError,
       onRangeUpdate: this.onRangeUpdate,
+      onRangeLimit: this.onRangeLimit,
       loader: this.loader,
     });
 
@@ -313,7 +321,7 @@ class VideoEditor {
         this.video.style.transform = newTransformValue;
         // this.video.style.transformOrigin = newTransformOriginValue;
         // update crop
-        if (this.timeline.cropper) {
+        if (this.timeline.cropper && this.timeline.transformations?.crop) {
           const cropButton = document.querySelector('.crop-button');
           if (cropButton.classList.contains('toggled')) {
             cropButton.click();

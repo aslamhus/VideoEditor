@@ -19,5 +19,8 @@
  *
  *
  *
- *
+ * @typedef {Object} limit - the min and max time range of the video editor
+ * @property {number} min - the min time range of the video editor
+ * @property {number} max - the max time range of the video editor
+ * @property {number} maxDuration - the max duration of the video
  */

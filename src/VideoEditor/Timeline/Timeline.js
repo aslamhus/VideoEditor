@@ -15,9 +15,11 @@ class Timeline {
    * @property {number} duration
    * @property {number} frameTotalLimit - default is 10
    * @property {Object} crop - the crop ratio
+   * @property {limit} limit - the min and max time range of the video editor
    * @property {transformations} transformations
    * @property {Function} onReady
-   * @property {Function} onRangeUpdate
+   * @property {Function} [onRangeUpdate]
+   * @property {Function} [onRangeLimit] - callback when the range limit is reached
    * @property {Loader} loader
    *
    * @param {constructor} constructor
@@ -27,9 +29,11 @@ class Timeline {
     duration,
     frameTotalLimit = 20,
     crop,
+    limit,
     transformations,
     onReady,
     onRangeUpdate,
+    onRangeLimit,
     loader,
   }) {
     this.video = video;
@@ -72,7 +76,9 @@ class Timeline {
         in: this.transformations?.time?.in || 0,
         out: this.transformations?.time?.out || null,
       },
+      limit,
       onRangeUpdate: this.handleRangeUpdate.bind(this),
+      onRangeLimit,
     });
     // control buttons
     this.controls = new Controls({

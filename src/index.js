@@ -3,7 +3,7 @@ import { FileSelect } from '@aslamhus/fileselect';
 
 const testUrls = {
   test1: 'https://storage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4',
-  test2: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+  test2: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
   test3: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
   wally:
     'https://res.cloudinary.com/dmxpkxal2/video/upload/v1684432443/covid-19-grief-project/7bc86818-591a-4061-bc5b-67ffb79c462e/memory-c958d848-2071-4210-a360-ce35715fb988.mp4',
@@ -11,7 +11,7 @@ const testUrls = {
 const crop = { width: 4, height: 5 };
 let maxHeight = 300;
 let renderDiv, vidEditor;
-const url = testUrls.test3;
+const url = testUrls.test2;
 
 window.onload = async () => {
   renderDiv = document.getElementById('render');
@@ -26,12 +26,12 @@ window.onload = async () => {
     // src: {},
     crop,
     // maxHeight,
-    // transformations: {
-    //   // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
-    //   // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
-    //   time: { in: 5, out: 10 },
-    // },
-
+    transformations: {
+      // crop: { h: 294, scale: '0.883', w: 582, x: '349', y: '125' },
+      // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
+      // time: { in: 5, out: 10 },
+    },
+    limit: { maxDuration: 2 },
     onError: (error) => {
       console.error('onError', error);
     },
@@ -40,6 +40,9 @@ window.onload = async () => {
     },
     onRangeUpdate: (currentIndex, time) => {
       // console.log('range update', currentIndex, time);
+    },
+    onRangeLimit: ({ marker, maxDuration, time }) => {
+      console.log('range limit reached', marker, maxDuration, time);
     },
     onClickHelpButton: (event) => {
       alert('help!');

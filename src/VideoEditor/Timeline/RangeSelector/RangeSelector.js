@@ -6,6 +6,7 @@ import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { initPresHoldEvent } from '../../utils/onpresshold.js';
 import PlayHead from '../PlayHead/PlayHead.js';
+import '../../types.js';
 //without this line, PixiPlugin and MotionPathPlugin may get dropped by your bundler (tree shaking)...
 gsap.registerPlugin(Draggable);
 import './range-selector.css';
@@ -13,13 +14,15 @@ import './range-selector.css';
 class RangeSelector {
   /**
    * @typedef {Object} constructor
-   * @property {HTMLVideoElement} video
-   * @property {PlayHead} playHead
-   * @property {Function} getTimelineElement
-   * @property {Function} getVideoDuration
-   * @property {Function} setVideoTimeIndex
-   * @property {Object} initialMarkers
-   * @property {Function} [onRangeUpdate]
+   * @property {HTMLVideoElement} video - the video element
+   * @property {PlayHead} playHead - the playhead component
+   * @property {Function} getTimelineElement - returns the timeline element
+   * @property {Function} getVideoDuration -  returns the video duration
+   * @property {Function} setVideoTimeIndex - sets the video time index
+   * @property {Object} initialMarkers - the initial in and out markers
+   * @property {limit} limit - the min and max time range of the video editor
+   * @property {Function} [onRangeUpdate] - callback when the range is updated
+   * @property {Function} [onRangeLimit] - callback when the range limit is reached
    */
   /**
    *
@@ -32,9 +35,14 @@ class RangeSelector {
     getVideoDuration,
     setVideoTimeIndex,
     initialMarkers,
+    limit,
     onRangeUpdate,
+    onRangeLimit,
   }) {
-    this.initialMarkers = initialMarkers;
+    this.initialMarkers = initialMarkers || { in: 0, out: video.duration };
+    if (!this.initialMarkers.out) this.initialMarkers.out = video.duration;
+
+    console.log(this.initialMarkers);
     this.video = video;
     this.getVideoDuration = getVideoDuration;
     this.timeIndexPrecision = 3;
@@ -44,10 +52,12 @@ class RangeSelector {
     this.lastOutPos = 0;
     this.lastRangeSelectorX = 0;
     this.onRangeUpdate = onRangeUpdate;
+    this.onRangeLimit = onRangeLimit;
     // range
-    this.currentIndex = this.initialMarkers?.in ?? 0;
+    this.currentIndex = this.initialMarkers.in;
     this.inTime = this.currentIndex;
-    this.outTime = this.initialMarker?.out ?? getVideoDuration();
+    this.outTime = this.initialMarkers.out;
+    this.limit = limit;
     // isDragging refers to the range selector draggable
     this.isDragging = false;
     this.currentMarker = null;
@@ -320,10 +330,14 @@ class RangeSelector {
       // console.log('inmarker x', this.inMarker.getX());
       this.updateMarkerPosition(this.inMarker, this.initialMarkers.in);
     }
-
+    // handle max duration
+    const { maxDuration } = this.limit;
+    const initialDuration = this.initialMarkers.out - this.initialMarkers.in;
+    if (maxDuration && initialDuration > maxDuration) {
+      this.initialMarkers.out = this.initialMarkers.in + maxDuration;
+    }
     if (this.initialMarkers?.out) {
       this.outMarker.setPositionByTimeIndex(this.initialMarkers.out);
-      // console.log('outmarker x', this.outMarker.getX());
       this.updateMarkerPosition(this.outMarker, this.initialMarkers.out);
     }
     this.show();
@@ -455,8 +469,6 @@ class RangeSelector {
 
   handleDragEnd(event) {
     const currentMarker = this.currentMarker;
-    // this.playHead.toggleAnimate(false);
-    // console.log('currentMarker', currentMarker);
     this.movePlayheadToMarkerPosition();
 
     setTimeout(() => {
@@ -470,6 +482,9 @@ class RangeSelector {
   }
 
   handleDragConstraint(event, Draggable) {
+    if (this.limit.maxDuration) {
+      this.handleDragConstraintMaxDuration(event, Draggable);
+    }
     let minX = 0,
       maxX = 0;
     const x = Draggable.x;
@@ -486,6 +501,37 @@ class RangeSelector {
       minX = (timelineWidth - this.inMarker.getX()) * -1;
     }
     Draggable.applyBounds({ minX, maxX, minY: 0, maxY: 0 });
+  }
+
+  handleDragConstraintMaxDuration(event, Draggable) {
+    const dragDirection = Draggable.getDirection();
+    if (
+      (this.currentMarker.is('in') && dragDirection === 'right') ||
+      (this.currentMarker.is('out') && dragDirection === 'left')
+    ) {
+      return;
+    }
+    const inTime = this.inMarker.getTimeIndex();
+    const outTime = this.outMarker.getTimeIndex();
+    const duration = outTime - inTime;
+    const { maxDuration } = this.limit;
+    if (duration >= maxDuration) {
+      // set the current marker to the limit position
+      if (this.currentMarker.is('in')) {
+        this.currentMarker.setPositionByTimeIndex(outTime - maxDuration);
+      }
+      if (this.currentMarker.is('out')) {
+        this.currentMarker.setPositionByTimeIndex(inTime + maxDuration);
+      }
+      if (this.onRangeLimit) {
+        this.onRangeLimit({
+          marker: this.currentMarker,
+          time: { in: inTime, out: outTime },
+          maxDuration,
+        });
+      }
+      throw new Error(`Max duration reached: ${maxDuration}`);
+    }
   }
 
   handleDragStart(event) {
