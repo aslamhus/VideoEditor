@@ -54,6 +54,7 @@ class Marker extends HTMLElement {
     this.onChange = onChange;
     // bind
     this.handleChange = this.handleChange.bind(this);
+    this.setXPosition = this.setXPosition.bind(this);
   }
 
   getMarker() {
@@ -185,8 +186,8 @@ class Marker extends HTMLElement {
     // console.log('getXPositionFromTimeIndex', x);
     this.setXPosition(x);
 
-    // console.log('set x position ', this.name, x);
-    this.setTimeIndex(timeIndex);
+    // // console.log('set x position ', this.name, x);
+    // this.setTimeIndex(timeIndex);
   }
 
   applyBounds(container) {
@@ -218,18 +219,31 @@ class Marker extends HTMLElement {
       this.draggable.kill();
     }
     this.marker.classList.add('marker-draggable');
-    const setX = this.setX.bind(this);
-    const setPercentageX = this.setPercentageX.bind(this);
-    const timeline = this.getTimelineElement();
-    const { onDrag, ...dragOptions } = options;
+    const marker = this;
+    const { onDrag, onDragEnd, ...dragOptions } = options;
+
     this.draggable = Draggable.create(this.marker, {
       ...dragOptions,
+
+      onDragEnd: function (event) {
+        if (onDragEnd instanceof Function) {
+          onDragEnd.call(this, event);
+        }
+      },
+
       onDrag: function (event) {
-        setX(this.x);
-        const timelineWidth = timeline.getBoundingClientRect().width;
-        setPercentageX(this.x / timelineWidth);
-        if (onDrag instanceof Function) {
-          onDrag.call(this, event);
+        // this.enable();
+        try {
+          if (onDrag instanceof Function) {
+            onDrag.call(this, event);
+          }
+          marker.setXPosition(this.x);
+        } catch (error) {
+          // console.warn('MarkerDragError', error.message);
+          this.endDrag(event);
+          gsap.killTweensOf(this.target);
+
+          return false;
         }
       },
     })[0];

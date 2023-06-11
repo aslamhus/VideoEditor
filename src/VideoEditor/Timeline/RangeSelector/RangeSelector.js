@@ -23,6 +23,8 @@ class RangeSelector {
    * @property {limit} limit - the min and max time range of the video editor
    * @property {Function} [onRangeUpdate] - callback when the range is updated
    * @property {Function} [onRangeLimit] - callback when the range limit is reached
+   * @property {Function} [onMarkerDrag] - callback when a marker is dragged
+   *
    */
   /**
    *
@@ -38,11 +40,11 @@ class RangeSelector {
     limit,
     onRangeUpdate,
     onRangeLimit,
+    onMarkerDrag,
   }) {
     this.initialMarkers = initialMarkers || { in: 0, out: video.duration };
     if (!this.initialMarkers.out) this.initialMarkers.out = video.duration;
 
-    console.log(this.initialMarkers);
     this.video = video;
     this.getVideoDuration = getVideoDuration;
     this.timeIndexPrecision = 3;
@@ -53,6 +55,7 @@ class RangeSelector {
     this.lastRangeSelectorX = 0;
     this.onRangeUpdate = onRangeUpdate;
     this.onRangeLimit = onRangeLimit;
+    this.onMarkerDrag = onMarkerDrag;
     // range
     this.currentIndex = this.initialMarkers.in;
     this.inTime = this.currentIndex;
@@ -76,7 +79,7 @@ class RangeSelector {
       initialIndex: initialMarkers?.in || 0,
       getVideoDuration,
       getTimelineElement,
-      onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'in', timeIndex, x }),
+      // onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'in', timeIndex, x }),
     });
     this.outMarker = new Marker({
       className: 'out-marker',
@@ -86,11 +89,14 @@ class RangeSelector {
       initialIndex: initialMarkers?.out || this.video.duration,
       getVideoDuration,
       getTimelineElement,
-      onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'out', timeIndex, x }),
+      // onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'out', timeIndex, x }),
     });
     this.playHead = playHead;
-    this.playHead.onChange = ({ timeIndex, x }) =>
-      this.handleRangeUpdate({ marker: 'playhead', timeIndex, x });
+    this.playHead.onChange = ({ timeIndex, x }) => {
+      // console.log('playhead change!');
+    };
+    // this.playHead.onChange = ({ timeIndex, x }) =>
+    //   this.handleRangeUpdate({ marker: 'playhead', timeIndex, x });
   }
 
   setCurrentMarker(target) {
@@ -186,51 +192,35 @@ class RangeSelector {
   attachDraggableEvents(timeline) {
     // attach in marker and out marker draggable options
     const handleDrag = this.handleDrag.bind(this);
+    const handleDragEnd = this.handleDragEnd.bind(this);
     const handleDragStart = this.handleDragStart.bind(this);
-    const handleDragConstraint = this.handleDragConstraint.bind(this);
     const timelineContainer = this.getTimelineElement().closest('.timeline-container');
     const markerOptions = {
       type: 'x',
-      inertia: true,
+      inertia: false,
       bounds: timelineContainer,
-      onDragEnd: this.handleDragEnd.bind(this),
-      onDragStart: function (event) {
-        try {
-          handleDragStart(event);
-        } catch (error) {
-          // range width = 0
-          this.endDrag();
-          console.error('Drag start error', error);
-        }
+      onDragEnd: function (event) {
+        handleDragEnd(event, this);
       },
+      onDragStart: function (event) {
+        // throwing an error here invokes draggable endDrag method
+        handleDragStart(event, this);
+      },
+      onMove: function (event) {},
       onDrag: function (event) {
-        try {
-          handleDrag(event);
-          handleDragConstraint(event, this);
-        } catch (error) {
-          // range width = 0
-          this.endDrag();
-          console.error(error);
-        }
+        // throwing an error here invokes draggable endDrag method
+        handleDrag(event, this);
       },
     };
     this.inMarker.setDraggable(markerOptions);
     this.outMarker.setDraggable(markerOptions);
     // attach range selector draggable options
-
-    // pressHoldEvent.removeEvent();
-    // this.rangeSelector.onmose = () => {
-    //   this.rangeSelector.style.setProperty('cursor', 'pointer', 'important');
-    // };
     this.rangeSelector.onmouseup = () => {
       this.rangeSelector.style.setProperty('cursor', 'pointer', 'important');
       this.rangeSelector.isDragging = false;
       document.body.style.removeProperty('cursor');
       this.rangeSelector.parentElement.classList.remove('range-selector-dragging');
     };
-    // this.rangeSelector.onmouseout = () => {
-    //   document.body.style.cursor = 'default';
-    // };
     const handleDragRangeSelector = this.handleDragRangeSelector.bind(this);
     const handleDragEndRangeSelector = this.handleDragEndRangeSelector.bind(this);
 
@@ -257,14 +247,11 @@ class RangeSelector {
         event.preventDefault();
         handleDragRangeSelector(event, this);
       },
-      onDragPressure: (event) => {
-        console.log('drag pressure', event);
-      },
+
       onClick: (event) => {
         event.preventDefault();
         event.stopPropagation();
         document.body.style.cursor = 'pointer';
-        console.log('onClick ');
       },
     };
     const rsDraggable = Draggable.create(this.rangeSelector, {
@@ -327,11 +314,10 @@ class RangeSelector {
     if (this.initialMarkers?.in) {
       this.inMarker.setPositionByTimeIndex(this.initialMarkers.in);
       this.video.currentTime = this.initialMarkers.in;
-      // console.log('inmarker x', this.inMarker.getX());
       this.updateMarkerPosition(this.inMarker, this.initialMarkers.in);
     }
     // handle max duration
-    const { maxDuration } = this.limit;
+    const { maxDuration } = this.limit || {};
     const initialDuration = this.initialMarkers.out - this.initialMarkers.in;
     if (maxDuration && initialDuration > maxDuration) {
       this.initialMarkers.out = this.initialMarkers.in + maxDuration;
@@ -353,6 +339,7 @@ class RangeSelector {
   handleRangeUpdate({ marker, timeIndex, x }) {
     switch (marker) {
       case 'in':
+      case 'rangeSelector':
         this.inTime = timeIndex;
         this.currentIndex = timeIndex;
         break;
@@ -364,6 +351,7 @@ class RangeSelector {
         break;
       default:
         // do nothing
+        console.log(`marker`, marker);
         console.error('unknown marker update in handleRangeUpdate');
     }
     // custom callback
@@ -391,6 +379,12 @@ class RangeSelector {
     // update time index
     const timeIndex = this.inMarker.getTimeIndex();
     this.video.currentTime = timeIndex;
+    // console.log(`outX vs marker explicit x: ${outX} vs ${this.outMarker.x}`);
+    this.handleRangeUpdate({
+      marker: 'rangeSelector',
+      timeIndex,
+      x: x1,
+    });
   }
 
   handleDragEndRangeSelector(event) {
@@ -405,11 +399,7 @@ class RangeSelector {
    * @param {*} event - Draggable onDrag Event
    * @returns {Boolean} - false if range selector width is <= 0, otherwise true
    */
-  handleDrag(event) {
-    if (!this.currentMarker) {
-      throw new Error('Failed to set range selector, current marker is unknown');
-    }
-    const { target: markerElement } = event;
+  handleDrag(event, draggable) {
     // console.log('handleDrag -> currentMarker', this.currentMarker);
     const timeIndex = this.currentMarker.getTimeIndexFromCurrentPosition();
     this.updateMarkerPosition(this.currentMarker, timeIndex);
@@ -420,6 +410,15 @@ class RangeSelector {
      * we do it here to avoid any ui delays
      */
     this.playHead.hide();
+
+    // handle drag constraint
+    this.handleDragConstraint(event, draggable);
+    // trigger range update
+    this.handleRangeUpdate({
+      marker: this.currentMarker.name,
+      timeIndex: this.currentMarker.timeIndex,
+      x: this.currentMarker.x,
+    });
     // this.playHead.setPercentPosition(timeIndex / this.video.duration, false);
     return true;
   }
@@ -467,10 +466,15 @@ class RangeSelector {
     }
   }
 
-  handleDragEnd(event) {
+  handleDragEnd(event, draggable) {
     const currentMarker = this.currentMarker;
     this.movePlayheadToMarkerPosition();
-
+    /**
+     * ometimes the range selector is not updated to the final
+     * drag position, so we call drag event one more time to
+     *  make sure everything is in the correct popsition
+     */
+    this.handleDrag(event, draggable);
     setTimeout(() => {
       /**
        * We have to keep a reference to the marker at the dragEnd event
@@ -481,14 +485,17 @@ class RangeSelector {
     }, 500);
   }
 
-  handleDragConstraint(event, Draggable) {
-    if (this.limit.maxDuration) {
-      this.handleDragConstraintMaxDuration(event, Draggable);
-    }
+  /**
+   * Handle drag constraint
+   *
+   * Sets the draggable bounds for the in and out markers
+   *
+   * @param {MouseEvent} event
+   * @param {Draggable} draggable - the draggable instance for the marker
+   */
+  handleDragConstraint(event, draggable) {
     let minX = 0,
       maxX = 0;
-    const x = Draggable.x;
-    // const { target} = Draggable;
     const timelineWidth = this.getTimelineWidth();
     if (this.currentMarker.is('in')) {
       // might be faster to get MaxX from other drag instance
@@ -500,11 +507,21 @@ class RangeSelector {
        *  */
       minX = (timelineWidth - this.inMarker.getX()) * -1;
     }
-    Draggable.applyBounds({ minX, maxX, minY: 0, maxY: 0 });
+    if (this.currentMarker.getX() > maxX) {
+      this.currentMarker.setXPosition(maxX);
+      throw new Error('out of bounds (in marker)');
+    }
+    if (this.currentMarker.getX() < minX) {
+      this.currentMarker.setXPosition(minX);
+      throw new Error('out of bounds(out marker)');
+    }
+    if (this.limit?.maxDuration) {
+      this.handleDragConstraintMaxDuration(event, draggable);
+    }
   }
 
-  handleDragConstraintMaxDuration(event, Draggable) {
-    const dragDirection = Draggable.getDirection();
+  handleDragConstraintMaxDuration(event, draggable) {
+    const dragDirection = draggable.getDirection();
     if (
       (this.currentMarker.is('in') && dragDirection === 'right') ||
       (this.currentMarker.is('out') && dragDirection === 'left')
@@ -515,6 +532,8 @@ class RangeSelector {
     const outTime = this.outMarker.getTimeIndex();
     const duration = outTime - inTime;
     const { maxDuration } = this.limit;
+    // find min max values
+
     if (duration >= maxDuration) {
       // set the current marker to the limit position
       if (this.currentMarker.is('in')) {
@@ -523,6 +542,7 @@ class RangeSelector {
       if (this.currentMarker.is('out')) {
         this.currentMarker.setPositionByTimeIndex(inTime + maxDuration);
       }
+      // trigger custom callback
       if (this.onRangeLimit) {
         this.onRangeLimit({
           marker: this.currentMarker,
@@ -534,23 +554,37 @@ class RangeSelector {
     }
   }
 
-  handleDragStart(event) {
-    const { target: markerElement } = event;
-
-    if (
-      !markerElement ||
-      !markerElement.closest('.marker') ||
-      !markerElement.classList.contains('marker')
-    ) {
-      console.log('markerElement', markerElement);
-      throw new Error('Failed to select marker');
-    }
+  handleDragStart(event, draggable) {
+    const selectedMarker = this.findMarkerFromDragEvent(event, draggable);
     event.stopPropagation();
     event.preventDefault();
     this.video.pause();
-    this.setCurrentMarker(markerElement);
+    this.setCurrentMarker(selectedMarker);
     this.setLastInAndOutMarkerPositions();
     this.currentMarker.timestamp.show();
+  }
+
+  findMarkerFromDragEvent(event, draggable) {
+    const { target: selectedMarker } = draggable;
+    // if (
+    //   !selectedMarker ||
+    //   !selectedMarker.closest('.marker') ||
+    //   !selectedMarker.classList.contains('marker')
+    // ) {
+    //   const { target: draggableTarget } = draggable;
+    //   if (
+    //     !draggableTarget ||
+    //     !draggableTarget.closest('.marker') ||
+    //     !draggableTarget.classList.contains('marker')
+    //   ) {
+    //     console.log('selectedMarker', selectedMarker, draggable);
+    //     throw new Error('Failed to select marker');
+    //   } else {
+    //     console.log('found draggableTarget', draggableTarget);
+    //     return draggableTarget;
+    //   }
+    // }
+    return selectedMarker;
   }
 
   handleWindowResizeDragPositions() {
@@ -608,7 +642,6 @@ class RangeSelector {
   }
 
   handleTimeUpdate(event) {
-    console.log('isDragging?', this.isDragging);
     if (this.isDragging) return;
     // move these to onPlay event
     const isPlaying = !this.video.paused;

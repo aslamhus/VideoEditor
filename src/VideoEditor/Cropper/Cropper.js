@@ -23,7 +23,6 @@ class Cropper {
     if (!el) {
       throw new TypeError('Cropper element cannot be null');
     }
-    console.log('points', points, scale);
 
     el.addEventListener('update', this.handleUpdate.bind(this));
     this.src = src;

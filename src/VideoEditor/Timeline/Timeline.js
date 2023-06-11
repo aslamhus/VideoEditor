@@ -20,6 +20,7 @@ class Timeline {
    * @property {Function} onReady
    * @property {Function} [onRangeUpdate]
    * @property {Function} [onRangeLimit] - callback when the range limit is reached
+   * @property {Function} [onMarkerDrag] - callback when the marker is dragged
    * @property {Loader} loader
    *
    * @param {constructor} constructor
@@ -34,6 +35,7 @@ class Timeline {
     onReady,
     onRangeUpdate,
     onRangeLimit,
+    onMarkerDrag,
     loader,
   }) {
     this.video = video;
@@ -79,6 +81,7 @@ class Timeline {
       limit,
       onRangeUpdate: this.handleRangeUpdate.bind(this),
       onRangeLimit,
+      onMarkerDrag,
     });
     // control buttons
     this.controls = new Controls({
@@ -220,7 +223,7 @@ class Timeline {
   }
 
   handlePause(event) {
-    console.info('pause');
+    // console.info('pause');
   }
 
   handlePlaying(event) {
@@ -229,7 +232,7 @@ class Timeline {
      * pressing play again should snap the playhead back to 0
      * before animating a smooth playback.
      */
-    console.info('playing');
+    // console.info('playing');
     this.playHead.toggleAnimate(false);
   }
 
@@ -351,7 +354,6 @@ class Timeline {
   }
 
   renderCanvasFrames() {
-    console.log('rendering frames');
     this.loader.updateMessage('Rendering frames');
     let countFrames = 0;
     this.video.currentTime = 0;
@@ -381,10 +383,10 @@ class Timeline {
       if (countFrames < this.frameTotalLimit - 1) {
         this.video.currentTime = newFrameIndex;
       } else {
-        console.info(
-          `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.duration} `,
-          'color:green'
-        );
+        // console.info(
+        //   `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.duration} `,
+        //   'color:green'
+        // );
         this.video.removeEventListener('seeked', renderFrameOnSeek);
         this.video.removeEventListener('canplay', handleCanPlay);
         this.handleTimelineReady();
@@ -428,7 +430,6 @@ class Timeline {
    * initialize cropper, then fire timelineReady event.
    */
   async handleTimelineReady() {
-    console.log('HANDLETIMELINE READY');
     setTimeout(async () => {
       await this.initCropper(this.transformations?.crop);
 

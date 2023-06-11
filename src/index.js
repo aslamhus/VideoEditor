@@ -1,4 +1,5 @@
 import VideoEditor from './VideoEditor/VideoEditor';
+import Popover from '../../Popover/Popover';
 import { FileSelect } from '@aslamhus/fileselect';
 
 const testUrls = {
@@ -12,9 +13,15 @@ const crop = { width: 4, height: 5 };
 let maxHeight = 300;
 let renderDiv, vidEditor;
 const url = testUrls.test2;
+let popover;
 
 window.onload = async () => {
   renderDiv = document.getElementById('render');
+  popover = new Popover({
+    title: 'Maximum Video Length Exceeded',
+    body: 'Please select a shorter video.',
+    variant: 'danger',
+  });
   // const uploadBtn = document.querySelector('button');
   // const saveBtn = document.querySelector('#save-btn');
   // const video = document.querySelector('video');
@@ -31,26 +38,37 @@ window.onload = async () => {
       // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
       // time: { in: 5, out: 10 },
     },
-    limit: { maxDuration: 2 },
+    limit: { maxDuration: 5 },
     onError: (error) => {
       console.error('onError', error);
     },
     onSave: (transform) => {
       console.log('save video -> transformations', transform);
     },
-    onRangeUpdate: (currentIndex, time) => {
-      // console.log('range update', currentIndex, time);
-    },
-    onRangeLimit: ({ marker, maxDuration, time }) => {
-      console.log('range limit reached', marker, maxDuration, time);
-    },
+
     onClickHelpButton: (event) => {
       alert('help!');
+    },
+    onRangeLimit: ({ marker, maxDuration, time }) => {
+      const el = marker.marker;
+      try {
+        popover.setBody(`Please select video shorter than ${maxDuration} seconds.`);
+        popover.render(el);
+      } catch (error) {
+        console.error('error', error);
+      }
+    },
+    onRangeUpdate: (...args) => {
+      if (!popover.hidden) popover.hide();
     },
   });
   vidEditor.render(renderDiv);
   // uploadBtn.onclick = handleUploadBtnClick;
   // saveBtn.onclick = handleSaveBtnClick;
+};
+
+window.onresize = () => {
+  if (!popover.hidden) popover.hide();
 };
 
 function handleUploadBtnClick(event) {

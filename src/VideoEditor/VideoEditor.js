@@ -29,6 +29,7 @@ class VideoEditor {
    * @property {Function}  [onReady] - onReady callback
    * @property {Function}  [onRangeUpdate] - callback when the range is updated
    * @property {Function}  [onRangeLimit] - callback when the range limit is reached
+   * @property {Function} [onMarkerDrag] - callback when the marker is dragged
    * @property {Function}  [onClickHelpButton] - onRangeUpdate callback
    * @property {Function} [onSave] - onSave callback. Fired when save button is clicked. Returns transformations and time indices.
    *
@@ -47,6 +48,7 @@ class VideoEditor {
     onReady,
     onRangeUpdate,
     onRangeLimit,
+    onMarkerDrag,
     onClickHelpButton,
     onSave,
   }) {
@@ -64,6 +66,7 @@ class VideoEditor {
     this.onSave = onSave;
     this.onRangeUpdate = onRangeUpdate;
     this.onRangeLimit = onRangeLimit;
+    this.onMarkerDrag = onMarkerDrag;
     // both timeline and info bar are invoked when we know the video duration
     this.timeline = null;
     this.loader = new Loader({ message: 'Loading video' });
@@ -183,7 +186,7 @@ class VideoEditor {
         responseType: 'blob',
       })
         .then((res) => {
-          console.log('result type', res.data.type, /video/.test(res.data.type));
+          // console.log('result type', res.data.type, /video/.test(res.data.type));
           if (res.data.type && !/video/.test(res.data.type)) {
             throw new Error(
               'Video src type was invalid. Expected video but found: ' + res.data.type
@@ -203,8 +206,6 @@ class VideoEditor {
     this.handleDurationChange = (event) => {
       handleDuration(event, container);
     };
-    // this.handleLoadedMetaData();
-    console.log('attach video events', this.video);
     this.video.addEventListener('durationchange', this.handleDurationChange);
     this.video.addEventListener('loadedmetadata', this.handleLoadedMetaData);
   }
@@ -222,7 +223,6 @@ class VideoEditor {
    * @returns {void}
    */
   handleDurationChange() {
-    console.info(this.video.readyState);
     if (!isFinite(this.video.duration)) {
       console.error('durationchange: duration is infinity', this.video.duration);
       return;
@@ -244,6 +244,7 @@ class VideoEditor {
       onError: this.onError,
       onRangeUpdate: this.onRangeUpdate,
       onRangeLimit: this.onRangeLimit,
+      onMarkerDrag: this.onMarkerDrag,
       loader: this.loader,
     });
 
@@ -264,7 +265,6 @@ class VideoEditor {
       if (!this.containerToVideoRatio) {
         this.containerToVideoRatio = this.previousBounds.width / videoBounds.width;
       }
-      // console.log('previosuScale', getScale(videoEl));
       this.updateVideoContainerDimensions(videoWidth, videoHeight);
     });
   }
@@ -326,10 +326,8 @@ class VideoEditor {
           if (cropButton.classList.contains('toggled')) {
             cropButton.click();
           }
-          console.log('previous trans', this.timeline.transformations.crop);
           this.timeline.transformations = this.timeline.getTransformations();
 
-          console.log('new trans', this.timeline.transformations.crop);
           this.timeline.cropper.destroy();
           this.timeline.cropper = null;
         }
@@ -426,7 +424,6 @@ class VideoEditor {
      * so we can retrive the duration value without having
      * to play the  entire length of the video.
      */
-    console.info('loadedmetadata');
 
     this.video.currentTime = 1e101;
     const { videoWidth, videoHeight } = this.video;

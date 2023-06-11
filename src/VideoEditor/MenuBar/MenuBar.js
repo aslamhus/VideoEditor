@@ -80,7 +80,6 @@ class MenuBar {
       }
       return button;
     });
-    console.log('newButtons', newButtons);
     return newButtons;
   }
 
