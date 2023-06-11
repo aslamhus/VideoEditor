@@ -1,5 +1,5 @@
 import VideoEditor from './VideoEditor/VideoEditor';
-import Popover from '../../Popover/Popover';
+import Popover from './VideoEditor/Popover/Popover';
 import { FileSelect } from '@aslamhus/fileselect';
 
 const testUrls = {
