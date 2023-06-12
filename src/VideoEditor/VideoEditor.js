@@ -328,7 +328,7 @@ class VideoEditor {
         this.video.style.transform = newTransformValue;
         // this.video.style.transformOrigin = newTransformOriginValue;
         // update crop
-        if (this.timeline.cropper && this.timeline.transformations?.crop) {
+        if (this.timeline.cropper) {
           const cropButton = document.querySelector('.crop-button');
           if (cropButton.classList.contains('toggled')) {
             cropButton.click();
