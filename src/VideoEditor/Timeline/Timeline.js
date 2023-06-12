@@ -21,6 +21,7 @@ class Timeline {
    * @property {Function} [onRangeUpdate]
    * @property {Function} [onRangeLimit] - callback when the range limit is reached
    * @property {Function} [onMarkerDrag] - callback when the marker is dragged
+   * @property {Function} [onTimelineClick] - callback when the timeline is clicked
    * @property {Loader} loader
    *
    * @param {constructor} constructor
@@ -36,6 +37,7 @@ class Timeline {
     onRangeUpdate,
     onRangeLimit,
     onMarkerDrag,
+    onTimelineClick,
     loader,
   }) {
     this.video = video;
@@ -53,6 +55,7 @@ class Timeline {
     // callbacks
     this.onReady = onReady;
     this.onRangeUpdate = onRangeUpdate;
+    this.onTimelineClick = onTimelineClick;
     // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
@@ -203,6 +206,9 @@ class Timeline {
     // this.playHead.toggleAnimate(false);
     this.setVideoTimeIndex(timeIndex);
     this.video.pause();
+    if (this.onTimelineClick instanceof Function) {
+      this.onTimelineClick(timeIndex);
+    }
   }
 
   // handleTimelineMouseUp(event) {

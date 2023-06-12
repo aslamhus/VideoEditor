@@ -27,9 +27,11 @@ export default function renderVideoEditor({
     onSave: (transform) => {
       console.log('save video -> transformations', transform);
     },
-
+    onTimelineClick: (timeIndex) => {
+      if (!popover.hidden) popover.hide();
+    },
     onClickHelpButton: (event) => {
-      alert('help!');
+      // alert('help!');
     },
     onRangeLimit: ({ marker, maxDuration, time }) => {
       const el = marker.marker;

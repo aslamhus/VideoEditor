@@ -31,6 +31,7 @@ class VideoEditor {
    * @property {Function}  [onRangeLimit] - callback when the range limit is reached
    * @property {Function} [onMarkerDrag] - callback when the marker is dragged
    * @property {Function}  [onClickHelpButton] - onRangeUpdate callback
+   * @property {Function} [onTimelineClick] - onTimelineClick callback
    * @property {Function} [onSave] - onSave callback. Fired when save button is clicked. Returns transformations and time indices.
    *
    */
@@ -50,6 +51,7 @@ class VideoEditor {
     onRangeLimit,
     onMarkerDrag,
     onClickHelpButton,
+    onTimelineClick,
     onSave,
   }) {
     this.videoSrc = src;
@@ -63,6 +65,7 @@ class VideoEditor {
     this.limit = limit;
     this.onError = onError;
     this.onReady = onReady;
+    this.onTimelineClick = onTimelineClick;
     this.onSave = onSave;
     this.onRangeUpdate = onRangeUpdate;
     this.onRangeLimit = onRangeLimit;
@@ -252,6 +255,7 @@ class VideoEditor {
       onRangeUpdate: this.onRangeUpdate,
       onRangeLimit: this.onRangeLimit,
       onMarkerDrag: this.onMarkerDrag,
+      onTimelineClick: this.onTimelineClick,
       loader: this.loader,
     });
 
