@@ -9,12 +9,12 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 export default merge(common, {
   mode: 'development',
   entry: {
-    main: './src/index.js',
+    main: './test/index.js',
   },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: './src/index.html',
+      template: './test/index.html',
     }),
   ],
   devServer: {

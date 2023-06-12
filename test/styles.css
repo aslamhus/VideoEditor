@@ -1,0 +1,43 @@
+body {
+  font-size: 18px;
+}
+
+/** Setup modal **/
+
+.setup-modal-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+.setup-modal-container.modal-open {
+  display: flex;
+}
+
+.setup-modal {
+  position: relative;
+  width: 400px;
+  height: 400px;
+  background: #d7d7d7;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  padding: 2rem;
+}
+.input-group {
+  margin-bottom: 2rem;
+}
+label {
+  display: block;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+.close-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 2rem;
+}
