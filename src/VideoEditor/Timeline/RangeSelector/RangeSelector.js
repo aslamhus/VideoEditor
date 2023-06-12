@@ -391,6 +391,7 @@ class RangeSelector {
     this.currentMarker = this.inMarker;
     this.movePlayheadToMarkerPosition();
     this.isDragging = false;
+    this.playHead.show();
   }
 
   /**
@@ -470,16 +471,18 @@ class RangeSelector {
     const currentMarker = this.currentMarker;
     this.movePlayheadToMarkerPosition();
     /**
-     * ometimes the range selector is not updated to the final
+     * sometimes the range selector is not updated to the final
      * drag position, so we call drag event one more time to
      *  make sure everything is in the correct popsition
      */
     this.handleDrag(event, draggable);
+    // fade out the timestamp
     setTimeout(() => {
       /**
-       * We have to keep a reference to the marker at the dragEnd event
-       * since by the time setTimeout is called, this.currentMarker may
-       * point to another marker.
+       * Note
+       * We have to create a reference to the current marker within the scope
+       * of this function call, because by the time setTimeout is called
+       * this.currentMarker may point to another marker.
        */
       currentMarker.timestamp.hide();
     }, 500);
@@ -534,13 +537,15 @@ class RangeSelector {
     const { maxDuration } = this.limit;
     // find min max values
 
-    if (duration >= maxDuration) {
-      // set the current marker to the limit position
+    if (duration > maxDuration) {
+      // set the current marker its limit time index
       if (this.currentMarker.is('in')) {
-        this.currentMarker.setPositionByTimeIndex(outTime - maxDuration);
+        const minInMarkerTime = parseFloat(outTime) - parseFloat(maxDuration);
+        this.currentMarker.setPositionByTimeIndex(minInMarkerTime);
       }
       if (this.currentMarker.is('out')) {
-        this.currentMarker.setPositionByTimeIndex(inTime + maxDuration);
+        const maxOutMarkerTime = parseFloat(inTime) + parseFloat(maxDuration);
+        this.currentMarker.setPositionByTimeIndex(maxOutMarkerTime);
       }
       // trigger custom callback
       if (this.onRangeLimit) {
