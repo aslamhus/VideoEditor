@@ -103,21 +103,27 @@ class Timeline {
   }
 
   async handleToggleCropper(toggle) {
+    const svg = document.querySelector('svg');
     if (toggle) {
       if (this.cropper) {
-        document.querySelector('svg').style.visibility = 'hidden';
+        // show cropper
+        // hide svg and video
         this.video.style.visibility = 'hidden';
+        svg.style.visibility = 'hidden';
+        // update cropper src
         this.getCurrentVideoFrameUrlObject().then((url) => {
           this.cropper.updateSrc(url);
           this.cropper.show();
         });
       } else {
+        // initialize cropper
         await this.initCropper(this.transformations?.crop);
         this.cropper.show();
       }
     } else {
+      // hide and apply cropper crop
       this.video.style.visibility = 'visible';
-      document.querySelector('svg').style.visibility = 'visible';
+      svg.style.visibility = 'visible';
       this.applyCrop();
     }
   }
@@ -467,7 +473,7 @@ class Timeline {
     const vidContainer = document.querySelector('.video-container');
     const cropContainer = vidContainer.querySelector('.crop-container');
     const { width: containerWidth, height: containerHeight } = vidContainer.getBoundingClientRect();
-    const [x, y, cropWidth, cropHeight] = this.computeCrop({
+    let [x, y, cropWidth, cropHeight] = this.computeCrop({
       width: containerWidth,
       height: containerHeight,
     });
@@ -476,6 +482,10 @@ class Timeline {
     // const vpWidth = (cropWidth / containerWidth) * 100;
     // const vpHeight = (cropHeight / containerHeight) * 100;
     // console.log('viewport', `${vpWidth.toFixed(2)}%`, `${vpHeight.toFixed(2)}%`);
+    if (cropWidth / cropHeight == this.video.videoWidth / this.video.videoHeight) {
+      cropWidth = '100%';
+      cropHeight = '100%';
+    }
     const viewport = { width: cropWidth, height: cropHeight };
     const boundary = { width: '100%', height: '100%' };
     this.cropper = new Cropper({ src, el: cropContainer, viewport, boundary, points, scale });
