@@ -44,7 +44,7 @@ class Marker extends HTMLElement {
     this.className = className;
     this.marker = this.createMarker();
     this.anchor = anchor;
-    this.timeIndex = initialIndex;
+    this.timeIndex = parseFloat(initialIndex);
     this.x = 0;
     this.percentageX = 0;
     this.direction = direction;
@@ -140,7 +140,7 @@ class Marker extends HTMLElement {
   }
 
   setTimeIndex(timeIndex) {
-    this.timeIndex = timeIndex;
+    this.timeIndex = parseFloat(timeIndex);
     this.timestamp.setDecimalTime(timeIndex);
     this.handleChange();
   }
