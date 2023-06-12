@@ -150,7 +150,7 @@ class VideoEditor {
     this.video = document.createElement('video');
     this.video.id = 'video-preview';
     this.video.className = 'preview';
-    const src = await this.getVideoBlob();
+    const src = await this.getURLObjectString();
     this.video.src = src;
     this.video.autoplay = false;
     this.video.setAttribute('playsinline', 'true');
@@ -175,13 +175,22 @@ class VideoEditor {
     this.loader.updateMessage(`Loading video ${progress}%`);
   }
 
-  async getVideoBlob() {
-    let blob;
-    if (!(this.videoSrc instanceof Blob) && typeof this.videoSrc != 'string') {
+  /**
+   * Get Video URL Object
+   *
+   * @returns {Promise<String>} - returns a url string
+   */
+  async getURLObjectString() {
+    let src = this.videoSrc;
+    const isBlob = src instanceof Blob;
+    const isUrl = typeof src == 'string' && src?.startsWith('http');
+    // Validate video src
+    if (!isBlob && !isUrl) {
       throw new TypeError('video src must be a Blob or url, found ' + typeof src);
     }
-    if (!(this.videoSrc instanceof Blob)) {
-      blob = await axios(this.videoSrc, {
+    // if src is a url, download the video
+    if (isUrl) {
+      src = await axios(src, {
         onDownloadProgress: this.handleVideoDownloadProgress.bind(this),
         responseType: 'blob',
       })
@@ -196,9 +205,7 @@ class VideoEditor {
         })
         .catch(this.handleAxiosError);
     }
-    if (!blob) return null;
-    blob = URL.createObjectURL(blob);
-    return blob;
+    return URL.createObjectURL(src);
   }
 
   attachVideoEvents(container) {
