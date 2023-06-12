@@ -239,7 +239,7 @@ class Marker extends HTMLElement {
           }
           marker.setXPosition(this.x);
         } catch (error) {
-          // console.warn('MarkerDragError', error.message);
+          console.warn('MarkerDragError', error.message);
           this.endDrag(event);
           gsap.killTweensOf(this.target);
 
