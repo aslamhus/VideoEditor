@@ -143,7 +143,7 @@ class Timeline {
   }
 
   attachTimelineEvents() {
-    this.timeline.addEventListener('mouseup', this.handleTimelineMouseDown.bind(this), false);
+    this.timeline.addEventListener('mouseup', this.handleTimelineMouseUp.bind(this), false);
     // this.timeline.addEventListener('mouseup', this.handleTimelineMouseUp.bind(this));
     this.video.addEventListener('timeupdate', this.timeupdate.bind(this));
     this.video.addEventListener('pause', this.handlePause.bind(this));
@@ -167,7 +167,7 @@ class Timeline {
     });
   }
 
-  handleTimelineMouseDown(event) {
+  handleTimelineMouseUp(event) {
     event.preventDefault();
     /**
      * If the range selector is being dragged, the mouseup should not fire.
@@ -176,6 +176,7 @@ class Timeline {
     if (this.rangeSelector.isDragging) {
       return;
     }
+    this.playHead.show();
     const { offsetX, clientX, layerX, target, currentTarget } = event;
     /**
      *
