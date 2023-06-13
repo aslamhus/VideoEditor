@@ -208,7 +208,10 @@ class VideoEditor {
         })
         .catch(this.handleAxiosError);
     }
-    return URL.createObjectURL(src);
+
+    this.videoSrc = src;
+    const blob = URL.createObjectURL(src);
+    return blob;
   }
 
   attachVideoEvents(container) {
@@ -473,7 +476,7 @@ class VideoEditor {
   handleSaveButtonClick(event) {
     if (this.onSave instanceof Function) {
       const transformations = this.timeline.getTransformations();
-      this.onSave(transformations);
+      this.onSave(transformations, this.videoSrc);
     }
   }
 

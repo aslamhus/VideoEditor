@@ -3,3 +3,6 @@ node_modules
 .npmrc
 test.mov
 dist/test.mp4
+.prod.env
+.dev.env
+dist

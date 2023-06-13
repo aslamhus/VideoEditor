@@ -1,6 +1,7 @@
 import path from 'path';
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
 export default {
   name: 'VideoEditor',
@@ -9,6 +10,7 @@ export default {
     path: path.resolve(__dirname, '../dist/'),
     publicPath: 'auto',
   },
+
   module: {
     rules: [
       {

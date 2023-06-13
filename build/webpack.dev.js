@@ -1,20 +1,20 @@
 import path from 'path';
 import { merge } from 'webpack-merge';
 import common from './webpack.common.js';
-
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export default merge(common, {
   mode: 'development',
   entry: {
-    main: './test/index.js',
+    main: './src/test/index.js',
   },
   plugins: [
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: './test/index.html',
+      template: './src/test/index.html',
     }),
   ],
   devServer: {

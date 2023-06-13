@@ -2,7 +2,7 @@
   /** color scheme **/
   --overall-color: #d4d4d5;
   --highlight-color: gold;
-  --video-wrapper-bg: #222324;
+  --video-wrapper-bg: #e7e7e7;
   /** text **/
   --font-family: arial;
   --loading-text-color: rgb(198, 198, 198);
@@ -13,7 +13,7 @@
   /** menu bar **/
   --menu-bar-btn-bg: transparent;
   --menu-bar-btn-border-color: gray;
-  --menu-bar-btn-text: white;
+  --menu-bar-btn-text: rgb(47, 47, 47);
   --menu-bar-btn-bg-hover: var(--highlight-color);
   --menu-bar-btn-text-hover: black;
   --menu-bar-btn-border-color-hover: transparent;

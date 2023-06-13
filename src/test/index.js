@@ -1,13 +1,10 @@
-import VideoEditor from '../../src/VideoEditor/VideoEditor';
-import Popover from '../../src/VideoEditor/Popover/Popover';
+import VideoEditor from '../VideoEditor/VideoEditor.js';
+import Popover from '../VideoEditor/Popover';
 
-export default function renderVideoEditor({
-  src,
-  transformations,
-  crop = { width: 4, height: 5 },
-  maxDuration = 5,
-  renderDiv,
-}) {
+let src = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
+
+window.onload = function () {
+  const root = document.getElementById('root');
   let popover = new Popover({
     title: 'Maximum Video Length Exceeded',
     body: 'Please select a shorter video.',
@@ -15,17 +12,17 @@ export default function renderVideoEditor({
   });
   let vidEditor = new VideoEditor({
     src,
-    crop,
+    crop: { width: 300, height: 200 },
     // maxHeight,
-    transformations,
+    // transformations,
     // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
     // time: { in: 5, out: 10 },
-    limit: { maxDuration },
+    limit: { maxDuration: 5 },
     onError: (error) => {
       console.error('onError', error);
     },
-    onSave: (transform) => {
-      console.log('save video -> transformations', transform);
+    onSave: (transform, videoSrc) => {
+      if (onSave) onSave(transform, videoSrc);
     },
     onTimelineClick: (timeIndex) => {
       if (!popover.hidden) popover.hide();
@@ -46,7 +43,7 @@ export default function renderVideoEditor({
       if (!popover.hidden) popover.hide();
     },
   });
-  vidEditor.render(renderDiv);
+  vidEditor.render(root);
 
   const hidePopover = () => {
     console.log('hidePopover');
@@ -54,4 +51,4 @@ export default function renderVideoEditor({
   };
   window.removeEventListener('resize', hidePopover);
   window.addEventListener('resize', hidePopover);
-}
+};

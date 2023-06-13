@@ -29,6 +29,8 @@
     "@aslamhus/fileselect": "^2.3.2",
     "autoprefixer": "^10.4.13",
     "axios": "^1.3.5",
+    "browser-sync-webpack-plugin": "^2.3.0",
+    "copy-webpack-plugin": "^11.0.0",
     "croppie": "^2.6.5",
     "css-loader": "^6.7.3",
     "gsap": "npm:@gsap/member@^3.11.4",
