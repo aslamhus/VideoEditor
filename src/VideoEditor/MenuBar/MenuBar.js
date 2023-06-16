@@ -3,8 +3,8 @@ import './menu-bar.css';
 class MenuBar {
   /**
    * @typedef {Object} constructor
-   * @property {Array<button>} inlineStartButtons - buttons that hug the inline start of the menubar
-   * @property {Array<button>} inlineEndButtons - buttons that hug the inline end of the menubar
+   * @property {Object<button>} inlineStartButtons - buttons that hug the inline start of the menubar
+   * @property {Object<button>} inlineEndButtons - buttons that hug the inline end of the menubar
    *
    *
    * @typedef {Object} button
@@ -35,11 +35,11 @@ class MenuBar {
     // inline start
     const inlineStartContainer = document.createElement('div');
     inlineStartContainer.className = 'inline-start-buttons';
-    inlineStartContainer.append(...this.createButtons(this.inlineStartButtons));
+    inlineStartContainer.append(...this.createButtons(Object.values(this.inlineStartButtons)));
     // inline end
     const inlineEndContainer = document.createElement('div');
     inlineEndContainer.className = 'inline-end-buttons';
-    inlineEndContainer.append(...this.createButtons(this.inlineEndButtons));
+    inlineEndContainer.append(...this.createButtons(Object.values(this.inlineEndButtons)));
     // append buttons to menu container
     menuContainer.append(...[inlineStartContainer, inlineEndContainer]);
     return menuContainer;
