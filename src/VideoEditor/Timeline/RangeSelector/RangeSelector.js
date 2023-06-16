@@ -10,6 +10,7 @@ import '../../types.js';
 //without this line, PixiPlugin and MotionPathPlugin may get dropped by your bundler (tree shaking)...
 gsap.registerPlugin(Draggable);
 import './range-selector.css';
+import Popover from '../../Popover/Popover.js';
 
 class RangeSelector {
   /**
@@ -21,6 +22,7 @@ class RangeSelector {
    * @property {Function} setVideoTimeIndex - sets the video time index
    * @property {Object} initialMarkers - the initial in and out markers
    * @property {limit} limit - the min and max time range of the video editor
+   * @property {Popover} popover - the popover component
    * @property {Function} [onRangeUpdate] - callback when the range is updated
    * @property {Function} [onRangeLimit] - callback when the range limit is reached
    * @property {Function} [onMarkerDrag] - callback when a marker is dragged
@@ -38,6 +40,7 @@ class RangeSelector {
     setVideoTimeIndex,
     initialMarkers,
     limit,
+    popover,
     onRangeUpdate,
     onRangeLimit,
     onMarkerDrag,
@@ -61,6 +64,8 @@ class RangeSelector {
     this.inTime = this.currentIndex;
     this.outTime = this.initialMarkers.out;
     this.limit = limit;
+    this.popover = popover;
+    console.log('popover', popover);
     // isDragging refers to the range selector draggable
     this.isDragging = false;
     this.currentMarker = null;
@@ -327,6 +332,7 @@ class RangeSelector {
       this.updateMarkerPosition(this.outMarker, this.initialMarkers.out);
     }
     this.show();
+    //
   }
 
   /**
@@ -354,6 +360,8 @@ class RangeSelector {
         console.log(`marker`, marker);
         console.error('unknown marker update in handleRangeUpdate');
     }
+    // hide popover if visible
+    if (!this.popover.hidden) this.popover.hide();
     // custom callback
     if (this.onRangeUpdate instanceof Function) {
       this.onRangeUpdate(this.currentIndex, { in: this.inTime, out: this.outTime });
@@ -547,6 +555,9 @@ class RangeSelector {
         const maxOutMarkerTime = parseFloat(inTime) + parseFloat(maxDuration);
         this.currentMarker.setPositionByTimeIndex(maxOutMarkerTime);
       }
+      // show popover on current marker
+      this.popover.setBody(`Please select video shorter than ${maxDuration} seconds.`);
+      this.popover.render(this.currentMarker.marker);
       // trigger custom callback
       if (this.onRangeLimit) {
         this.onRangeLimit({

@@ -6,6 +6,7 @@ import InfoBar from '../InfoBar/InfoBar.js';
 import Cropper from '../Cropper/Cropper.js';
 import '../types.js';
 import Loader from '../Loader/Loader.js';
+import Popover from '../Popover/Popover.js';
 
 class Timeline {
   /**
@@ -70,6 +71,12 @@ class Timeline {
       getTimelineElement: this.getTimelineElement.bind(this),
       isDraggable: false,
     });
+    // popover
+    this.popover = new Popover({
+      title: 'Maximum Video Length Exceeded',
+      body: 'Please select a shorter video.',
+      variant: 'danger',
+    });
     // range selector
     this.rangeSelector = new RangeSelector({
       video,
@@ -82,6 +89,8 @@ class Timeline {
         out: this.transformations?.time?.out || null,
       },
       limit,
+
+      popover: this.popover,
       onRangeUpdate: this.handleRangeUpdate.bind(this),
       onRangeLimit,
       onMarkerDrag,
@@ -206,6 +215,9 @@ class Timeline {
     // this.playHead.toggleAnimate(false);
     this.setVideoTimeIndex(timeIndex);
     this.video.pause();
+    // hide popover
+    if (!this.popover.hidden) this.popover.hide();
+    // video editor onTimelineClick callback
     if (this.onTimelineClick instanceof Function) {
       this.onTimelineClick(timeIndex);
     }

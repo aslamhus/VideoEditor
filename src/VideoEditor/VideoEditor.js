@@ -28,6 +28,7 @@ class VideoEditor {
    * @property {transformations} transformations
    * @property {number}  [maxHeight] - the max height of the video editor, default is 300
    * @property {limit}  [limit] - the min and max time range of the video editor
+   * @property {Object<button>}  [menuBarButtons] - custom menu bar buttons
    * @property {Function}  [onError] - error callback. If the error type is AxiosError, the error will contain
    * status and statusText properties.
    * @property {Function}  [onReady] - onReady callback
@@ -49,6 +50,7 @@ class VideoEditor {
     transformations,
     maxHeight,
     limit,
+    menuBarButtons,
     onError,
     onReady,
     onRangeUpdate,
@@ -77,17 +79,24 @@ class VideoEditor {
     // both timeline and info bar are invoked when we know the video duration
     this.timeline = null;
     this.loader = new Loader({ message: 'Loading video' });
+    // get custom buttons (custom buttons cannot override default buttons)
+    const { inlineStartButtons: customInlineButtons, inlineEndButtons: customInlineEndButtons } =
+      menuBarButtons || { inlineStartButtons: {}, inlineEndButtons: {} };
+    console.log('menuBarButtons', menuBarButtons);
+    console.log(customInlineButtons, customInlineEndButtons);
     this.menuBar = new MenuBar({
-      inlineStartButtons: [
-        {
+      inlineStartButtons: {
+        ...customInlineButtons,
+        help: {
           label: '?',
           title: 'Help',
           className: 'help-button',
           onClick: onClickHelpButton,
         },
-      ],
-      inlineEndButtons: [
-        {
+      },
+      inlineEndButtons: {
+        ...customInlineEndButtons,
+        crop: {
           label: 'Crop',
           title: 'Crop',
           toggle: true,
@@ -95,14 +104,14 @@ class VideoEditor {
           fontAwesomeIcon: 'fa fa-crop',
           onClick: this.handleToggleCrop.bind(this),
         },
-        {
+        save: {
           label: 'Save',
           title: 'Save',
           className: 'save-button',
-          fontAwesomeIcon: 'fa fa-check',
+          fontAwesomeIcon: 'fa fa-save',
           onClick: this.handleSaveButtonClick.bind(this),
         },
-      ],
+      },
     });
     // bind
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
@@ -402,7 +411,7 @@ class VideoEditor {
     const { currentTarget } = event || { currentTarget: document.querySelector('.crop-button') };
     this.timeline.handleToggleCropper(toggleState);
     const span = currentTarget.querySelector('span');
-    const icon = currentTarget.querySelector('i');
+    const icon = currentTarget.querySelector('i') ?? currentTarget.querySelector('svg');
     if (toggleState) {
       span.innerText = 'Done';
       icon.style.display = 'none';

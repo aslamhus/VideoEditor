@@ -17,12 +17,23 @@ window.onload = function () {
     // transformations,
     // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
     // time: { in: 5, out: 10 },
+    menuBarButtons: {
+      inlineEndButtons: {
+        // save: {
+        //   label: 'Save',
+        //   onClick: (event) => {
+        //     console.log('custom save', event);
+        //   },
+        // },
+      },
+    },
     limit: { maxDuration: 5 },
     onError: (error) => {
       console.error('onError', error);
     },
     onSave: (transform, videoSrc) => {
-      if (onSave) onSave(transform, videoSrc);
+      console.log('onSave', transform, videoSrc);
+      // if (onSave) onSave(transform, videoSrc);
     },
     onTimelineClick: (timeIndex) => {
       if (!popover.hidden) popover.hide();
