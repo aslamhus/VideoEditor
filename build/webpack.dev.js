@@ -2,7 +2,7 @@ import path from 'path';
 import { merge } from 'webpack-merge';
 import common from './webpack.common.js';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
+// import BrowserSyncPlugin from 'browser-sync-webpack-plugin';
 import * as url from 'url';
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 

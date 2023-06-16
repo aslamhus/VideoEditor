@@ -6,7 +6,11 @@ import axios from 'axios';
 import { decomposeMatrix, getTranslateOrigin } from './utils.js';
 import './types.js';
 import './video-editor.css';
-import '@fontawesome/css/font-awesome.min.css';
+// import '@fontawesome/css/font-awesome.min.css';
+import '@fortawesome/fontawesome-free/js/fontawesome';
+import '@fortawesome/fontawesome-free/js/solid';
+import '@fortawesome/fontawesome-free/js/regular';
+import '@fortawesome/fontawesome-free/js/brands';
 
 /**
  * To do: find moment to revoke object url of video src
