@@ -14,8 +14,11 @@ import './video-editor.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 
 /**
- * To do: find moment to revoke object url of video src
-
+ * To do:
+ *
+ * 1) find moment to revoke object url of video src
+ * 2) window event listener clean up when video editor is destroyed
+ * 3) Readme
  */
 
 class VideoEditor {
