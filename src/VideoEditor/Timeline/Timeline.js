@@ -98,14 +98,7 @@ class Timeline {
     // control buttons
     this.controls = new Controls({
       video,
-      onPlayClick: ({ target }) => {
-        if (this.video.paused) {
-          this.video.play();
-        } else {
-          this.video.pause();
-          this.video.currentTime = this.video.currentTime + 0.01;
-        }
-      },
+      onPlayClick: this.handlePlayClick.bind(this),
     });
     // info bar
     this.infoBar = new InfoBar({
@@ -183,6 +176,17 @@ class Timeline {
         });
       }
     });
+  }
+
+  handlePlayClick(target) {
+    if (this.video.paused) {
+      // hide popover if visible
+      if (!this.popover.hidden) this.popover.hide();
+      this.video.play();
+    } else {
+      this.video.pause();
+      this.video.currentTime = this.video.currentTime + 0.01;
+    }
   }
 
   handleTimelineMouseUp(event) {
