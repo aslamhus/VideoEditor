@@ -11,8 +11,9 @@
 .play-btn i {
   margin-left: 3px;
 }
-.pause i {
-  color: blue;
+/** pause btn **/
+.play-btn.control-btn-active i {
+  margin-left: 0px;
 }
 
 @media (max-device-width: 380px) {
