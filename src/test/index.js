@@ -1,15 +1,10 @@
 import VideoEditor from '../VideoEditor/VideoEditor.js';
-import Popover from '../VideoEditor/Popover';
 
 let src = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
 
 window.onload = function () {
   const root = document.getElementById('root');
-  let popover = new Popover({
-    title: 'Maximum Video Length Exceeded',
-    body: 'Please select a shorter video.',
-    variant: 'danger',
-  });
+
   let vidEditor = new VideoEditor({
     src,
     crop: { width: 300, height: 200 },
@@ -36,30 +31,20 @@ window.onload = function () {
       // if (onSave) onSave(transform, videoSrc);
     },
     onTimelineClick: (timeIndex) => {
-      if (!popover.hidden) popover.hide();
+      // console.log('onTimelineClick', timeIndex);
     },
     onClickHelpButton: (event) => {
       // alert('help!');
     },
     onRangeLimit: ({ marker, maxDuration, time }) => {
-      const el = marker.marker;
-      try {
-        popover.setBody(`Please select video shorter than ${maxDuration} seconds.`);
-        popover.render(el);
-      } catch (error) {
-        console.error('error', error);
-      }
+      // console.log('onRangeLimit', { marker, maxDuration, time });
     },
     onRangeUpdate: (...args) => {
-      if (!popover.hidden) popover.hide();
+      // console.log('onRangeUpdate', ...args);
     },
   });
   vidEditor.render(root);
 
-  const hidePopover = () => {
-    console.log('hidePopover');
-    if (!popover.hidden) popover.hide();
-  };
   window.removeEventListener('resize', hidePopover);
   window.addEventListener('resize', hidePopover);
 };

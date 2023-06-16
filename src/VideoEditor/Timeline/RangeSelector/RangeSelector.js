@@ -639,6 +639,8 @@ class RangeSelector {
     this.inMarker.draggable.applyBounds(timelineContainer);
     this.outMarker.draggable.applyBounds(timelineContainer);
     this.rsDraggable.applyBounds(this.calculateRangeSelectorDragBounds());
+    // hide popover
+    if (!this.popover.hidden) this.popover.hide();
   }
 
   /*** VIDEO EVENTS ***/
