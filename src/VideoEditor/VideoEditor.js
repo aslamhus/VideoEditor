@@ -6,13 +6,11 @@ import axios from 'axios';
 import { decomposeMatrix, getTranslateOrigin } from './utils.js';
 import './types.js';
 import './video-editor.css';
-// import '@fontawesome/css/font-awesome.min.css';
-import '@fortawesome/fontawesome-free/js/fontawesome';
-import '@fortawesome/fontawesome-free/js/solid';
-import '@fortawesome/fontawesome-free/js/regular';
-import '@fortawesome/fontawesome-free/js/brands';
-// import '@fortawesome/fontawesome-free/css/all.css';
-// import '@fortawesome/fontawesome-free/js/all.js';
+/** font awesome, import only used icons to keep build size small */
+import { dom, library } from '@fortawesome/fontawesome-svg-core';
+import { faPlay, faPause, faCrop, faSave } from '@fortawesome/free-solid-svg-icons';
+library.add(faPlay, faPause, faCrop, faSave);
+dom.watch();
 
 /**
  * To do:
