@@ -14,7 +14,7 @@
   color: var(--menu-bar-btn-text);
   text-transform: uppercase;
 }
-.menu-bar-button svg {
+.menu-bar-button i {
   display: inline;
   margin-left: 7px;
   font-size: 14px;

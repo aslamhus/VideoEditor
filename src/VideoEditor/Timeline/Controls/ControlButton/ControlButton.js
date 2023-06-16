@@ -73,11 +73,13 @@ class ControlButton {
   }
 
   setIconClass(className) {
-    this.btn.querySelector('i').className = className;
+    const icon = this.btn.querySelector('i') ?? this.btn.querySelector('svg');
+    icon.className = className;
   }
 
   resetIconClass(className) {
-    this.btn.querySelector('i').className = this.iconClassName;
+    const icon = this.btn.querySelector('i') ?? this.btn.querySelector('svg');
+    icon.className = this.iconClassName;
   }
 
   createControlButton() {
