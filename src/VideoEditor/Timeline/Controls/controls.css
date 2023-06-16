@@ -8,12 +8,15 @@
 }
 
 /** play/pause btn **/
-.play-btn i {
+.play-btn i,
+.play-btn svg {
+  font-size: 20px;
   margin-left: 3px;
 }
 /** pause btn **/
-.play-btn.control-btn-active i {
-  margin-left: 0px;
+.play-btn.control-btn-active i,
+.play-btn.control-btn-active svg {
+  margin-left: -1px;
 }
 
 @media (max-device-width: 380px) {

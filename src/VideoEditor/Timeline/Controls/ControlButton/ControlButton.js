@@ -1,3 +1,4 @@
+import c from '../../../Cropper/croppie-test';
 import './control-button.css';
 
 class ControlButton {
@@ -72,15 +73,31 @@ class ControlButton {
     this.btn.classList.remove(className);
   }
 
-  setIconClass(className) {
-    const icon = this.btn.querySelector('i') ?? this.btn.querySelector('svg');
-    icon.className = className;
+  addIconClass(className) {
+    const icon = this.findIcon();
+    icon.classList.add(className);
   }
 
-  resetIconClass(className) {
-    const icon = this.btn.querySelector('i') ?? this.btn.querySelector('svg');
-    icon.className = this.iconClassName;
+  removeIconClass(className) {
+    const icon = this.findIcon();
+    icon.classList.remove(className);
   }
+
+  findIcon() {
+    return this.btn.querySelector('i') ?? this.btn.querySelector('svg');
+  }
+
+  // setIconClass(className) {
+  //
+  //   /** @type {HTMLElement} */
+  //   console.log('set icon class', icon.className, className);
+  //   icon.setAttribute('class', className);
+  // }
+
+  // resetIconClass(className) {
+  //   const icon = this.btn.querySelector('i') ?? this.btn.querySelector('svg');
+  //   icon.setAttribute('class', className);
+  // }
 
   createControlButton() {
     this.btn = document.createElement('button');

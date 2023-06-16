@@ -16,13 +16,15 @@ class PlayButton extends ControlButton {
   handlePause(event) {
     this.toggle(false);
     this.setTitle('Play');
-    this.resetIconClass();
+    this.addIconClass('fa-play');
+    this.removeIconClass('fa-pause');
   }
 
   handlePlaying(event) {
     this.toggle(true);
     this.setTitle('Pause');
-    this.setIconClass('fa fa-pause');
+    this.addIconClass('fa-pause');
+    this.removeIconClass('fa-play');
   }
 
   attachVideoEvents() {

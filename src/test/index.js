@@ -44,7 +44,4 @@ window.onload = function () {
     },
   });
   vidEditor.render(root);
-
-  window.removeEventListener('resize', hidePopover);
-  window.addEventListener('resize', hidePopover);
 };

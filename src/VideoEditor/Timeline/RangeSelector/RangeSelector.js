@@ -65,7 +65,6 @@ class RangeSelector {
     this.outTime = this.initialMarkers.out;
     this.limit = limit;
     this.popover = popover;
-    console.log('popover', popover);
     // isDragging refers to the range selector draggable
     this.isDragging = false;
     this.currentMarker = null;

@@ -7,11 +7,12 @@ import { decomposeMatrix, getTranslateOrigin } from './utils.js';
 import './types.js';
 import './video-editor.css';
 // import '@fontawesome/css/font-awesome.min.css';
-// import '@fortawesome/fontawesome-free/js/fontawesome';
-// import '@fortawesome/fontawesome-free/js/solid';
-// import '@fortawesome/fontawesome-free/js/regular';
-// import '@fortawesome/fontawesome-free/js/brands';
-import '@fortawesome/fontawesome-free/css/all.css';
+import '@fortawesome/fontawesome-free/js/fontawesome';
+import '@fortawesome/fontawesome-free/js/solid';
+import '@fortawesome/fontawesome-free/js/regular';
+import '@fortawesome/fontawesome-free/js/brands';
+// import '@fortawesome/fontawesome-free/css/all.css';
+// import '@fortawesome/fontawesome-free/js/all.js';
 
 /**
  * To do:
@@ -86,8 +87,6 @@ class VideoEditor {
     // get custom buttons (custom buttons cannot override default buttons)
     const { inlineStartButtons: customInlineButtons, inlineEndButtons: customInlineEndButtons } =
       menuBarButtons || { inlineStartButtons: {}, inlineEndButtons: {} };
-    console.log('menuBarButtons', menuBarButtons);
-    console.log(customInlineButtons, customInlineEndButtons);
     this.menuBar = new MenuBar({
       inlineStartButtons: {
         ...customInlineButtons,

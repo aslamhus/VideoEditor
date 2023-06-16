@@ -19,13 +19,13 @@ export default {
         },
       },
       { test: /\.m?js/, type: 'javascript/auto' },
-      {
-        test: /\.(ttf|eot|woff2|woff)/,
-        generator: {
-          //If emitting file, the file path is
-          filename: 'fonts/[hash][ext]',
-        },
-      },
+      // {
+      //   test: /\.(ttf|eot|woff2|woff)/,
+      //   generator: {
+      //     //If emitting file, the file path is
+      //     filename: 'fonts/[hash][ext]',
+      //   },
+      // },
 
       {
         test: /\.(scss|css)$/,
@@ -36,17 +36,17 @@ export default {
           {
             loader: 'css-loader',
           },
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: () => [require('autoprefixer')],
-              },
-            },
-          },
-          {
-            loader: 'sass-loader',
-          },
+          // {
+          //   loader: 'postcss-loader',
+          //   options: {
+          //     postcssOptions: {
+          //       plugins: () => [require('autoprefixer')],
+          //     },
+          //   },
+          // },
+          // {
+          //   loader: 'sass-loader',
+          // },
         ],
       },
     ],
