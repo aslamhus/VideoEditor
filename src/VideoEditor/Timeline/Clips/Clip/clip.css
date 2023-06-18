@@ -1,0 +1,9 @@
+.clip {
+  /* display: inline-block; */
+  position: relative;
+  height: 100%;
+  border: 4px solid purple;
+  border-radius: 5px;
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}

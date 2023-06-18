@@ -432,6 +432,7 @@ class VideoEditor {
   }
 
   handleTimelineReady() {
+    console.log('handletimelineready!!!!!');
     this.show();
     if (this.onReady instanceof Function) {
       this.onReady();

@@ -70,7 +70,7 @@ class RangeSelector {
     this.currentMarker = null;
     this.rangeSelector = null;
     this.selectedFrames = null;
-    this.hidden = false;
+    this.hidden = true;
 
     // bind
     this.handleRangeUpdate = this.handleRangeUpdate.bind(this);
@@ -175,7 +175,7 @@ class RangeSelector {
   hide() {
     this.rangeSelector.parentElement.style.visibility = 'hidden';
     this.hidden = true;
-    this.resetRange();
+    // this.resetRange();
   }
 
   resetRange() {
@@ -330,7 +330,7 @@ class RangeSelector {
       this.outMarker.setPositionByTimeIndex(this.initialMarkers.out);
       this.updateMarkerPosition(this.outMarker, this.initialMarkers.out);
     }
-    this.show();
+    // this.show();
     //
   }
 
@@ -743,11 +743,18 @@ class RangeSelector {
     // super.render(rsContainer, container);
     const rs = this.createRangeSelector();
     rsContainer.append(rs);
+
+    // initially, range selector is hidden
+    this.hide();
     this.inMarker.render(rsContainer);
     this.outMarker.render(rsContainer);
     container.append(rsContainer);
 
     this.attachTimelineEvents();
+    setTimeout(() => {
+      console.log('hide');
+      this.hide();
+    }, 1000);
   }
 }
 

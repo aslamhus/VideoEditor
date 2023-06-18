@@ -22,7 +22,7 @@ window.onload = function () {
         // },
       },
     },
-    limit: { maxDuration: 5 },
+    // limit: { maxDuration: 5 },
     onError: (error) => {
       console.error('onError', error);
     },
