@@ -1,0 +1,91 @@
+/** static styles that do not change between themes **/
+.video-editor-wrapper {
+}
+
+/** colors **/
+.video-editor-wrapper.darkmode {
+  /** color scheme **/
+  --overall-color: #959595;
+  --highlight-saturation: rgb(186, 35, 161);
+  --higlight-saturation-secondary: rgb(112, 14, 96);
+  --highlight-luminosity: white;
+  --highlight-light: transparent;
+  --video-wrapper-bg: #262626;
+  --light-shadow: rgb(72, 72, 72);
+  --medium-shadow: rgb(224, 224, 224);
+  --heavy-shadow: black;
+  --transparent-bg: rgba(175, 175, 175, 0.508);
+  --semi-transparent-bg: rgba(204, 39, 196, 0.2508);
+}
+.video-editor-wrapper:not(.video-editor-wrapper.darkmode) {
+  /** color scheme **/
+  --overall-color: #d4d4d5;
+  --highlight-saturation: gold;
+
+  --highlight-luminosity: white;
+  --higlight-saturation-secondary: rgb(134, 117, 20);
+  --highlight-light: transparent;
+  --video-wrapper-bg: #e7e7e7;
+  --light-shadow: rgb(128, 128, 128);
+  --medium-shadow: rgb(47, 47, 47);
+  --heavy-shadow: black;
+  --transparent-bg: rgba(0, 0, 0, 0.2);
+  --semi-transparent-bg: rgba(0, 0, 0, 0.5);
+}
+
+.video-editor-wrapper {
+  /** ############ SIZES ############## **/
+  --font-family: arial;
+  /** range select **/
+  --range-selector-border-size: 4px;
+  /** markers **/
+  --marker-border-size: 7px;
+  /** marker width MUST be greater than (marker-border-size * 2) **/
+  --marker-width: 20px;
+  /** frames **/
+  --frame-border-size: 2px;
+  --frame-border-style: solid;
+  /** playhead **/
+  --play-head-width: 1.5px;
+
+  /** ############ COLORS ############## **/
+  /** text **/
+  --loading-text-color: var(--shadow-medium);
+  --info-bar-text-color: var(--shadow-medium);
+  /** video container **/
+  --video-container-border-size: 0px;
+  --video-container-border-color: var(--shadow-medium);
+  /** menu bar **/
+  --menu-bar-btn-bg: var(--highlight-light);
+  --menu-bar-btn-border-color: var(--light-shadow);
+  --menu-bar-btn-text: var(--medium-shadow);
+  --menu-bar-btn-bg-hover: var(--highlight-saturation);
+  --menu-bar-btn-text-hover: var(--heavy-shadow);
+  --menu-bar-btn-border-color-hover: var(--highlight-light);
+  /** frames **/
+  --frame-bg: var(--light-shadow);
+  --frame-border-color: var(--heavy-shadow);
+  /** range select **/
+  --range-selector-border-color: var(--highlight-saturation);
+  --range-selector-dragging-color: var(--highlight-saturation);
+  /** markers **/
+  --marker-border-color: var(--highlight-saturation);
+  --marker-bg-color: var(--highlight-saturation);
+  --in-out-marker-grab-color: var(--higlight-saturation-secondary);
+  /** playhead **/
+  --play-head-color: var(--highlight-luminosity);
+  /** crop slider **/
+  --crop-slider-thumb-color: var(--highlight-saturation);
+  --crop-slider-runnable-track: var(--overall-color);
+  /** control button **/
+  --control-btn: var(--overall-color);
+  --control-btn-bg: var(--transparent-bg);
+  --control-btn-i: var(--overall-color);
+  --control-btn-hover: var(--highlight-saturation);
+  --control-btn-border-radius: 50%;
+  --control-btn-hover-i: var(--highlight-saturation);
+  --control-btn-focus-i: var(--highlight-saturation);
+  --control-btn-focus-bg: var(--semi-transparent-bg);
+  --control-btn-active: var(--highlight-saturation);
+  --control-btn-active-icon: var(--highlight-saturation);
+}
