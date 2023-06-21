@@ -51,7 +51,6 @@ class Clip {
       frameTotalLimit,
       crop,
       getTimelineElement,
-      onClipReady: this.handleClipReady.bind(this),
     });
     // range selector
     this.rangeSelector = new RangeSelector({
@@ -129,19 +128,6 @@ class Clip {
 
   handleClipReady() {
     this.ready = true;
-    // init cropper
-    setTimeout(async () => {
-      await this.clipCropper.init(this.transformations?.crop);
-
-      setTimeout(() => {
-        this.clipCropper.applyCrop();
-
-        // fire custom callback
-        if (this.onClipReady instanceof Function) {
-          this.onClipReady(this.id);
-        }
-      }, 500);
-    }, 50);
   }
 
   /**
@@ -160,10 +146,19 @@ class Clip {
   }
 
   render(container) {
-    container.appendChild(this.createClipElement());
+    return new Promise((resolve, reject) => {
+      container.appendChild(this.createClipElement());
 
-    this.frameRenderer.renderCanvasFrames(this.clipContainer);
-    this.attachClipsEvents();
+      this.frameRenderer.onClipReady = () => {
+        // wait for clip frames to render
+        this.handleClipReady();
+        console.log('resolve');
+        resolve(this);
+      };
+      // begin rendering clip frames
+      this.frameRenderer.renderCanvasFrames(this.clipContainer);
+      this.attachClipsEvents();
+    });
   }
 }
 

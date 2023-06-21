@@ -245,9 +245,7 @@ class Timeline {
     const timelineContainer = this.createTimelineContainer();
     this.timeline = this.getTimelineElement();
     // render clips
-    this.clips.getClips().forEach((clip) => {
-      clip.render(this.timeline);
-    });
+    this.clips.render(this.timeline);
     // render playhead
     this.playHead.render(this.timeline);
     // apend timeline to container

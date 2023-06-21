@@ -1,4 +1,5 @@
 import Clip from './Clip/Clip';
+import Cropper from '../../Cropper/Cropper';
 
 /**
  * For Clips to work, we need to reorganize the logic of the video player.
@@ -103,14 +104,31 @@ class Clips {
    */
   handleClipReady(clipId) {
     console.log('clip ready', clipId);
-    for (let clip of this.clips) {
-      if (!clip.ready) return;
-    }
+    // for (let clip of this.clips) {
+    //   if (!clip.ready) return;
+    // }
     // fire custom on all clips ready
-    if (this.onAllClipsReady instanceof Function) {
-      console.log('all clips ready');
-      this.onAllClipsReady(this.clips);
-    }
+    // if (this.onAllClipsReady instanceof Function) {
+    //   console.log('all clips ready');
+    //   this.onAllClipsReady(this.clips);
+    // }
+  }
+
+  handleAllClipsReady() {
+    // init cropper
+    setTimeout(async () => {
+      await this.clipCropper.init(this.transformations?.crop);
+
+      setTimeout(() => {
+        this.clipCropper.applyCrop();
+        // fire custom callback
+        if (this.onClipReady instanceof Function) {
+          this.onClipReady(this.id);
+        }
+      }, 500);
+    }, 50);
+    // fire custom callback
+    this.onAllClipsReady(this.clips);
   }
 
   findCurrentClip(currentTime) {
@@ -134,11 +152,14 @@ class Clips {
     return nextClip;
   }
 
-  render(container) {
-    this.clips.forEach((clip) => {
+  async render(container) {
+    for (let clip of this.clips) {
       // wait for each clip to render before starting on the next one
-      clip.render(container);
-    });
+      console.log('start rendering clip', clip.id);
+      await clip.render(container);
+      console.log('clip rendered', clip.id);
+    }
+    this.handleAllClipsReady();
   }
 }
 

@@ -52,7 +52,7 @@ class FrameRenderer {
     const framesContainer = this.createFramesContainer();
     // handle can play event
     const handleCanPlay = () => {
-      const frameStartTime = parseFloat(this.time.in) + 0.25;
+      const frameStartTime = parseFloat(this.time.in);
       this.video.currentTime = frameStartTime; // + 0.5??
       console.log('set frame start time', this.video.currentTime);
       this.video.addEventListener('seeked', renderFrameOnSeek);
@@ -83,15 +83,15 @@ class FrameRenderer {
       canvas.style.width = '';
 
       const newFrameIndex = parseInt(countFrames + 1) * this.frameInterval;
-
+      console.log(`countFrames: ${countFrames}, clipFrameTotal: ${this.clipFrameTotal - 1}`);
       if (countFrames < this.clipFrameTotal - 1) {
         // go to next frame
         this.video.currentTime = newFrameIndex;
       } else {
-        // console.info(
-        //   `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.duration} `,
-        //   'color:green'
-        // );
+        console.info(
+          `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.video.duration} `,
+          'color:green'
+        );
         this.video.removeEventListener('seeked', renderFrameOnSeek);
         this.video.removeEventListener('canplay', handleCanPlay);
         this.handleClipReady();
