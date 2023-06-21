@@ -1,0 +1,91 @@
+.slides-container {
+  --button-text-color: rgb(250, 250, 250);
+  --button-bg: rgb(67, 67, 67);
+}
+.slides-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: white;
+  padding: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  /* overflow: hidden; */
+}
+.slides-container * {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+.all-slides-container {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-basis: 1;
+  width: 100%;
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+.slide-container {
+  display: inline-block;
+  flex-basis: 100%;
+  flex-shrink: 0;
+  position: relative;
+  top: 0;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 1rem;
+  background: white;
+  overflow: scroll;
+}
+.slide-container figure {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1490 / 1526;
+  background: black;
+  margin: 0;
+}
+.slide-container figure img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+.slide-container h2 {
+  font-family: Arial, Helvetica, sans-serif;
+}
+.slide-container p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.05rem;
+  color: rgb(105, 105, 105);
+  line-height: 1.35;
+}
+.button-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+}
+button.instructions-button {
+  background: var(--button-bg);
+  color: var(--button-text-color);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1.25rem;
+  margin: 0.25rem;
+  display: block;
+}
+button.instructions-button:hover {
+  color: var(--button-bg);
+  background: var(--button-text-color);
+  cursor: pointer;
+}
+button.instructions-button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+button.instructions-prev-button {
+  visibility: hidden;
+}

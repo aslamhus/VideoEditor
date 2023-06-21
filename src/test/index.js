@@ -33,9 +33,9 @@ window.onload = function () {
     onTimelineClick: (timeIndex) => {
       // console.log('onTimelineClick', timeIndex);
     },
-    onClickHelpButton: (event) => {
-      // alert('help!');
-    },
+    // onClickHelpButton: (event) => {
+    //   // alert('help!');
+    // },
     onRangeLimit: ({ marker, maxDuration, time }) => {
       // console.log('onRangeLimit', { marker, maxDuration, time });
     },

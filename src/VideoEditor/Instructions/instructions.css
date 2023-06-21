@@ -1,0 +1,37 @@
+.instructions-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 200px;
+  max-height: 80%;
+  height: auto;
+  aspect-ratio: 3/5;
+  background: white;
+  z-index: 1024;
+  opacity: 0;
+  display: inline-block;
+  box-shadow: 0px 0px 25px 5px rgba(0, 0, 0, 0.95);
+  --animation-speed: 0.5s;
+}
+
+/** Animations **/
+
+.float-in {
+  animation: float-in var(--animation-speed) forwards;
+}
+
+.float-out {
+  animation: float-in var(--animation-speed) reverse forwards !important;
+}
+
+@keyframes float-in {
+  from {
+    transform: translate(-50%, -20%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, -50%);
+    opacity: 1;
+  }
+}

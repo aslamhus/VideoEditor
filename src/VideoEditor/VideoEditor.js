@@ -1,5 +1,6 @@
 import MenuBar from './MenuBar/MenuBar.js';
 import Timeline from './Timeline/Timeline.js';
+import Instructions from './Instructions';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
 import axios from 'axios';
@@ -77,6 +78,7 @@ class VideoEditor {
     this.onError = onError;
     this.onReady = onReady;
     this.onTimelineClick = onTimelineClick;
+    this.onClickHelpButton = onClickHelpButton;
     this.onSave = onSave;
     this.onRangeUpdate = onRangeUpdate;
     this.onRangeLimit = onRangeLimit;
@@ -119,7 +121,7 @@ class VideoEditor {
           label: '?',
           title: 'Help',
           className: 'help-button',
-          onClick: onClickHelpButton,
+          onClick: this.handleClickHelpButton.bind(this),
         },
       },
       inlineEndButtons: {
@@ -141,6 +143,7 @@ class VideoEditor {
         },
       },
     });
+
     // bind
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
     this.handleAxiosError = this.handleAxiosError.bind(this);
@@ -453,6 +456,14 @@ class VideoEditor {
     }
   }
 
+  handleClickHelpButton() {
+    if (this.onClickHelpButton instanceof Function) {
+      this.onClickHelpButton();
+    } else {
+      this.instructions.begin();
+    }
+  }
+
   removeEvents() {
     this.video.removeEventListener('durationchange', this.handleDurationChange);
     this.video.onloadedmetadata = null;
@@ -524,6 +535,10 @@ class VideoEditor {
   async render(container) {
     try {
       const wrapper = this.createWrapper();
+      // instructions
+
+      this.instructions = new Instructions({ container });
+      this.instructions.render(container);
       //  loader
       this.loader.render(wrapper);
       container.append(wrapper);
