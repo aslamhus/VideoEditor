@@ -5,6 +5,7 @@ import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
 import axios from 'axios';
 import { decomposeMatrix, getTranslateOrigin } from './utils.js';
+import { defaultButtons } from './MenuBar/default-buttons.js';
 import './types.js';
 import './themes.css';
 import './video-editor.css';
@@ -101,39 +102,28 @@ class VideoEditor {
       inlineEndButtons: customInlineEndButtons,
       disable,
     } = menuBarButtons;
-
+    // init menu bar
     this.menuBar = new MenuBar({
       disable,
       inlineStartButtons: {
         ...customInlineButtons,
         darkmode: {
-          label: 'Dark',
-          fontAwesomeIcon: 'fa fa-moon',
+          ...defaultButtons.darkmode,
           onClick: this.handleClickDarkMode.bind(this),
         },
         help: {
-          label: 'Help',
-          title: 'Help',
-          className: 'help-button',
-          fontAwesomeIcon: 'fa fa-question',
+          ...defaultButtons.help,
           onClick: this.handleClickHelpButton.bind(this),
         },
       },
       inlineEndButtons: {
         ...customInlineEndButtons,
         crop: {
-          label: 'Crop',
-          title: 'Crop',
-          toggle: true,
-          className: 'crop-button',
-          fontAwesomeIcon: 'fa fa-crop',
+          ...defaultButtons.crop,
           onClick: this.handleToggleCrop.bind(this),
         },
         save: {
-          label: 'Save',
-          title: 'Save',
-          className: 'save-button',
-          fontAwesomeIcon: 'fa fa-save',
+          ...defaultButtons.save,
           onClick: this.handleSaveButtonClick.bind(this),
         },
       },
