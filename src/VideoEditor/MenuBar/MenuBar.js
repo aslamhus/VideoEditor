@@ -3,6 +3,7 @@ import './menu-bar.css';
 class MenuBar {
   /**
    * @typedef {Object} constructor
+   * @property {Array<string>} disable - list of buttons to disable
    * @property {Object<button>} inlineStartButtons - buttons that hug the inline start of the menubar
    * @property {Object<button>} inlineEndButtons - buttons that hug the inline end of the menubar
    *
@@ -18,9 +19,16 @@ class MenuBar {
    *
    * @param {constructor} constructor
    */
-  constructor({ inlineStartButtons, inlineEndButtons }) {
+  constructor({ inlineStartButtons, inlineEndButtons, disable }) {
     this.inlineStartButtons = inlineStartButtons;
     this.inlineEndButtons = inlineEndButtons;
+    // disable buttons
+    if (Array.isArray(disable)) {
+      disable.forEach((buttonName) => {
+        if (this.inlineStartButtons[buttonName]) delete this.inlineStartButtons[buttonName];
+        if (this.inlineEndButtons[buttonName]) delete this.inlineEndButtons[buttonName];
+      });
+    }
     // bind
     this.createMenuBar = this.createMenuBar.bind(this);
     this.createButtons = this.createButtons.bind(this);

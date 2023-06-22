@@ -21,6 +21,7 @@ window.onload = function () {
         //   },
         // },
       },
+      // disable: ['darkmode', 'help'],
     },
     limit: { maxDuration: 5 },
     onError: (error) => {

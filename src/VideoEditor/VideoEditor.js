@@ -34,7 +34,8 @@ class VideoEditor {
    * @property {transformations} transformations
    * @property {number}  [maxHeight] - the max height of the video editor, default is 300
    * @property {limit}  [limit] - the min and max time range of the video editor
-   * @property {Object<button>}  [menuBarButtons] - custom menu bar buttons
+   * @property {Object<button>}  [menuBarButtons] - custom menu bar buttons with option to disable default buttons { inlineStartButtons: {}, inlineEndButtons: {}, disable: []}
+   * @property {Object}  [disabledButtons] - object with keys of button names to disable
    * @property {Function}  [onError] - error callback. If the error type is AxiosError, the error will contain
    * status and statusText properties.
    * @property {Function}  [onReady] - onReady callback
@@ -56,7 +57,7 @@ class VideoEditor {
     transformations,
     maxHeight,
     limit,
-    menuBarButtons,
+    menuBarButtons = { inlineStartButtons: {}, inlineEndButtons: {}, disable: [] },
     onError,
     onReady,
     onRangeUpdate,
@@ -87,9 +88,14 @@ class VideoEditor {
     this.timeline = null;
     this.loader = new Loader({ message: 'Loading video' });
     // get custom buttons (custom buttons cannot override default buttons)
-    const { inlineStartButtons: customInlineButtons, inlineEndButtons: customInlineEndButtons } =
-      menuBarButtons || { inlineStartButtons: {}, inlineEndButtons: {} };
+    const {
+      inlineStartButtons: customInlineButtons,
+      inlineEndButtons: customInlineEndButtons,
+      disable,
+    } = menuBarButtons;
+
     this.menuBar = new MenuBar({
+      disable,
       inlineStartButtons: {
         ...customInlineButtons,
         darkmode: {
