@@ -219,12 +219,15 @@ class RangeSelector {
     this.inMarker.setDraggable(markerOptions);
     this.outMarker.setDraggable(markerOptions);
     // attach range selector draggable options
-    this.rangeSelector.onmouseup = () => {
+
+    const onRangeSelectorDragEnd = () => {
       this.rangeSelector.style.setProperty('cursor', 'pointer', 'important');
       this.rangeSelector.isDragging = false;
       document.body.style.removeProperty('cursor');
+
       this.rangeSelector.parentElement.classList.remove('range-selector-dragging');
     };
+    // this.rangeSelector.onmouseup = onRangeSelectorDragEnd
     const handleDragRangeSelector = this.handleDragRangeSelector.bind(this);
     const handleDragEndRangeSelector = this.handleDragEndRangeSelector.bind(this);
 
@@ -236,6 +239,7 @@ class RangeSelector {
       onDragEnd: function (event) {
         handleDragEndRangeSelector(event);
         this.disable();
+        onRangeSelectorDragEnd();
       },
       onDragStart: (event) => {
         event.preventDefault();
@@ -609,7 +613,7 @@ class RangeSelector {
     const inMarkerX = this.inMarker.getPercentageX() * timelineWidth;
     const outMarkerX = this.outMarker.getPercentageX() * timelineWidth;
     const playheadX = this.playHead.getPercentageX() * timelineWidth;
-    console.log('inMarkerX', this.inMarker.getPercentageX());
+    // console.log('inMarkerX', this.inMarker.getPercentageX());
     this.inMarker.setXPosition(inMarkerX);
     this.outMarker.setXPosition(outMarkerX);
     this.playHead.setXPosition(playheadX);
