@@ -63,3 +63,6 @@
   width: calc(100% + 1px);
   height: calc(100% + 1px);
 }
+.video-container svg path {
+  fill: var(--video-wrapper-bg);
+}

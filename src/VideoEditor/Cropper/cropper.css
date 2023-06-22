@@ -31,3 +31,8 @@
 .cr-overlay {
   /* background: rgba(250, 0, 0, 0.5); */
 }
+
+.croppie-container .cr-viewport,
+.croppie-container .cr-resizer {
+  box-shadow: none;
+}

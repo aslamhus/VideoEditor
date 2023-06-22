@@ -47,7 +47,6 @@ class RangeSelector {
   }) {
     this.initialMarkers = initialMarkers || { in: 0, out: video.duration };
     if (!this.initialMarkers.out) this.initialMarkers.out = video.duration;
-
     this.video = video;
     this.getVideoDuration = getVideoDuration;
     this.timeIndexPrecision = 3;
@@ -95,6 +94,7 @@ class RangeSelector {
       getTimelineElement,
       // onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'out', timeIndex, x }),
     });
+
     this.playHead = playHead;
     this.playHead.onChange = ({ timeIndex, x }) => {
       // console.log('playhead change!');
