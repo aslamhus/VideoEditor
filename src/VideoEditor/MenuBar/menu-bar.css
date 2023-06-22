@@ -3,22 +3,35 @@
   flex-direction: row;
   justify-content: space-between;
   margin-bottom: 16px;
+  background-color: var(--container-bg);
+  padding: 10px;
+}
+/** buttons **/
+.menu-bar-button-container {
+  display: inline-block;
 }
 .menu-bar-button {
+  display: block;
   padding: 0.5rem 1rem;
   border: 1px solid var(--menu-bar-btn-border-color);
+  border: none;
   margin: 4px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 20px;
   background: var(--menu-bar-btn-bg);
-  color: var(--menu-bar-btn-text);
   text-transform: uppercase;
+  color: var(--menu-bar-btn-text);
 }
 .menu-bar-button i,
 .menu-bar-button svg {
   display: inline;
-  margin-left: 7px;
-  font-size: 14px;
+}
+.menu-bar-button-container span {
+  display: block;
+  text-align: center;
+  width: 100%;
+
+  color: var(--menu-bar-btn-text);
 }
 
 .menu-bar-button:hover,
@@ -26,6 +39,6 @@
   background: var(--menu-bar-btn-bg-hover);
   color: var(--menu-bar-btn-text-hover);
 
-  border-color: var(--menu-bar-btn-border-color-hover);
+  /* border-color: var(--menu-bar-btn-border-color-hover); */
   cursor: pointer;
 }

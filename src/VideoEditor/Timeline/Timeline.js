@@ -556,8 +556,8 @@ class Timeline {
   }
 
   render(container) {
-    this.renderTimeline(container);
     this.controls.render(container);
+    this.renderTimeline(container);
     this.renderCanvasFrames();
     this.infoBar.render(container);
   }

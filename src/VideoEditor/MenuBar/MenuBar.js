@@ -63,11 +63,13 @@ class MenuBar {
     const newButtons = buttons.map((buttonObj) => {
       const { label, title, className, onClick, fontAwesomeIcon, toggle } = buttonObj;
       // create button
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'menu-bar-button-container';
       const button = document.createElement('button');
       // add label span
       const span = document.createElement('span');
       span.textContent = label;
-      button.append(span);
+      // add click event
       button.onclick = (event) => {
         event.preventDefault();
         if (toggle) {
@@ -79,14 +81,15 @@ class MenuBar {
       button.title = title ?? '';
       button.className = `menu-bar-button ${className}`;
       // create icon
-
-      // button.append(label);
       if (fontAwesomeIcon) {
         const icon = document.createElement('i');
         icon.className = fontAwesomeIcon;
+        // append icon to button
         button.append(icon);
       }
-      return button;
+      // append all parts to button container
+      buttonContainer.append(button, span);
+      return buttonContainer;
     });
     return newButtons;
   }

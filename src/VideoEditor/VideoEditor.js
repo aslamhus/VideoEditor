@@ -11,8 +11,16 @@ import './video-editor.css';
 
 /** font awesome, import only used icons to keep build size small */
 import { dom, library } from '@fortawesome/fontawesome-svg-core';
-import { faPlay, faPause, faCrop, faSave, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlay, faPause, faCrop, faSave, faMoon, faSun);
+import {
+  faPlay,
+  faPause,
+  faCrop,
+  faSave,
+  faMoon,
+  faSun,
+  faQuestion,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faPlay, faPause, faCrop, faSave, faMoon, faSun, faQuestion);
 dom.watch();
 
 /**
@@ -101,32 +109,13 @@ class VideoEditor {
         darkmode: {
           label: 'Dark',
           fontAwesomeIcon: 'fa fa-moon',
-          onClick: (event) => {
-            const { currentTarget } = event;
-            const span = currentTarget.querySelector('span');
-            const svg = currentTarget.querySelector('svg');
-            const wrapper = this.videoEditorContainer.closest('.video-editor-wrapper');
-            const isDark = wrapper.classList.contains('darkmode');
-            console.log('isDark ', isDark);
-            if (!isDark) {
-              // dark mode
-              wrapper.classList.add('darkmode');
-              span.textContent = 'Light';
-              svg.classList.remove('fa-moon');
-              svg.classList.add('fa-sun');
-            } else {
-              // lightmode
-              wrapper.classList.remove('darkmode');
-              span.textContent = 'Dark';
-              svg.classList.remove('fa-sun');
-              svg.classList.add('fa-moon');
-            }
-          },
+          onClick: this.handleClickDarkMode.bind(this),
         },
         help: {
-          label: '?',
+          label: 'Help',
           title: 'Help',
           className: 'help-button',
+          fontAwesomeIcon: 'fa fa-question',
           onClick: this.handleClickHelpButton.bind(this),
         },
       },
@@ -462,11 +451,33 @@ class VideoEditor {
     }
   }
 
-  handleClickHelpButton() {
+  handleClickHelpButton(event) {
     if (this.onClickHelpButton instanceof Function) {
-      this.onClickHelpButton();
+      this.onClickHelpButton(event);
     } else {
       this.instructions.begin();
+    }
+  }
+
+  handleClickDarkMode(event) {
+    const { currentTarget } = event;
+    const span = currentTarget.querySelector('span');
+    const svg = currentTarget.querySelector('svg');
+    const wrapper = this.videoEditorContainer.closest('.video-editor-wrapper');
+    const isDark = wrapper.classList.contains('darkmode');
+    console.log('isDark ', isDark);
+    if (!isDark) {
+      // dark mode
+      wrapper.classList.add('darkmode');
+      span.textContent = 'Light';
+      svg.classList.remove('fa-moon');
+      svg.classList.add('fa-sun');
+    } else {
+      // lightmode
+      wrapper.classList.remove('darkmode');
+      span.textContent = 'Dark';
+      svg.classList.remove('fa-sun');
+      svg.classList.add('fa-moon');
     }
   }
 

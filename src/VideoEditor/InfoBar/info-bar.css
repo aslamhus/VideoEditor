@@ -8,6 +8,8 @@
   -moz-box-sizing: border-box;
   padding: 20px;
   text-transform: uppercase;
-  margin-top: 16px;
+  margin-top: 6px;
   font-size: 14px;
+
+  background-color: var(--container-bg);
 }

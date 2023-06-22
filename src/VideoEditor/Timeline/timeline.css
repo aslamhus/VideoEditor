@@ -8,6 +8,8 @@
   display: flex;
   justify-content: center;
   /* background: rgb(220, 220, 220); */
+
+  background-color: var(--container-bg);
   box-sizing: border-box;
   margin: 0 auto;
   margin-top: 1.5rem;

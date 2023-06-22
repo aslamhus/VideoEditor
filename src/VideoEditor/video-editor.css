@@ -35,6 +35,8 @@
   /* overflow: hidden; */
   margin: 0 auto;
   box-shadow: 0px 0px 0px var(--video-container-border-size) var(--video-container-border-color);
+
+  background-color: var(--container-bg);
 }
 .video-wrap,
 .video-editor-container {
