@@ -35,7 +35,7 @@
 .croppie-container .cr-viewport,
 .croppie-container .cr-resizer {
   box-shadow: none;
-  border: 2px solid blue;
+  border: 2px solid var(--highlight-saturation);
 }
 .croppie-container .cr-boundary {
   /* overflow: visible; */
