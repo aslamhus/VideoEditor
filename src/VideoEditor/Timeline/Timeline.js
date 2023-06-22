@@ -30,7 +30,7 @@ class Timeline {
   constructor({
     video,
     duration,
-    frameTotalLimit = 20,
+    frameTotalLimit,
     crop,
     limit,
     transformations,
@@ -47,7 +47,7 @@ class Timeline {
       throw new Error('Video duration is non finite number: ' + duration);
     }
     this.duration = duration;
-    this.frameTotalLimit = frameTotalLimit; // eventually will be timeline width divided by frame width
+    this.frameTotalLimit = frameTotalLimit || window.innerWidth * 0.01; // eventually will be timeline width divided by frame width
     this.frameInterval = this.duration / this.frameTotalLimit;
     this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
     this.cropAspectRatio = this.crop.width / this.crop.height;
