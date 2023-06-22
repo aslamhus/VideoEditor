@@ -2,23 +2,26 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--control-btn-bg);
-  border: 2px solid var(--control-btn);
+  /* background: var(--control-btn-bg); */
+  /* border: 2px solid var(--control-btn); */
+  background: transparent;
+  border: none;
   border-radius: var(--control-btn-border-radius);
   width: 0;
   height: 0;
-  padding: 35px;
+  /* padding: 35px; */
+  padding: 1.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin: 0 0.5rem;
+  margin: 0 0rem;
 }
 
-.control-btn i {
+.control-btn i,
+.control-btn svg {
   position: relative;
   width: 35px;
-  font-size: 30px;
+  font-size: 25px;
   background: transparent;
-  padding: 0px;
   color: var(--control-btn-i);
 }
 
@@ -26,9 +29,10 @@
 .control-btn-active {
   transform: scale(0.95);
 
-  border: 2px solid var(--control-btn-active);
+  /* border: 2px solid var(--control-btn-active); */
 }
-.control-btn:active i {
+.control-btn:active i,
+.control-btn:active svg {
   transform: scale(1.05);
 }
 .control-btn:hover,
@@ -40,7 +44,8 @@
   /* background-color: var(--control-btn-hover);  */
   opacity: 0.9;
 }
-.control-btn:hover:not(.control-btn-active) i {
+.control-btn:hover:not(.control-btn-active) i,
+.control-btn:hover:not(.control-btn-active) svg {
   color: var(--control-btn-hover);
 }
 
@@ -48,7 +53,8 @@
   background-color: var(--control-btn-focus-bg);
   outline: none;
 }
-.control-btn.control-btn-active i {
+.control-btn.control-btn-active i,
+.control-btn.control-btn-active svg {
   color: var(--control-btn-focus-i);
 }
 .control-btn:disabled {
@@ -56,7 +62,7 @@
   pointer-events: none;
 }
 
-@media (min-device-width: 360px) {
+/* @media (min-device-width: 360px) {
   .control-btn {
     padding: 25px;
   }
@@ -65,4 +71,4 @@
     width: 25px;
     font-size: 22px;
   }
-}
+} */

@@ -14,13 +14,13 @@
   --highlight-light: #4d4d4d;
   --shadow-light: rgb(119, 119, 119);
   --shadow-medium: rgb(224, 224, 224);
-  --heavy-shadow: black;
+  --shadow-heavy: black;
   --transparent-bg: rgba(175, 175, 175, 0.508);
   --semi-transparent-bg: rgba(255, 217, 0, 0.514);
 }
 .video-editor-wrapper:not(.video-editor-wrapper.darkmode) {
   /** color scheme **/
-  --overall-color: #ccccf0;
+  --overall-color: #636363;
   --video-wrapper-bg: #eeeeee;
   --container-bg: #e9e9e9;
   --highlight-saturation: gold;
@@ -29,7 +29,7 @@
   --highlight-light: rgb(231, 231, 231);
   --shadow-light: rgb(128, 128, 128);
   --shadow-medium: rgb(47, 47, 47);
-  --heavy-shadow: black;
+  --shadow-heavy: black;
   --transparent-bg: rgba(0, 0, 0, 0.2);
   --semi-transparent-bg: rgba(0, 0, 0, 0.5);
 }
@@ -61,11 +61,11 @@
   --menu-bar-btn-border-color: var(--shadow-light);
   --menu-bar-btn-text: var(--shadow-medium);
   --menu-bar-btn-bg-hover: var(--highlight-saturation);
-  --menu-bar-btn-text-hover: var(--heavy-shadow);
+  --menu-bar-btn-text-hover: var(--shadow-heavy);
   --menu-bar-btn-border-color-hover: var(--highlight-light);
   /** frames **/
   --frame-bg: var(--shadow-light);
-  --frame-border-color: var(--heavy-shadow);
+  --frame-border-color: var(--shadow-heavy);
   /** range select **/
   --range-selector-border-color: var(--highlight-saturation);
   --range-selector-dragging-color: var(--highlight-saturation);
@@ -85,8 +85,8 @@
   --control-btn-hover: var(--highlight-saturation);
   --control-btn-border-radius: 50%;
   --control-btn-hover-i: var(--highlight-saturation);
-  --control-btn-focus-i: var(--highlight-saturation);
-  --control-btn-focus-bg: var(--semi-transparent-bg);
+  --control-btn-focus-i: var(--higlight-saturation-secondary);
+  --control-btn-focus-bg: var(--highlight-saturation);
   --control-btn-active: var(--highlight-saturation);
-  --control-btn-active-icon: var(--highlight-saturation);
+  --control-btn-active-icon: var(--shadow-heavy);
 }
