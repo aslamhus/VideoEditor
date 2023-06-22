@@ -103,6 +103,8 @@ class Timeline {
     });
     // info bar
     this.infoBar = new InfoBar({
+      video,
+      crop,
       duration: this.video.duration,
       currentIndex: this.transformations?.time?.in,
     });

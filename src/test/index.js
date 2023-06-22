@@ -7,7 +7,7 @@ window.onload = function () {
 
   let vidEditor = new VideoEditor({
     src,
-    crop: { width: 300, height: 200 },
+    crop: { width: 3, height: 2 },
     // maxHeight,
     // transformations,
     // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },

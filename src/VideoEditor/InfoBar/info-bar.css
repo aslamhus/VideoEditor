@@ -13,3 +13,16 @@
 
   background-color: var(--container-bg);
 }
+.info-bar-container .inline-start-column,
+.info-bar-container .inline-end-column {
+  display: flex;
+  flex-direction: row;
+}
+.info-bar-container .inline-start-column div,
+.info-bar-container .inline-end-column div {
+  margin: 0 0.25rem;
+}
+.video-info {
+  display: flex;
+  flex-direction: row;
+}
