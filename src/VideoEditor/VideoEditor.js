@@ -22,6 +22,7 @@ import {
   faQuestion,
   faStepBackward,
   faStepForward,
+  faCheck,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faPlay,
@@ -32,7 +33,8 @@ library.add(
   faSun,
   faQuestion,
   faStepBackward,
-  faStepForward
+  faStepForward,
+  faCheck
 );
 dom.watch();
 
@@ -438,16 +440,21 @@ class VideoEditor {
   handleToggleCrop(event, toggleState) {
     const { currentTarget } = event || { currentTarget: document.querySelector('.crop-button') };
     this.timeline.handleToggleCropper(toggleState);
-    const span = currentTarget.querySelector('span');
-    const icon = currentTarget.querySelector('i') ?? currentTarget.querySelector('svg');
+    const buttonContainer = currentTarget.parentElement;
+    const span = buttonContainer.querySelector('span');
+    const icon = buttonContainer.querySelector('i') ?? buttonContainer.querySelector('svg');
     if (toggleState) {
       span.innerText = 'Done';
-      icon.style.display = 'none';
+      // icon.style.display = 'none';
+      icon.classList.add('fa-check');
+      icon.classList.remove('fa-crop');
       this.timeline.controls.disableControlButtons();
       this.timeline.disable();
     } else {
       span.innerText = 'Crop';
-      icon.style.display = '';
+      // icon.style.display = '';
+      icon.classList.remove('fa-check');
+      icon.classList.add('fa-crop');
       this.timeline.controls.enableControlButtons();
       this.timeline.enable();
     }

@@ -109,13 +109,13 @@ class Timeline {
   }
 
   async handleToggleCropper(toggle) {
-    const svg = document.querySelector('svg');
+    // const svg = document.querySelector('svg');
     if (toggle) {
       if (this.cropper) {
         // show cropper
         // hide svg and video
         this.video.style.visibility = 'hidden';
-        svg.style.visibility = 'hidden';
+        // svg.style.visibility = 'hidden';
         // update cropper src
         this.getCurrentVideoFrameUrlObject().then((url) => {
           this.cropper.updateSrc(url);
@@ -129,7 +129,7 @@ class Timeline {
     } else {
       // hide and apply cropper crop
       this.video.style.visibility = 'visible';
-      svg.style.visibility = 'visible';
+      // svg.style.visibility = 'visible';
       this.applyCrop();
     }
   }

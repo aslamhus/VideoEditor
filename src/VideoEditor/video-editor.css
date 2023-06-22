@@ -48,6 +48,7 @@
 .video-wrap {
   position: relative;
   /* max-height: 200px; */
+  overflow: hidden;
 }
 .video-wrap,
 .video-wrap video {
@@ -63,6 +64,18 @@
   width: calc(100% + 1px);
   height: calc(100% + 1px);
 }
+.video-container {
+}
+.preview-container,
 .video-container svg path {
-  fill: var(--video-wrapper-bg);
+  --bg-color: var(--video-wrapper-bg);
+  background: var(--video-container-bg);
+  fill: var(--bg-color);
+}
+
+.preview-container {
+  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  width: 100%;
+  height: 100%;
 }

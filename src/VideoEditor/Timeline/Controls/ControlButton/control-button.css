@@ -58,7 +58,7 @@
   color: var(--control-btn-focus-i);
 }
 .control-btn:disabled {
-  opacity: 0.2;
+  opacity: 0;
   pointer-events: none;
 }
 
