@@ -331,6 +331,7 @@ class VideoEditor {
     const aspectRatio = height / width;
     // console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
     const vidWrap = this.video.closest('.video-wrap');
+    const vidWrapBounds = vidWrap.getBoundingClientRect();
     const vidContainer = this.video.closest('.video-container');
     const vidBounds = this.video.getBoundingClientRect();
     let vidMaxWidth;
@@ -351,9 +352,15 @@ class VideoEditor {
       // console.log('maxHeight', maxHeight);
       vidMaxWidth = maxHeight / aspectRatio;
     }
-    if (vidMaxWidth > window.innerWidth) {
-      vidMaxWidth = window.innerWidth;
+    /**
+     * to do: on window resize, recalculate video max width
+     */
+    if (vidMaxWidth > vidWrapBounds.width) {
+      vidMaxWidth = vidWrapBounds.width;
     }
+    console.log('vidMaxWidth', vidMaxWidth);
+    console.log('window inner width', window.innerWidth);
+    console.log('vidWrapBounds.width', vidWrapBounds.width);
     // set the width
 
     vidContainer.style.width = `${vidMaxWidth}px`;

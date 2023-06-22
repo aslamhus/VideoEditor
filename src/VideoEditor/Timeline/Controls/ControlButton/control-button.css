@@ -62,13 +62,10 @@
   pointer-events: none;
 }
 
-/* @media (min-device-width: 360px) {
-  .control-btn {
-    padding: 25px;
+/** mobile styles **/
+@media screen and (max-width: 768px) {
+  .control-btn i,
+  .control-btn svg {
+    font-size: 35px;
   }
-
-  .control-btn i {
-    width: 25px;
-    font-size: 22px;
-  }
-} */
+}

@@ -70,10 +70,10 @@
   .timeline-container {
     margin-top: 0rem;
     padding: 20px 30px !important;
-    width: calc(100% + 40px);
+
     background: transparent;
   }
   .timeline {
-    height: 70px;
+    height: 80px;
   }
 }

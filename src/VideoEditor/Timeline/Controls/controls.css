@@ -19,10 +19,15 @@
   margin-left: -1px;
 }
 
-@media (max-device-width: 380px) {
+@media screen and (max-width: 768px) {
   .video-editor-controls {
-    margin-top: 0rem;
+    margin-top: 1rem;
     display: flex;
     flex-direction: row;
+  }
+  .play-btn i,
+  .play-btn svg {
+    font-size: 50px;
+    margin-left: 3px;
   }
 }

@@ -91,8 +91,8 @@ class InfoBar {
 
     // append all divs to video info div
     videoInfoDiv.append(
-      resolutionDiv,
-      frameDiv
+      resolutionDiv
+      // frameDiv
       // formatDiv,
       // videoCodecDiv,
       // audioCodecDiv,

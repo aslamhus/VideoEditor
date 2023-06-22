@@ -26,3 +26,18 @@
   display: flex;
   flex-direction: row;
 }
+
+/** mobile styles **/
+@media only screen and (max-width: 768px) {
+  .info-bar-container {
+    font-size: 14px;
+  }
+  .info-bar-container .inline-start-column {
+    width: 100%;
+    /* background: blue; */
+    justify-content: space-between;
+  }
+  .info-bar-container .inline-end-column {
+    display: none;
+  }
+}
