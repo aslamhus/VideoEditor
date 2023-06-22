@@ -98,6 +98,7 @@ class Timeline {
     // control buttons
     this.controls = new Controls({
       video,
+      rangeSelector: this.rangeSelector,
       onPlayClick: this.handlePlayClick.bind(this),
     });
     // info bar

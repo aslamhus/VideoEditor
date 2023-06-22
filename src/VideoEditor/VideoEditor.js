@@ -20,8 +20,20 @@ import {
   faMoon,
   faSun,
   faQuestion,
+  faStepBackward,
+  faStepForward,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlay, faPause, faCrop, faSave, faMoon, faSun, faQuestion);
+library.add(
+  faPlay,
+  faPause,
+  faCrop,
+  faSave,
+  faMoon,
+  faSun,
+  faQuestion,
+  faStepBackward,
+  faStepForward
+);
 dom.watch();
 
 /**

@@ -16,7 +16,9 @@ class ControlButton {
     if (this.onClick instanceof Function) {
       this.onClick(event);
     }
-    this.toggle();
+    if (this.onToggle instanceof Function) {
+      this.toggle();
+    }
   }
 
   getElement() {

@@ -1,8 +1,9 @@
+import RangeSelector from '../RangeSelector/RangeSelector';
 import ControlButton from './ControlButton/ControlButton';
 import PlayButton from './PlayButton';
 import './controls.css';
 class Controls {
-  constructor({ video, onPlayToggle, onTrimToggle, onPlayClick, onCropToggle }) {
+  constructor({ video, rangeSelector, onPlayToggle, onTrimToggle, onPlayClick, onCropToggle }) {
     this.video = video;
     this.controls = null;
     this.playBtn = new PlayButton({ video, onPlayToggle, onPlayClick });
@@ -21,7 +22,23 @@ class Controls {
     //   },
     //   title: 'Crop video',
     // });
-    this.controlElements = [this.playBtn];
+    this.firstFrameBtn = new ControlButton({
+      className: 'first-frame-btn',
+      iconClassName: 'fa fa-step-backward',
+      onClick: () => {
+        this.video.currentTime = 0;
+      },
+      title: 'Jump to first frame',
+    });
+    this.lastFrameBtn = new ControlButton({
+      className: 'last-frame-btn',
+      iconClassName: 'fa fa-step-forward',
+      onClick: () => {
+        this.video.currentTime = rangeSelector.outMarker.getTimeIndex();
+      },
+      title: 'Jump to last frame',
+    });
+    this.controlElements = [this.firstFrameBtn, this.playBtn, this.lastFrameBtn];
   }
 
   disableControlButtons() {
