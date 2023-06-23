@@ -78,7 +78,8 @@
 }
 
 .video-container svg path {
-  fill: var(--video-wrapper-bg);
+  /* fill: var(--video-wrapper-bg); */
+  fill: var(--svg-crop-overlay-bg);
 }
 
 /** mobile styles **/

@@ -13,3 +13,13 @@
 .timeline .timestamp p {
   color: white;
 }
+/** mobile styles **/
+
+@media only screen and (max-width: 768px) {
+  .timeline .timestamp {
+    bottom: unset;
+    top: 0rem;
+    padding: 0 0.5rem;
+    transform: translate(-50%, -100%);
+  }
+}

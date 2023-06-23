@@ -1,6 +1,5 @@
 .timeline-container {
   width: fit-content;
-  /* width: 100%; */
   /** 
   padding left/right must be at least the total width
   of the left and right markers **/

@@ -345,13 +345,7 @@ class VideoEditor {
       vidMaxWidth = this.maxHeight / aspectRatio;
     } else {
       // limit height of video display if screen size exceeds limit
-      // const editorHeight = editorContainer.getBoundingClientRect().height;
-      // const vidPercentHeight = vidBounds.height / window.innerHeight;
-      // console.log('vidHeight', vidBounds.height);
-      // console.log('vidPercentHeight', vidPercentHeight);
-      // calculate 35% of videoContainer
 
-      // console.log('resize max height percent', vidBounds.height);
       const maxHeight = window.innerHeight * this.maxHeightPercent;
       // console.log('maxHeight', maxHeight);
       vidMaxWidth = maxHeight / aspectRatio;
@@ -359,10 +353,10 @@ class VideoEditor {
     /**
      * to do: on window resize, recalculate video max width
      */
-    if (vidMaxWidth > window.innerWidth - 50) {
-      vidMaxWidth = window.innerWidth - 50;
+    if (vidMaxWidth > window.innerWidth) {
+      vidMaxWidth = window.innerWidth;
     }
-    console.log('vidMaxWidth', vidMaxWidth, vidWrapBounds);
+    // console.log('vidMaxWidth', vidMaxWidth, vidWrapBounds);
 
     // set the width
 

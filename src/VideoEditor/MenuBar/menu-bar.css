@@ -46,5 +46,6 @@
 @media only screen and (max-width: 768px) {
   .menu-bar-container {
     padding: 0.55rem;
+    background: transparent;
   }
 }

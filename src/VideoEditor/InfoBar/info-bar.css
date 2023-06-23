@@ -31,6 +31,7 @@
 @media only screen and (max-width: 768px) {
   .info-bar-container {
     font-size: 14px;
+    background: transparent;
   }
   .info-bar-container .inline-start-column {
     width: 100%;
