@@ -47,7 +47,7 @@ class Timeline {
       throw new Error('Video duration is non finite number: ' + duration);
     }
     this.duration = duration;
-    this.frameTotalLimit = frameTotalLimit || window.innerWidth * 0.01; // eventually will be timeline width divided by frame width
+    this.frameTotalLimit = frameTotalLimit || Math.ceil(window.innerWidth * 0.011); // eventually will be timeline width divided by frame width
     this.frameInterval = this.duration / this.frameTotalLimit;
     this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
     this.cropAspectRatio = this.crop.width / this.crop.height;
@@ -527,6 +527,8 @@ class Timeline {
   createFrame(timeIndex) {
     const frameContainer = document.createElement('div');
     const frameWidth = 100 / this.frameTotalLimit;
+    // console.log('this.frameTotalLimit', this.frameTotalLimit);
+    // console.log('frameWidth', frameWidth);
     frameContainer.style.width = `${frameWidth}%`;
     frameContainer.style.height = '100%';
     frameContainer.className = 'frame';

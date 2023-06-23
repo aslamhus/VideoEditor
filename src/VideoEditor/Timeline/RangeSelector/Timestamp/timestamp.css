@@ -1,10 +1,11 @@
 .timeline .timestamp {
   position: absolute;
   left: 50%;
-  bottom: -1rem;
-  transform: translate(-50%, 100%);
+  top: -1rem;
+  transform: translate(-50%, -100%);
   background: rgb(46, 46, 46);
-  padding: 1rem;
+  padding: 0.25rem 1rem;
+
   width: fit-content;
   opacity: 0;
   pointer-events: none;
@@ -19,7 +20,7 @@
   .timeline .timestamp {
     bottom: unset;
     top: 0rem;
-    padding: 0 0.5rem;
     transform: translate(-50%, -100%);
+    padding: 0 0.5rem;
   }
 }

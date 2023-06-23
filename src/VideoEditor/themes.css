@@ -7,9 +7,8 @@
   /** color scheme **/
   --overall-color: #959595;
   --video-wrapper-bg: #262626;
-
-  --svg-crop-overlay-bg: white;
-  --container-bg: #323232;
+  --svg-crop-overlay-bg: rgb(44, 43, 43);
+  --container-bg: #2d2d2d;
   --highlight-saturation: gold;
   --higlight-saturation-secondary: rgb(137, 119, 16);
   --highlight-luminosity: white;
@@ -29,7 +28,7 @@
   --highlight-saturation: gold;
   --highlight-luminosity: white;
   --higlight-saturation-secondary: rgb(134, 117, 20);
-  --highlight-light: rgb(231, 231, 231);
+  --highlight-light: rgb(219, 219, 219);
   --shadow-light: rgb(128, 128, 128);
   --shadow-medium: rgb(47, 47, 47);
   --shadow-heavy: black;
