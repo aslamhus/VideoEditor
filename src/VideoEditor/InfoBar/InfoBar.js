@@ -65,8 +65,11 @@ class InfoBar {
     const resolutionDiv = document.createElement('div');
     resolutionDiv.textContent = `Video Resolution: ${this.video.videoWidth} x ${this.video.videoHeight}`;
     // frame
-    const frameDiv = document.createElement('div');
-    frameDiv.textContent = `Frame Aspect Ratio: ${this.crop.width} x ${this.crop.height}`;
+    let frameDiv;
+    if (this.crop) {
+      frameDiv = document.createElement('div');
+      frameDiv.textContent = `Frame Aspect Ratio: ${this.crop.width} x ${this.crop.height}`;
+    }
     // // format
     // const formatDiv = document.createElement('div');
     // formatDiv.textContent = `Video Format: ${this.video.videoFormat}`;
@@ -90,17 +93,8 @@ class InfoBar {
     // audioFpsDiv.textContent = `Audio FPS: ${this.video.audioFps}`;
 
     // append all divs to video info div
-    videoInfoDiv.append(
-      resolutionDiv
-      // frameDiv
-      // formatDiv,
-      // videoCodecDiv,
-      // audioCodecDiv,
-      // videoBitrateDiv,
-      // audioBitrateDiv,
-      // videoFpsDiv,
-      // audioFpsDiv
-    );
+    const allDivs = [resolutionDiv, frameDiv].filter((div) => div !== undefined);
+    videoInfoDiv.append(...allDivs);
     return videoInfoDiv;
   }
 
