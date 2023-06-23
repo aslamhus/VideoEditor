@@ -163,8 +163,12 @@ class VideoEditor {
     this.loader.updateMessage('Loading video');
     // menu bar
     this.menuBar.render(this.videoEditorContainer);
-    // video element
-    this.videoEditorContainer.append(await this.createVideo());
+    // create flexbox container to center video in viewport
+    const videoFlexboxContainer = document.createElement('div');
+    videoFlexboxContainer.classList.add('video-flexbox-container');
+    this.videoEditorContainer.append(videoFlexboxContainer);
+    // create video element
+    videoFlexboxContainer.append(await this.createVideo());
     this.loader.updateMessage('Initializing video editor');
     return this.videoEditorContainer;
   }
@@ -355,9 +359,10 @@ class VideoEditor {
     /**
      * to do: on window resize, recalculate video max width
      */
-    if (vidMaxWidth > vidWrapBounds.width) {
-      vidMaxWidth = vidWrapBounds.width;
+    if (vidMaxWidth > window.innerWidth - 50) {
+      vidMaxWidth = window.innerWidth - 50;
     }
+    console.log('vidMaxWidth', vidMaxWidth, vidWrapBounds);
 
     // set the width
 

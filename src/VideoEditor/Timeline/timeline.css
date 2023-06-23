@@ -12,7 +12,7 @@
   background-color: var(--container-bg);
   box-sizing: border-box;
   margin: 0 auto;
-  margin-top: 1.5rem;
+  margin-top: auto;
 }
 .timeline {
   position: relative;
