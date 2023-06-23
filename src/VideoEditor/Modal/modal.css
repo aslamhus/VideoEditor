@@ -45,12 +45,15 @@
   /* padding: 0.55rem; */
   width: 2.5rem;
   height: 2.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   border-radius: 50%;
-  border: 1px solid gray;
-  font-size: 1.5rem;
-  color: gray;
+  border: 1px solid rgb(183, 183, 183);
+  font-size: 1.75rem;
+  color: rgb(164, 164, 164);
   margin: 0.5rem;
 }
 .modal-container .close-btn:hover {
