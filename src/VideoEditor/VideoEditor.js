@@ -358,9 +358,7 @@ class VideoEditor {
     if (vidMaxWidth > vidWrapBounds.width) {
       vidMaxWidth = vidWrapBounds.width;
     }
-    console.log('vidMaxWidth', vidMaxWidth);
-    console.log('window inner width', window.innerWidth);
-    console.log('vidWrapBounds.width', vidWrapBounds.width);
+
     // set the width
 
     vidContainer.style.width = `${vidMaxWidth}px`;
@@ -477,11 +475,10 @@ class VideoEditor {
 
   handleClickDarkMode(event) {
     const { currentTarget } = event;
-    const span = currentTarget.querySelector('span');
-    const svg = currentTarget.querySelector('svg');
+    const span = currentTarget.parentElement.querySelector('span');
+    const svg = currentTarget.parentElement.querySelector('svg');
     const wrapper = this.videoEditorContainer.closest('.video-editor-wrapper');
     const isDark = wrapper.classList.contains('darkmode');
-    console.log('isDark ', isDark);
     if (!isDark) {
       // dark mode
       wrapper.classList.add('darkmode');
@@ -571,7 +568,7 @@ class VideoEditor {
       // instructions
 
       this.instructions = new Instructions({ container });
-      this.instructions.render(container);
+      // this.instructions.render(container);
       //  loader
       this.loader.render(wrapper);
       container.append(wrapper);

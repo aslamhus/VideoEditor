@@ -1,16 +1,19 @@
 import Slides from './Slides';
+import Modal from '../Modal';
 import './instructions.css';
 
-class Instructions {
+class Instructions extends Modal {
   constructor({ container, fadeDuration }) {
+    super({
+      content: '',
+      className: 'instructions-modal',
+      options: { animationDuration: 0.35, overlay: true, hidden: true },
+    });
     this.instructions = null;
-    this.fadeDuration = fadeDuration ?? 0.35;
     console.log('container', container);
     this.hidden = true;
     // bind
     this.begin = this.begin.bind(this);
-    this.show = this.show.bind(this);
-    this.hide = this.hide.bind(this);
     // slides
     this.slides = new Slides({
       slides: [
@@ -36,34 +39,8 @@ class Instructions {
     });
     this.currentSlide = 0;
     // instructions modal is appended to container or body
+
     this.render(container ?? document.body);
-  }
-
-  init() {}
-
-  async show() {
-    this.instructions.style.opacity = 0;
-    this.instructions.style.display = '';
-    this.instructions.classList.add('float-in');
-    this.slides.reset();
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        this.hidden = false;
-        resolve();
-      }, this.fadeDuration * 1000);
-    });
-  }
-
-  async hide() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        this.instructions.classList.remove('float-in');
-        this.instructions.classList.remove('float-out');
-        this.instructions.style.display = 'none';
-        this.hidden = true;
-        resolve();
-      }, 10);
-    });
   }
 
   async begin() {
@@ -73,21 +50,13 @@ class Instructions {
     await this.show();
   }
 
-  createInstructions() {
-    this.instructions = document.createElement('div');
-    this.instructions.className = 'instructions-container';
-    this.instructions.style.display = 'none';
-    this.instructions.style.setProperty('--animation-speed', `${this.fadeDuration}s`);
-
-    return this.instructions;
-  }
-
   render(container) {
-    this.instructions = this.createInstructions();
-    // render slides
+    this.instructions = document.createElement('div');
     this.slides.render(this.instructions);
-    console.log('this.instructions', this.instructions);
-    container.append(this.instructions);
+    this.setState({ content: this.instructions });
+
+    console.log('rendering instructions', this.instructions);
+    super.render(container);
   }
 }
 
