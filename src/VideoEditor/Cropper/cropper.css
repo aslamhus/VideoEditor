@@ -39,7 +39,7 @@
 }
 .croppie-container .cr-boundary {
   /* overflow: visible; */
-  height: calc(100% + 4px) !important;
+  /* height: calc(100% + 4px) !important; */
   overflow: hidden;
 }
 .croppie-container {
