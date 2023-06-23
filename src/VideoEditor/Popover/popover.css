@@ -91,3 +91,16 @@
 .popover-danger .popover-body {
   color: #b32130;
 }
+
+/** mobile styles **/
+@media only screen and (max-width: 400px) {
+  .popover {
+    width: 300px;
+  }
+  .popover-title {
+    font-size: 1rem;
+  }
+  .popover-body {
+    font-size: 0.8rem;
+  }
+}

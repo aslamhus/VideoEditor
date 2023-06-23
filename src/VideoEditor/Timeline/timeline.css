@@ -69,8 +69,7 @@
 @media (max-device-width: 380px) {
   .timeline-container {
     margin-top: 0rem;
-    padding: 20px 30px !important;
-
+    padding: 20px 0 !important;
     background: transparent;
   }
   .timeline {

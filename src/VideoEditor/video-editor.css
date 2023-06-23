@@ -68,3 +68,10 @@
 .video-container svg path {
   fill: var(--video-wrapper-bg);
 }
+
+/** mobile styles **/
+@media only screen and (max-width: 768px) {
+  .video-editor-wrapper {
+    padding: 0.5rem;
+  }
+}
