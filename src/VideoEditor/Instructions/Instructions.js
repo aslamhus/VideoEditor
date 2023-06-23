@@ -25,7 +25,7 @@ class Instructions extends Modal {
         {
           url: 'https://res.cloudinary.com/dmxpkxal2/video/upload/c_limit,w_500/e_loop/dl_150,vs_0.1s/fl_lossy/q_50/covid-19-grief-project/video-editor/crop-example_otwihm.gif',
           title: 'Crop',
-          body: 'Active the crop tool by selecting the "Crop" button on the top right corner of the video editor. You can zoom in or out by dragging the zoom range left or right. Reposition the video by dragging the video frame in any direction. ',
+          body: 'Activate the crop tool by selecting the "Crop" button on the top right corner of the video editor. Zoom in or out by dragging the zoom range left or right. Reposition the video by dragging the video frame in any direction. ',
         },
         // {
         //   url: 'https://storage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg',

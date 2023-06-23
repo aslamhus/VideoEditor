@@ -13,7 +13,7 @@
   position: relative;
   min-width: 375px;
   min-height: 450px;
-  height: 100vh;
+  height: 100%;
   width: 100%;
   background: var(--video-wrapper-bg);
 }
@@ -27,6 +27,7 @@
 }
 .video-flexbox-container {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   flex-grow: 1;
@@ -83,6 +84,6 @@
 /** mobile styles **/
 @media only screen and (max-width: 768px) {
   .video-editor-wrapper {
-    padding: 0.5rem;
+    padding: 0rem;
   }
 }

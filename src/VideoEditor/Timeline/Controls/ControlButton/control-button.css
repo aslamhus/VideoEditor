@@ -66,6 +66,9 @@
 @media screen and (max-width: 768px) {
   .control-btn i,
   .control-btn svg {
-    font-size: 35px;
+    font-size: 25px;
+  }
+  .control-btn {
+    padding: 1.5rem;
   }
 }

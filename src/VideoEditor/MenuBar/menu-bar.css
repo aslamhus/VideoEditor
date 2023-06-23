@@ -42,3 +42,9 @@
   /* border-color: var(--menu-bar-btn-border-color-hover); */
   cursor: pointer;
 }
+/** mobile styles **/
+@media only screen and (max-width: 768px) {
+  .menu-bar-container {
+    padding: 0.55rem;
+  }
+}

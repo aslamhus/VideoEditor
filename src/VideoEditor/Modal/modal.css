@@ -42,6 +42,7 @@
 .modal-content {
   height: 100%;
   width: 100%;
+  min-height: 0;
 }
 
 .modal-container .close-btn {
@@ -60,7 +61,8 @@
   border: 1px solid rgb(183, 183, 183);
   font-size: 1.75rem;
   color: rgb(164, 164, 164);
-  margin: 0.5rem;
+  padding: 0;
+  margin: 0.25rem;
 }
 .modal-container .close-btn:hover {
   background: lightgray;
@@ -86,5 +88,13 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+/** mobile sizes **/
+
+@media only screen and (max-width: 768px) {
+  .modal-content-container {
+    padding: 0.25rem;
   }
 }

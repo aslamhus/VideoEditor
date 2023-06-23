@@ -26,3 +26,11 @@
     aspect-ratio: 3/5;
   }
 }
+
+/** mobile **/
+
+@media only screen and (max-width: 768px) {
+  .instructions-modal .modal-content-container {
+    padding: 0.5rem;
+  }
+}
