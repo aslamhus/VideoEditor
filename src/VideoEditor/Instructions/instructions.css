@@ -16,6 +16,7 @@
     aspect-ratio: 5/3;
     max-width: 80vw;
     height: auto;
+    max-height: 500px;
   }
 }
 
