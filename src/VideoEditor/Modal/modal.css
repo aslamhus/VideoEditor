@@ -24,7 +24,9 @@
 .modal-content-container {
   position: relative;
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   min-width: 240px;
   max-width: 85vw;
   max-height: 80%;
@@ -36,6 +38,10 @@
   border-radius: 10px;
   box-shadow: 0px 0px 25px 5px rgba(0, 0, 0, 0.55);
   --animation-duration: 0.5s;
+}
+.modal-content {
+  height: 100%;
+  width: 100%;
 }
 
 .modal-container .close-btn {

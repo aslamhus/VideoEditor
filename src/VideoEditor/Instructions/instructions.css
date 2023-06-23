@@ -1,0 +1,27 @@
+.instructions-modal .modal-content-container {
+  max-width: 100%;
+  /* max-height: 90vh; */
+  width: auto;
+  overflow: hidden;
+  aspect-ratio: 3/5;
+  padding: 1rem;
+}
+.instructions-container {
+  height: 100%;
+  width: 100%;
+}
+/** landscape **/
+@media screen and (orientation: landscape) {
+  .instructions-modal .modal-content-container {
+    aspect-ratio: 5/3;
+    max-width: 80vw;
+    height: auto;
+  }
+}
+
+/** portrait **/
+@media screen and (orientation: portrait) {
+  .instructions-modal .modal-content-container {
+    aspect-ratio: 3/5;
+  }
+}

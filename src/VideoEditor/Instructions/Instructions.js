@@ -52,6 +52,7 @@ class Instructions extends Modal {
 
   render(container) {
     this.instructions = document.createElement('div');
+    this.instructions.classList.add('instructions-container');
     this.slides.render(this.instructions);
     this.setState({ content: this.instructions });
 
