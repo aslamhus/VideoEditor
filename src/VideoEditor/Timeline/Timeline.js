@@ -376,7 +376,7 @@ class Timeline {
       canvas.getContext('2d').drawImage(this.video, 0, 0);
       canvas.toBlob(
         (blob) => {
-          const urlObject = URL.createObjectURL(blob);
+          const urlObject = window.URL.createObjectURL(blob);
           resolve(urlObject);
         },
         'image/jpg',
@@ -386,11 +386,16 @@ class Timeline {
   }
 
   renderCanvasFrames() {
+    console.log('renderCanvasFrames');
     this.loader.updateMessage('Rendering frames');
     let countFrames = 0;
     this.video.currentTime = 0;
     const framesContainer = this.createFramesContainer();
+    let initialPlay = false;
     const handleCanPlay = () => {
+      if (initialPlay) return;
+      console.log('HANDLE CAN PLAY');
+      initialPlay = true;
       this.video.currentTime = 0.5;
       this.video.addEventListener('seeked', renderFrameOnSeek);
     };
@@ -411,14 +416,14 @@ class Timeline {
       canvas.style.width = '';
 
       const newFrameIndex = parseInt(countFrames + 1) * this.frameInterval;
-
+      // console.log('newFrameIndex', newFrameIndex, this.video.currentTime);
       if (countFrames < this.frameTotalLimit - 1) {
         this.video.currentTime = newFrameIndex;
       } else {
-        // console.info(
-        //   `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.duration} `,
-        //   'color:green'
-        // );
+        console.info(
+          `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.duration} `,
+          'color:green'
+        );
         this.video.removeEventListener('seeked', renderFrameOnSeek);
         this.video.removeEventListener('canplay', handleCanPlay);
         this.handleTimelineReady();
@@ -451,7 +456,7 @@ class Timeline {
   drawFrame(frame, sourceRect) {
     const [sX, sY, sWidth, sHeight] = sourceRect;
     const frameBounds = frame.getBoundingClientRect();
-    // console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
+    console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
     frame
       .getContext('2d')
       .drawImage(this.video, sX, sY, sWidth, sHeight, 0, 0, frameBounds.width, frameBounds.height);

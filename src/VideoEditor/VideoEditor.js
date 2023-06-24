@@ -257,7 +257,7 @@ class VideoEditor {
     }
 
     this.videoSrc = src;
-    const blob = URL.createObjectURL(src);
+    const blob = window.URL.createObjectURL(src);
     return blob;
   }
 
