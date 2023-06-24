@@ -13,6 +13,7 @@ class Timeline {
    *
    * @typedef {Object} constructor
    * @property {HTMLVideoElement} video
+   * @property {string} mimeType
    * @property {number} duration
    * @property {number} frameTotalLimit - default is 10
    * @property {Object} crop - the crop ratio
@@ -29,6 +30,7 @@ class Timeline {
    */
   constructor({
     video,
+    mimeType,
     duration,
     frameTotalLimit,
     crop,
@@ -42,6 +44,7 @@ class Timeline {
     loader,
   }) {
     this.video = video;
+    this.mimeType = mimeType;
     // video
     if (!isFinite(duration)) {
       throw new Error('Video duration is non finite number: ' + duration);
@@ -386,7 +389,6 @@ class Timeline {
   }
 
   renderCanvasFrames() {
-    console.log('renderCanvasFrames');
     this.loader.updateMessage('Rendering frames');
     let countFrames = 0;
     this.video.currentTime = 0;
@@ -394,25 +396,29 @@ class Timeline {
     let initialPlay = false;
     const handleCanPlay = () => {
       if (initialPlay) return;
-      console.log('HANDLE CAN PLAY');
       initialPlay = true;
       this.video.currentTime = 0.5;
       this.video.addEventListener('seeked', renderFrameOnSeek);
     };
     const renderFrameOnSeek = (event) => {
+      // note: if the mime type is not supported, do not crop, instead use aspect ratio of original video
+      const isSupportedMimeType = this.video.canPlayType(this.mimeType) == 'probably';
+      const ratio = isSupportedMimeType
+        ? this.cropAspectRatio
+        : this.video.videoWidth / this.video.videoHeight;
       const frameContainer = this.createFrame(this.video.currentTime);
       const canvas = frameContainer.querySelector('canvas');
       // set canvas canvas aspect ratio
       const frameHeight = this.getTimelineElement().getBoundingClientRect().height;
-      // if landscape divide, if portrait multiple
-      const frameWidth = frameHeight * this.cropAspectRatio;
+      const frameWidth = frameHeight * ratio;
       canvas.width = frameWidth;
       canvas.height = frameHeight;
       canvas.style.width = frameWidth + 'px';
+      canvas.style.height = frameHeight + 'px';
       framesContainer.append(frameContainer);
       const videoDimensions = { width: this.video.videoWidth, height: this.video.videoHeight };
       const sourceCoordinates = this.computeCrop(videoDimensions);
-      this.drawFrame(canvas, sourceCoordinates);
+      this.drawFrame(canvas, sourceCoordinates, isSupportedMimeType);
       canvas.style.width = '';
 
       const newFrameIndex = parseInt(countFrames + 1) * this.frameInterval;
@@ -420,10 +426,10 @@ class Timeline {
       if (countFrames < this.frameTotalLimit - 1) {
         this.video.currentTime = newFrameIndex;
       } else {
-        console.info(
-          `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.duration} `,
-          'color:green'
-        );
+        // console.info(
+        //   `%cFinished rendering frames: index: ${newFrameIndex} duration: ${this.duration} `,
+        //   'color:green'
+        // );
         this.video.removeEventListener('seeked', renderFrameOnSeek);
         this.video.removeEventListener('canplay', handleCanPlay);
         this.handleTimelineReady();
@@ -443,23 +449,34 @@ class Timeline {
    * Draw frame on canvas
    *
    * @param {HTMLCanvasElement} frame
-   * @param {Array<Number>} sourceRect - optional source coordinates
-   * @property {Number} sourceRect[] - The x-axis coordinate of the top left corner of the
-   * sub-rectangle of the source image to draw into the destination context.
-   * @property {Number} sourceRect[] - The y-axis coordinate of the top left corner of the
-   * sub-rectangle of the source image to draw into the destination context.
-   * @property {Number} sourceRect[] - The width of the sub-rectangle of the source image
-   * to draw into the destination context.
-   *  @property {Number} sourceRect[] - The height of the sub-rectangle of the source image
-   * to draw into the destination context.
+   * @param {Array<Number>} sourceRect -  source coordinates
+   * @param {Boolean} isSupportedMimeType - is the video mime type supported by the browser.
+   * Note: unsupported mime types will not be rendered correctly by draw image, so we cannot
+   * perform cropping. Unsupported mime types will be rendered with the original aspect ratio.
    */
-  drawFrame(frame, sourceRect) {
+  drawFrame(frame, sourceRect, isSupportedMimeType = false) {
     const [sX, sY, sWidth, sHeight] = sourceRect;
     const frameBounds = frame.getBoundingClientRect();
-    console.log(`sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}`);
-    frame
-      .getContext('2d')
-      .drawImage(this.video, sX, sY, sWidth, sHeight, 0, 0, frameBounds.width, frameBounds.height);
+    // console.log(
+    //   `sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}, frameBounds.width: ${frameBounds.width}, frameBounds.height: ${frameBounds.height}`
+    // );
+    if (isSupportedMimeType) {
+      frame
+        .getContext('2d')
+        .drawImage(
+          this.video,
+          sX,
+          sY,
+          sWidth,
+          sHeight,
+          0,
+          0,
+          frameBounds.width,
+          frameBounds.height
+        );
+    } else {
+      frame.getContext('2d').drawImage(this.video, 0, 0, frameBounds.width, frameBounds.height);
+    }
   }
 
   /**
@@ -468,10 +485,10 @@ class Timeline {
    */
   async handleTimelineReady() {
     setTimeout(async () => {
-      await this.initCropper(this.transformations?.crop);
+      // await this.initCropper(this.transformations?.crop);
 
       setTimeout(() => {
-        this.applyCrop();
+        // this.applyCrop();
         if (this.onReady instanceof Function) {
           this.onReady();
         }

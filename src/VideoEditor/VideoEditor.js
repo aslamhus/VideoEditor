@@ -91,6 +91,7 @@ class VideoEditor {
     onSave,
   }) {
     this.videoSrc = src;
+    this.mimeType = '';
     this.crop = crop;
     this.transformations = transformations;
     this.video = null;
@@ -201,7 +202,7 @@ class VideoEditor {
     this.video.id = 'video-preview';
     this.video.className = 'preview';
     const src = await this.getURLObjectString();
-    this.video.src = src;
+    // this.video.src = src;
     this.video.autoplay = false;
     this.video.setAttribute('playsinline', 'true');
     this.video.setAttribute('webkit-playsinline', 'true');
@@ -210,6 +211,10 @@ class VideoEditor {
     this.video.controls = false;
     this.video.playbackRate = 16;
     this.video.style.width = '100%';
+    // create source tag
+    const source = document.createElement('source');
+    source.src = src;
+    this.video.append(source);
     // video events must be attached before rendering in the DOM
     this.attachVideoEvents(vidContainer);
     vidWrap.append(this.video);
@@ -257,6 +262,7 @@ class VideoEditor {
     }
 
     this.videoSrc = src;
+    this.mimeType = src.type || 'unknown';
     const blob = window.URL.createObjectURL(src);
     return blob;
   }
@@ -295,6 +301,7 @@ class VideoEditor {
     // render timeline
     this.timeline = new Timeline({
       video: this.video,
+      mimeType: this.mimeType,
       duration: this.video.duration,
       frameInterval: 10,
       crop: this.crop,
