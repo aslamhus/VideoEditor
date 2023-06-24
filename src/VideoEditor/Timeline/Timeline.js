@@ -393,7 +393,27 @@ class Timeline {
     let countFrames = 0;
     this.video.currentTime = 0;
     const framesContainer = this.createFramesContainer();
+    const isSupportedMimeType = this.video.canPlayType(this.mimeType) == 'probably';
+    console.info('isSupportedMimeType', this.mimeType, this.video.canPlayType(this.mimeType));
+    console.log('video', this.video);
+    if (this.video.videoWidth == 0 || this.video.videoHeight == 0) {
+      // throw new Error('Video has no dimensions');
+    }
+    let ratio;
+    if (!this.cropAspectRatio || !isSupportedMimeType) {
+      ratio = this.video.videoWidth / this.video.videoHeight;
+    } else {
+      ratio = this.cropAspectRatio;
+    }
     let initialPlay = false;
+
+    console.log(
+      'ratio, cropRatio, videoWidth,videoHeight',
+      ratio,
+      this.cropAspectRatio,
+      this.video.videoWidth,
+      this.video.videoHeight
+    );
     const handleCanPlay = () => {
       if (initialPlay) return;
       initialPlay = true;
@@ -402,19 +422,18 @@ class Timeline {
     };
     const renderFrameOnSeek = (event) => {
       // note: if the mime type is not supported, do not crop, instead use aspect ratio of original video
-      const isSupportedMimeType = this.video.canPlayType(this.mimeType) == 'probably';
-      const ratio = isSupportedMimeType
-        ? this.cropAspectRatio
-        : this.video.videoWidth / this.video.videoHeight;
+
       const frameContainer = this.createFrame(this.video.currentTime);
       const canvas = frameContainer.querySelector('canvas');
       // set canvas canvas aspect ratio
       const frameHeight = this.getTimelineElement().getBoundingClientRect().height;
+
       const frameWidth = frameHeight * ratio;
       canvas.width = frameWidth;
       canvas.height = frameHeight;
       canvas.style.width = frameWidth + 'px';
       canvas.style.height = frameHeight + 'px';
+      // console.log('frameHeight, Width', frameHeight, frameWidth);
       framesContainer.append(frameContainer);
       const videoDimensions = { width: this.video.videoWidth, height: this.video.videoHeight };
       const sourceCoordinates = this.computeCrop(videoDimensions);
@@ -439,6 +458,10 @@ class Timeline {
 
     // attach on seek event
     this.video.addEventListener('canplay', handleCanPlay);
+    this.video.addEventListener('loadedmetadata', (e) => {
+      console.log('loadedmetadata', e);
+      console.log('video dimensions', this.video.videoWidth, this.video.videoHeight);
+    });
 
     // add frames container
     this.timeline.append(framesContainer);
@@ -455,11 +478,10 @@ class Timeline {
    * perform cropping. Unsupported mime types will be rendered with the original aspect ratio.
    */
   drawFrame(frame, sourceRect, isSupportedMimeType = false) {
+    // console.log('drawImage canvas type', typeof frame, frame);
     const [sX, sY, sWidth, sHeight] = sourceRect;
     const frameBounds = frame.getBoundingClientRect();
-    // console.log(
-    //   `sX: ${sX}, sY: ${sY}, sWidth: ${sWidth}, sHeight: ${sHeight}, frameBounds.width: ${frameBounds.width}, frameBounds.height: ${frameBounds.height}`
-    // );
+
     if (isSupportedMimeType) {
       frame
         .getContext('2d')

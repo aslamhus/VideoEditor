@@ -3,6 +3,8 @@ import VideoEditor from '../VideoEditor/VideoEditor.js';
 let src = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
 src =
   'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687484528/video-editor/vxwbazvzjgzitgkjzxgj.mov';
+src =
+  'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687579716/video-editor/PXL_20230519_034925382_aqp36e.mp4';
 
 window.onload = function () {
   const root = document.getElementById('root');
@@ -26,9 +28,9 @@ window.onload = function () {
       // disable: ['darkmode', 'help'],
     },
     limit: { maxDuration: 5 },
-    onError: (error) => {
-      console.error('onError', error);
-    },
+    // onError: (error) => {
+    //   console.error('onError', error);
+    // },
     onSave: (transform, videoSrc) => {
       console.log('onSave', transform, videoSrc);
       // if (onSave) onSave(transform, videoSrc);

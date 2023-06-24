@@ -1,6 +1,7 @@
 import MenuBar from './MenuBar/MenuBar.js';
 import Timeline from './Timeline/Timeline.js';
 import Instructions from './Instructions';
+import Modal from './Modal/Modal.js';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
 import axios from 'axios';
@@ -202,6 +203,9 @@ class VideoEditor {
     this.video.id = 'video-preview';
     this.video.className = 'preview';
     const src = await this.getURLObjectString();
+    if (!src) {
+      return;
+    }
     // this.video.src = src;
     this.video.autoplay = false;
     this.video.setAttribute('playsinline', 'true');
@@ -252,7 +256,7 @@ class VideoEditor {
         .then((res) => {
           // console.log('result type', res.data.type, /video/.test(res.data.type));
           if (res.data.type && !/video/.test(res.data.type)) {
-            throw new Error(
+            throw new TypeError(
               'Video src type was invalid. Expected video but found: ' + res.data.type
             );
           }
@@ -260,11 +264,13 @@ class VideoEditor {
         })
         .catch(this.handleAxiosError);
     }
-
-    this.videoSrc = src;
-    this.mimeType = src.type || 'unknown';
-    const blob = window.URL.createObjectURL(src);
-    return blob;
+    if (src) {
+      this.videoSrc = src;
+      this.mimeType = src.type || 'unknown';
+      const blob = window.URL.createObjectURL(src);
+      return blob;
+    }
+    return;
   }
 
   attachVideoEvents(container) {
@@ -289,6 +295,14 @@ class VideoEditor {
    * @returns {void}
    */
   handleDurationChange() {
+    if (this.video.videoWidth == 0 || this.video.videoHeight == 0) {
+      this.handleError(
+        new Error(
+          'We were unable to load the video. It may be corrupted, or your browser may not support this video format. Please try another video or browser'
+        )
+      );
+      return;
+    }
     if (!isFinite(this.video.duration)) {
       console.error('durationchange: duration is infinity', this.video.duration);
       return;
@@ -535,8 +549,18 @@ class VideoEditor {
   }
 
   handleError(error) {
+    console.error(error);
     if (this.onError instanceof Function) {
       this.onError(error);
+    } else {
+      if (error.name === 'AxiosError') {
+        /**
+         * ince video editor already shows an error message in the handle axios error method,
+         * we don't need to display an error modal as well
+         */
+        return;
+      }
+      this.loader.showError(error?.message);
     }
   }
 

@@ -1,26 +1,6 @@
-/** static styles that do not change between themes **/
-.video-editor-wrapper {
-}
-
 /** colors **/
-.video-editor-wrapper.darkmode {
-  /** color scheme **/
-  --overall-color: #959595;
-  --video-wrapper-bg: #262626;
-  --svg-crop-overlay-bg: rgb(44, 43, 43);
-  --container-bg: #2d2d2d;
-  --highlight-saturation: gold;
-  --higlight-saturation-secondary: rgb(137, 119, 16);
-  --highlight-luminosity: white;
-  --highlight-light: #4d4d4d;
-  --shadow-light: rgb(119, 119, 119);
-  --shadow-medium: rgb(224, 224, 224);
-  --shadow-heavy: black;
-  --transparent-bg: rgba(175, 175, 175, 0.508);
-  --semi-transparent-bg: rgba(255, 217, 0, 0.514);
-}
-.video-editor-wrapper:not(.video-editor-wrapper.darkmode) {
-  /** color scheme **/
+/* Light */
+.video-editor-wrapper {
   --overall-color: #636363;
   --video-wrapper-bg: #eeeeee;
   --svg-crop-overlay-bg: rgb(230, 230, 230);
@@ -34,6 +14,22 @@
   --shadow-heavy: black;
   --transparent-bg: rgba(0, 0, 0, 0.2);
   --semi-transparent-bg: rgba(0, 0, 0, 0.5);
+}
+/* dark */
+.video-editor-wrapper.darkmode {
+  --overall-color: #959595;
+  --video-wrapper-bg: #262626;
+  --svg-crop-overlay-bg: rgb(44, 43, 43);
+  --container-bg: #2d2d2d;
+  --highlight-saturation: gold;
+  --higlight-saturation-secondary: rgb(137, 119, 16);
+  --highlight-luminosity: white;
+  --highlight-light: #4d4d4d;
+  --shadow-light: rgb(119, 119, 119);
+  --shadow-medium: rgb(224, 224, 224);
+  --shadow-heavy: black;
+  --transparent-bg: rgba(175, 175, 175, 0.508);
+  --semi-transparent-bg: rgba(255, 217, 0, 0.514);
 }
 
 .video-editor-wrapper {
