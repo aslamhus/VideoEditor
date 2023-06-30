@@ -161,7 +161,6 @@ class Timeline {
 
   attachTimelineEvents() {
     this.timeline.addEventListener('mouseup', this.handleTimelineMouseUp.bind(this), false);
-    // this.timeline.addEventListener('mouseup', this.handleTimelineMouseUp.bind(this));
     this.video.addEventListener('timeupdate', this.timeupdate.bind(this));
     this.video.addEventListener('pause', this.handlePause.bind(this));
     this.video.addEventListener('playing', this.handlePlaying.bind(this));
@@ -199,12 +198,12 @@ class Timeline {
     event.preventDefault();
     /**
      * If the range selector is being dragged, the mouseup should not fire.
-     * We do ne
      */
+    console.log('isRangeSelector dragging? ', this.rangeSelector.isDragging);
     if (this.rangeSelector.isDragging) {
+      this.rangeSelector.isDragging = false;
       return;
     }
-    this.playHead.show();
     const { offsetX, clientX, layerX, target, currentTarget } = event;
     /**
      *
@@ -232,17 +231,6 @@ class Timeline {
       this.onTimelineClick(timeIndex);
     }
   }
-
-  // handleTimelineMouseUp(event) {
-  //   event.preventDefault();
-  //   clearInterval(this.pressed);
-  //   const { target } = event;
-  //   if (!this.rangeSelector.hidden && !target.closest('.range-selector')) return;
-  //   if (!this.video.paused) {
-  //     // resume animation
-  //     // this.playHead.toggleAnimate(true);
-  //   }
-  // }
 
   handleRangeUpdate(currentIndex, time) {
     // get now and duration

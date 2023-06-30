@@ -220,13 +220,6 @@ class RangeSelector {
     this.outMarker.setDraggable(markerOptions);
     // attach range selector draggable options
 
-    const onRangeSelectorDragEnd = () => {
-      this.rangeSelector.style.setProperty('cursor', 'pointer', 'important');
-      this.rangeSelector.isDragging = false;
-      document.body.style.removeProperty('cursor');
-
-      this.rangeSelector.parentElement.classList.remove('range-selector-dragging');
-    };
     // this.rangeSelector.onmouseup = onRangeSelectorDragEnd
     const handleDragRangeSelector = this.handleDragRangeSelector.bind(this);
     const handleDragEndRangeSelector = this.handleDragEndRangeSelector.bind(this);
@@ -239,7 +232,6 @@ class RangeSelector {
       onDragEnd: function (event) {
         handleDragEndRangeSelector(event);
         this.disable();
-        onRangeSelectorDragEnd();
       },
       onDragStart: (event) => {
         event.preventDefault();
@@ -401,8 +393,11 @@ class RangeSelector {
   handleDragEndRangeSelector(event) {
     this.currentMarker = this.inMarker;
     this.movePlayheadToMarkerPosition();
-    this.isDragging = false;
     this.playHead.show();
+    this.rangeSelector.style.setProperty('cursor', 'pointer', 'important');
+    document.body.style.removeProperty('cursor');
+
+    this.rangeSelector.parentElement.classList.remove('range-selector-dragging');
   }
 
   /**
@@ -479,14 +474,19 @@ class RangeSelector {
   }
 
   handleDragEnd(event, draggable) {
+    console.log('drag end');
     const currentMarker = this.currentMarker;
     this.movePlayheadToMarkerPosition();
+
     /**
      * sometimes the range selector is not updated to the final
      * drag position, so we call drag event one more time to
      *  make sure everything is in the correct popsition
      */
     this.handleDrag(event, draggable);
+    // show playhead
+
+    this.playHead.show();
     // fade out the timestamp
     setTimeout(() => {
       /**
