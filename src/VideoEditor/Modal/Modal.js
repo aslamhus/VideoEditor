@@ -69,7 +69,7 @@ class Modal {
   createCloseBtn() {
     const closeBtn = document.createElement('button');
     closeBtn.classList.add('close-btn');
-    closeBtn.innerHTML = '&times;';
+    closeBtn.innerHTML = '<span>&times;</span>';
     closeBtn.addEventListener('click', () => {
       if (this.onDismiss instanceof Function) {
         this.onDismiss();
