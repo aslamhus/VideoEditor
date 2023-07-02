@@ -3,7 +3,7 @@
   /** 
   padding left/right must be at least the total width
   of the left and right markers **/
-  padding: 30px !important;
+  padding: 0 30px !important;
   display: flex;
   justify-content: center;
   /* background: rgb(220, 220, 220); */
@@ -12,11 +12,16 @@
   box-sizing: border-box;
   margin: 0 auto;
   margin-top: auto;
+  min-height: 50px;
+  max-height: 150px;
+  height: 15%;
 }
 .timeline {
   position: relative;
   width: calc(100% - var(--marker-width) * 2) !important;
-  height: 100px;
+  /* height: 100px; */
+  /* min-height: 50px; */
+  height: 100%;
 }
 .timeline.disabled {
   opacity: 0.25;

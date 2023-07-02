@@ -415,12 +415,13 @@ class Timeline {
       const canvas = frameContainer.querySelector('canvas');
       // set canvas canvas aspect ratio
       const frameHeight = this.getTimelineElement().getBoundingClientRect().height;
-
       const frameWidth = frameHeight * ratio;
       canvas.width = frameWidth;
       canvas.height = frameHeight;
       canvas.style.width = frameWidth + 'px';
-      canvas.style.height = frameHeight + 'px';
+      // canvas.style.height = frameHeight + 'px';
+      // keep the canvas style at 100% so the timeline can be responsive
+      canvas.style.height = '100%';
       // console.log('frameHeight, Width', frameHeight, frameWidth);
       framesContainer.append(frameContainer);
       const videoDimensions = { width: this.video.videoWidth, height: this.video.videoHeight };

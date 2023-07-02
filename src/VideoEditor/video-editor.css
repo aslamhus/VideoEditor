@@ -1,4 +1,16 @@
-/** primary ancestor of the editor **/
+/**
+
+Note on Video Editor element structure:
+
+[ MenuBar 10% ]
+[ VideoContainer 60% ]
+[ Controls 10% ]
+[ Timeline 15% ]
+[ InfoBar 5% ]
+
+**/
+
+/** primary ancestor of the entire editor **/
 .video-editor-wrapper * {
   font-family: var(--font-family);
   user-select: none;
@@ -17,6 +29,7 @@
   width: 100%;
   background: var(--video-wrapper-bg);
 }
+/** the container for all the editor elements **/
 .video-editor-container {
   position: relative;
   /* width: 100%; */
@@ -25,14 +38,17 @@
   flex-direction: column;
   justify-content: space-between;
 }
+/** the container for the video display in the editor **/
 .video-flexbox-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   flex-grow: 1;
+  max-height: 60%;
   /* background: var(--container-bg); */
 }
+
 .video-editor-container video {
   position: absolute;
   top: 0;
