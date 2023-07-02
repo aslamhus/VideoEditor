@@ -207,7 +207,7 @@ class Cropper {
     const { target } = event;
     if (target.closest('.cropper') == null) {
       if (this.onClickOutside instanceof Function) {
-        this.onClickOutside();
+        this.onClickOutside(event);
       }
     }
     if (!this.initialValues.x) {

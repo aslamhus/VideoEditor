@@ -554,8 +554,12 @@ class Timeline {
       boundary,
       points,
       scale,
-      onClickOutside: () => {
-        this.toggleCropperOff();
+      onClickOutside: (event) => {
+        const { target } = event;
+        // only toggle off if the click is not on the crop button
+        if (!target.classList.contains('crop-button') && !target.closest('.crop-button')) {
+          this.toggleCropperOff();
+        }
       },
     });
   }
