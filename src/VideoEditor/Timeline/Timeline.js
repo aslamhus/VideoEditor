@@ -200,7 +200,6 @@ class Timeline {
     /**
      * If the range selector is being dragged, the mouseup should not fire.
      */
-    console.log('isRangeSelector dragging? ', this.rangeSelector.isDragging);
     if (this.rangeSelector.isDragging) {
       this.rangeSelector.isDragging = false;
       return;
@@ -383,8 +382,7 @@ class Timeline {
     this.video.currentTime = 0;
     const framesContainer = this.createFramesContainer();
     const isSupportedMimeType = this.video.canPlayType(this.mimeType) == 'probably';
-    console.info('isSupportedMimeType', this.mimeType, this.video.canPlayType(this.mimeType));
-    console.log('video', this.video);
+    // console.info('isSupportedMimeType', this.mimeType, this.video.canPlayType(this.mimeType));
     if (this.video.videoWidth == 0 || this.video.videoHeight == 0) {
       // throw new Error('Video has no dimensions');
     }
@@ -396,13 +394,6 @@ class Timeline {
     }
     let initialPlay = false;
 
-    console.log(
-      'ratio, cropRatio, videoWidth,videoHeight',
-      ratio,
-      this.cropAspectRatio,
-      this.video.videoWidth,
-      this.video.videoHeight
-    );
     const handleCanPlay = () => {
       if (initialPlay) return;
       initialPlay = true;
@@ -448,10 +439,10 @@ class Timeline {
 
     // attach on seek event
     this.video.addEventListener('canplay', handleCanPlay);
-    this.video.addEventListener('loadedmetadata', (e) => {
-      console.log('loadedmetadata', e);
-      console.log('video dimensions', this.video.videoWidth, this.video.videoHeight);
-    });
+    // this.video.addEventListener('loadedmetadata', (e) => {
+    //   console.log('loadedmetadata', e);
+    //   console.log('video dimensions', this.video.videoWidth, this.video.videoHeight);
+    // });
 
     // add frames container
     this.timeline.append(framesContainer);

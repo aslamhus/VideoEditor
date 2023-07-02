@@ -163,10 +163,8 @@ class Modal {
    */
   async show(duration) {
     if (!this.hidden) {
-      console.warn('modal is already shown');
+      // console.warn('modal is already shown');
       return;
-    } else {
-      console.log('show modal');
     }
 
     if (duration != undefined && duration != null) {

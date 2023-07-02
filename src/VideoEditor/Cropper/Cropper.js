@@ -262,8 +262,8 @@ class Cropper {
    */
   updateSrc(src) {
     const { points, zoom, orientation } = this.croppie.get();
-    console.log('croppie get', { points, zoom });
-    console.log('saved values', { points: this.points, zoom: this.zoom });
+    // console.log('croppie get', { points, zoom });
+    // console.log('saved values', { points: this.points, zoom: this.zoom });
     return this.croppie.bind({
       url: src,
       points,
@@ -274,7 +274,7 @@ class Cropper {
   update() {
     const { points, zoom, orientation } = this.croppie.get();
 
-    console.log('updating croppie', { points, zoom });
+    // console.log('updating croppie', { points, zoom });
     this.croppie.setZoom(zoom);
     // return this.croppie.bind({
     //   url: this.src,

@@ -474,7 +474,6 @@ class RangeSelector {
   }
 
   handleDragEnd(event, draggable) {
-    console.log('drag end');
     const currentMarker = this.currentMarker;
     this.movePlayheadToMarkerPosition();
 

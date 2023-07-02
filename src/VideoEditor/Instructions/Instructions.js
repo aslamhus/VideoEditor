@@ -10,7 +10,6 @@ class Instructions extends Modal {
       options: { animationDuration: 0.35, overlay: true, hidden: true },
     });
     this.instructions = null;
-    console.log('container', container);
     this.hidden = true;
     // bind
     this.begin = this.begin.bind(this);
@@ -55,8 +54,6 @@ class Instructions extends Modal {
     this.instructions.classList.add('instructions-container');
     this.slides.render(this.instructions);
     this.setState({ content: this.instructions });
-
-    console.log('rendering instructions', this.instructions);
     super.render(container);
   }
 }
