@@ -6,3 +6,4 @@ dist/test.mp4
 .prod.env
 .dev.env
 dist
+.VSCodeCounter
