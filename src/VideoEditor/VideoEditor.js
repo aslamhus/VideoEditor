@@ -1,42 +1,18 @@
 import MenuBar from './MenuBar/MenuBar.js';
 import Timeline from './Timeline/Timeline.js';
 import Instructions from './Instructions';
-import Modal from './Modal/Modal.js';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
 import axios from 'axios';
 import { decomposeMatrix, getTranslateOrigin } from './utils.js';
-import { defaultButtons } from './MenuBar/default-buttons.js';
 import './types.js';
 import './themes.css';
 import './video-editor.css';
 
 /** font awesome, import only used icons to keep build size small */
 import { dom, library } from '@fortawesome/fontawesome-svg-core';
-import {
-  faPlay,
-  faPause,
-  faCrop,
-  faSave,
-  faMoon,
-  faSun,
-  faQuestion,
-  faStepBackward,
-  faStepForward,
-  faCheck,
-} from '@fortawesome/free-solid-svg-icons';
-library.add(
-  faPlay,
-  faPause,
-  faCrop,
-  faSave,
-  faMoon,
-  faSun,
-  faQuestion,
-  faStepBackward,
-  faStepForward,
-  faCheck
-);
+import { faPlay, faPause, faStepBackward, faStepForward } from '@fortawesome/free-solid-svg-icons';
+library.add(faPlay, faPause, faStepBackward, faStepForward);
 dom.watch();
 
 /**
@@ -113,36 +89,15 @@ class VideoEditor {
     this.timeline = null;
     this.loader = new Loader({ message: 'Loading video' });
     // get custom buttons (custom buttons cannot override default buttons)
-    const {
-      inlineStartButtons: customInlineButtons,
-      inlineEndButtons: customInlineEndButtons,
-      disable,
-    } = menuBarButtons;
+
     // init menu bar
     this.menuBar = new MenuBar({
-      disable,
-      inlineStartButtons: {
-        ...customInlineButtons,
-        darkmode: {
-          ...defaultButtons.darkmode,
-          onClick: this.handleClickDarkMode.bind(this),
-        },
-        help: {
-          ...defaultButtons.help,
-          onClick: this.handleClickHelpButton.bind(this),
-        },
-      },
-      inlineEndButtons: {
-        ...customInlineEndButtons,
-        crop: {
-          ...defaultButtons.crop,
-          onClick: this.handleToggleCrop.bind(this),
-        },
-        save: {
-          ...defaultButtons.save,
-          onClick: this.handleSaveButtonClick.bind(this),
-        },
-      },
+      customButtons: menuBarButtons,
+      onClickDarkMode: this.handleClickDarkMode.bind(this),
+      onClickHelpButton: this.handleClickHelpButton.bind(this),
+      onToggleCrop: this.handleToggleCrop.bind(this),
+      onSaveButtonClick: this.handleSaveButtonClick.bind(this),
+      library,
     });
 
     // bind

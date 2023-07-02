@@ -1,8 +1,18 @@
+import { defaultButtons } from './default-buttons.js';
 import './menu-bar.css';
 
 class MenuBar {
   /**
+   *
    * @typedef {Object} constructor
+   * @property {menuBarButtons} customButtons
+   * @property {Function} onClickDarkMode
+   * @property {Function} onClickHelpButton
+   * @property {Function} onClickSaveButton
+   * @property {Function} onToggleCrop
+   * @property {Object} library - the font awesome icon library
+   *
+   * @typedef {Object} menuBarButtons
    * @property {Array<string>} disable - list of buttons to disable
    * @property {Object<button>} inlineStartButtons - buttons that hug the inline start of the menubar
    * @property {Object<button>} inlineEndButtons - buttons that hug the inline end of the menubar
@@ -19,22 +29,84 @@ class MenuBar {
    *
    * @param {constructor} constructor
    */
-  constructor({ inlineStartButtons, inlineEndButtons, disable }) {
-    this.inlineStartButtons = inlineStartButtons;
-    this.inlineEndButtons = inlineEndButtons;
+  constructor({
+    customButtons,
+    onClickDarkMode,
+    onClickHelpButton,
+    onClickSaveButton,
+    onToggleCrop,
+    library,
+  }) {
+    // init inline start buttons
+    this.inlineStartButtons = {
+      // add custom inline start buttons
+      ...customButtons?.inlineStartButtons,
+      // default buttons
+      darkmode: {
+        ...defaultButtons.darkmode,
+        onClick: onClickDarkMode,
+      },
+      help: {
+        ...defaultButtons.help,
+        onClick: onClickHelpButton,
+      },
+    };
+    // init inline end buttons
+    this.inlineEndButtons = {
+      // add custom inline end buttons
+      ...customButtons?.inlineEndButtons,
+      // default buttons
+      crop: {
+        ...defaultButtons.crop,
+        onClick: onToggleCrop,
+      },
+      save: {
+        ...defaultButtons.save,
+        onClick: onClickSaveButton,
+      },
+    };
     // disable buttons
-    if (Array.isArray(disable)) {
+
+    const { disable } = customButtons;
+    Array.isArray(disable) &&
       disable.forEach((buttonName) => {
         if (this.inlineStartButtons[buttonName]) delete this.inlineStartButtons[buttonName];
         if (this.inlineEndButtons[buttonName]) delete this.inlineEndButtons[buttonName];
       });
-    }
+
     // bind
     this.createMenuBar = this.createMenuBar.bind(this);
     this.createButtons = this.createButtons.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
     this.render = this.render.bind(this);
+    // init
+    this.importFontAwesomeIcons(library);
+  }
+
+  /**
+   * Dynamically add fontawsome icons to the library
+   *
+   * This way users can import custom icons and we don't have to
+   * import the entire font awesome library
+   */
+  async importFontAwesomeIcons(library) {
+    const icons = Object.values({ ...this.inlineStartButtons, ...this.inlineEndButtons }).map(
+      (button) => {
+        console.log(button);
+        return button?.fontAwesomeIcon.replace(/(fa|fas|-|\s)/g, '');
+      }
+    );
+    // import icons from fortawesome
+    const faIcons = await import('@fortawesome/free-solid-svg-icons');
+    icons.forEach((icon) => {
+      const iconName = `fa${icon.charAt(0).toUpperCase() + icon.slice(1)}`;
+      const faIcon = faIcons[iconName];
+      console.log('faIcon', faIcon);
+      library.add(faIcon);
+    });
+
+    // await import({ ...icons } from '@fortawesome/free-solid-svg-icons';
   }
 
   createMenuBar() {
@@ -61,6 +133,7 @@ class MenuBar {
    */
   createButtons(buttons) {
     const newButtons = buttons.map((buttonObj) => {
+      console.log(buttonObj);
       const { label, title, className, onClick, fontAwesomeIcon, toggle } = buttonObj;
       // create button
       const buttonContainer = document.createElement('div');
@@ -78,8 +151,11 @@ class MenuBar {
           this.handleClick(event, onClick);
         }
       };
-      button.title = title ?? '';
-      button.className = `menu-bar-button ${className}`;
+      if (button.title) {
+        button.title = title;
+      }
+
+      button.className = `menu-bar-button ${className ?? ''}`;
       // create icon
       if (fontAwesomeIcon) {
         const icon = document.createElement('i');

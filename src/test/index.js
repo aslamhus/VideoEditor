@@ -3,8 +3,8 @@ import VideoEditor from '../VideoEditor/VideoEditor.js';
 let src = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
 src =
   'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687484528/video-editor/vxwbazvzjgzitgkjzxgj.mov';
-src =
-  'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687579716/video-editor/PXL_20230519_034925382_aqp36e.mp4';
+// src =
+//   'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687579716/video-editor/PXL_20230519_034925382_aqp36e.mp4';
 
 window.onload = function () {
   const root = document.getElementById('root');
@@ -18,14 +18,11 @@ window.onload = function () {
     // time: { in: 5, out: 10 },
     menuBarButtons: {
       inlineEndButtons: {
-        // save: {
-        //   label: 'Save',
-        //   onClick: (event) => {
-        //     console.log('custom save', event);
-        //   },
-        // },
+        cancel: {
+          label: 'Cancel',
+          fontAwesomeIcon: 'fa fa-times',
+        },
       },
-      // disable: ['darkmode', 'help'],
     },
     limit: { maxDuration: 5 },
     // onError: (error) => {
