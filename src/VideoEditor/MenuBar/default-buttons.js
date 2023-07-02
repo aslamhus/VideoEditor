@@ -3,6 +3,7 @@ export const defaultButtons = {
     index: 0,
     title: 'Switch between dark mode and light mode',
     label: 'Dark',
+    toggle: { highlight: false },
     fontAwesomeIcon: 'fa fa-moon',
   },
   help: {
@@ -11,6 +12,14 @@ export const defaultButtons = {
     title: 'Help',
     className: 'help-button',
     fontAwesomeIcon: 'fa fa-question',
+  },
+  mute: {
+    index: 0,
+    label: 'Mute',
+    title: 'Mute',
+    toggle: { highlight: false },
+    className: 'mute-button',
+    fontAwesomeIcon: 'fa fa-volume-up',
   },
   crop: {
     index: 1,

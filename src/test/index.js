@@ -1,8 +1,8 @@
 import VideoEditor from '../VideoEditor/VideoEditor.js';
 
 let src = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
-src =
-  'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687484528/video-editor/vxwbazvzjgzitgkjzxgj.mov';
+// src =
+//   'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687484528/video-editor/vxwbazvzjgzitgkjzxgj.mov';
 // src =
 //   'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687579716/video-editor/PXL_20230519_034925382_aqp36e.mp4';
 
@@ -11,7 +11,7 @@ window.onload = function () {
 
   let vidEditor = new VideoEditor({
     src,
-    crop: { width: 5, height: 4 },
+    crop: { width: 7, height: 4 },
     // maxHeight,
     // transformations,
     // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },

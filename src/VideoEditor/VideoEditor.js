@@ -16,8 +16,22 @@ import {
   faCheck,
   faStepBackward,
   faStepForward,
+  faVolumeUp,
+  faVolumeMute,
+  faSun,
+  faMoon,
 } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlay, faPause, faCheck, faStepBackward, faStepForward);
+library.add(
+  faPlay,
+  faPause,
+  faCheck,
+  faStepBackward,
+  faStepForward,
+  faVolumeUp,
+  faVolumeMute,
+  faSun,
+  faMoon
+);
 dom.watch();
 
 /**
@@ -100,10 +114,11 @@ class VideoEditor {
     // init menu bar
     this.menuBar = new MenuBar({
       customButtons: menuBarButtons,
-      onClickDarkMode: this.handleClickDarkMode.bind(this),
+      onToggleDarkMode: this.handleToggleDarkMode.bind(this),
       onClickHelpButton: this.handleClickHelpButton.bind(this),
       onToggleCrop: this.handleToggleCrop.bind(this),
       onSaveButtonClick: this.handleSaveButtonClick.bind(this),
+      onToggleMute: this.handleToggleMute.bind(this),
       library,
     });
 
@@ -443,15 +458,32 @@ class VideoEditor {
     }
   }
 
-  handleClickHelpButton(event) {
-    if (this.onClickHelpButton instanceof Function) {
-      this.onClickHelpButton(event);
+  handleToggleMute(event, toggleState) {
+    const { currentTarget } = event || { currentTarget: document.querySelector('.mute-button') };
+    const buttonContainer = currentTarget.parentElement;
+    const span = buttonContainer.querySelector('span');
+    const icon = buttonContainer.querySelector('i') ?? buttonContainer.querySelector('svg');
+    if (toggleState) {
+      // muted
+      this.video.volume = 0;
+      // update button UI
+      span.innerText = 'Unmute';
+      icon.classList.remove('fa-volume-up');
+      icon.classList.add('fa-volume-mute');
+      this.video.muted = true;
     } else {
-      this.instructions.begin();
+      // unmuted
+
+      this.video.volume = 1;
+      // update button UI
+      span.innerText = 'Mute';
+      icon.classList.remove('fa-volume-mute');
+      icon.classList.add('fa-volume-up');
+      this.video.muted = false;
     }
   }
 
-  handleClickDarkMode(event) {
+  handleToggleDarkMode(event, toggleState) {
     const { currentTarget } = event;
     const span = currentTarget.parentElement.querySelector('span');
     const svg = currentTarget.parentElement.querySelector('svg');
@@ -469,6 +501,14 @@ class VideoEditor {
       span.textContent = 'Dark';
       svg.classList.remove('fa-sun');
       svg.classList.add('fa-moon');
+    }
+  }
+
+  handleClickHelpButton(event) {
+    if (this.onClickHelpButton instanceof Function) {
+      this.onClickHelpButton(event);
+    } else {
+      this.instructions.begin();
     }
   }
 
