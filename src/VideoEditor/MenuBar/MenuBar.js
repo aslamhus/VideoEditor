@@ -99,23 +99,7 @@ class MenuBar {
    * This way users can import custom icons and we don't have to
    * import the entire font awesome library
    */
-  async importFontAwesomeIcons(library) {
-    const icons = Object.values({ ...this.inlineStartButtons, ...this.inlineEndButtons }).map(
-      (button) => {
-        // remove fa, fas, -, and spaces so that "fa fa-times" becomes "times"
-        return button?.fontAwesomeIcon.replace(/(fa|fas|-|\s)/g, '');
-      }
-    );
-    // import icons from fortawesome
-    const faIcons = await import('@fortawesome/free-solid-svg-icons');
-    icons.forEach((icon) => {
-      // fatimes -> faTimes
-      const iconName = `fa${icon.charAt(0).toUpperCase() + icon.slice(1)}`;
-      const faIcon = faIcons?.[iconName];
-      // add icon to library
-      faIcon && library.add(faIcon);
-    });
-  }
+  async importFontAwesomeIcons(library) {}
 
   sortByIndex(a, b) {
     return a?.index > b?.index ? 1 : -1;

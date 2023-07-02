@@ -20,6 +20,10 @@ import {
   faVolumeMute,
   faSun,
   faMoon,
+  faCrop,
+  faSave,
+  faTimes,
+  faQuestion,
 } from '@fortawesome/free-solid-svg-icons';
 library.add(
   faPlay,
@@ -30,7 +34,11 @@ library.add(
   faVolumeUp,
   faVolumeMute,
   faSun,
-  faMoon
+  faMoon,
+  faCrop,
+  faSave,
+  faTimes,
+  faQuestion
 );
 dom.watch();
 

@@ -8,8 +8,15 @@ export default {
   output: {
     path: path.resolve(__dirname, '../dist/'),
     publicPath: 'auto',
-  },
 
+    filename: '[name].js',
+    chunkFilename: '[name].js',
+  },
+  // optimization: {
+  //   splitChunks: {
+  //     chunks: 'all',
+  //   },
+  // },
   module: {
     rules: [
       {
