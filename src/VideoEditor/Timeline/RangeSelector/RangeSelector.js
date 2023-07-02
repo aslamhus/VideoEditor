@@ -342,6 +342,7 @@ class RangeSelector {
       case 'in':
       case 'rangeSelector':
         this.inTime = timeIndex;
+        this.outTime = this.outMarker.getTimeIndex();
         this.currentIndex = timeIndex;
         break;
       case 'out':
@@ -352,8 +353,7 @@ class RangeSelector {
         break;
       default:
         // do nothing
-        console.log(`marker`, marker);
-        console.error('unknown marker update in handleRangeUpdate');
+        console.error('unknown marker update in handleRangeUpdate', marker);
     }
     // hide popover if visible
     if (!this.popover.hidden) this.popover.hide();
