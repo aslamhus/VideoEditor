@@ -38,7 +38,7 @@
 }
 
 .menu-bar-button:hover,
-.menu-bar-button.toggled {
+.menu-bar-button.toggled:not(.menu-bar-button.no-toggle-highlight) {
   background: var(--menu-bar-btn-bg-hover);
   color: var(--menu-bar-btn-text-hover);
 

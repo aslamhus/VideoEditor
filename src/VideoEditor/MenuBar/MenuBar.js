@@ -6,10 +6,11 @@ class MenuBar {
    *
    * @typedef {Object} constructor
    * @property {menuBarButtons} customButtons
-   * @property {Function} onClickDarkMode
+   * @property {Function} onToggleDarkMode
    * @property {Function} onClickHelpButton
    * @property {Function} onClickSaveButton
    * @property {Function} onToggleCrop
+   * @property {Function} onToggleMute
    * @property {Object} library - the font awesome icon library
    *
    * @typedef {Object} menuBarButtons
@@ -32,10 +33,11 @@ class MenuBar {
    */
   constructor({
     customButtons,
-    onClickDarkMode,
+    onToggleDarkMode,
     onClickHelpButton,
     onClickSaveButton,
     onToggleCrop,
+    onToggleMute,
     library,
   }) {
     // init inline start buttons
@@ -45,7 +47,7 @@ class MenuBar {
       // default buttons
       darkmode: {
         ...defaultButtons.darkmode,
-        onClick: onClickDarkMode,
+        onClick: onToggleDarkMode,
       },
       help: {
         ...defaultButtons.help,
@@ -57,6 +59,11 @@ class MenuBar {
       // add custom inline end buttons
       ...customButtons?.inlineEndButtons,
       // default buttons
+      mute: {
+        ...defaultButtons.mute,
+
+        onClick: onToggleMute,
+      },
       crop: {
         ...defaultButtons.crop,
         onClick: onToggleCrop,
@@ -142,7 +149,6 @@ class MenuBar {
    */
   createButtons(buttons) {
     const newButtons = buttons.map((buttonObj) => {
-      console.log(buttonObj);
       const { label, title, className, onClick, fontAwesomeIcon, toggle } = buttonObj;
       // create button
       const buttonContainer = document.createElement('div');
@@ -165,6 +171,12 @@ class MenuBar {
       }
 
       button.className = `menu-bar-button ${className ?? ''}`;
+      // toggle property can be set to true or an object with a highlight property
+      // sometimes we want to toggle, but not highlight the button (ie. for mute / dark mode button)
+
+      if (toggle?.highlight === false) {
+        button.classList.add('no-toggle-highlight');
+      }
       // create icon
       if (fontAwesomeIcon) {
         const icon = document.createElement('i');
