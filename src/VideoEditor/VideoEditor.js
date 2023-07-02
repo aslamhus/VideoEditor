@@ -401,12 +401,8 @@ class VideoEditor {
         // this.video.style.transformOrigin = `${vidBounds.width / 2}px ${vidBounds.height / 2}px`;
         // update crop
         if (this.timeline.cropper) {
-          const cropButton = document.querySelector('.crop-button');
-          if (cropButton.classList.contains('toggled')) {
-            cropButton.click();
-          }
+          this.timeline.toggleCropperOff();
           this.timeline.transformations = this.timeline.getTransformations();
-
           this.timeline.cropper.destroy();
           this.timeline.cropper = null;
         }

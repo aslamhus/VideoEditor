@@ -63,7 +63,6 @@ class Timeline {
     // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
-    //
     // playhead
     this.playHead = new PlayHead({
       className: 'play-head',
@@ -111,6 +110,8 @@ class Timeline {
       duration: this.video.duration,
       currentIndex: this.transformations?.time?.in,
     });
+    // bind
+    this.toggleCropperOff = this.toggleCropperOff.bind(this);
   }
 
   async handleToggleCropper(toggle) {
@@ -546,7 +547,24 @@ class Timeline {
     }
     const viewport = { width: cropWidth, height: cropHeight };
     const boundary = { width: '100%', height: '100%' };
-    this.cropper = new Cropper({ src, el: cropContainer, viewport, boundary, points, scale });
+    this.cropper = new Cropper({
+      src,
+      el: cropContainer,
+      viewport,
+      boundary,
+      points,
+      scale,
+      onClickOutside: () => {
+        this.toggleCropperOff();
+      },
+    });
+  }
+
+  toggleCropperOff() {
+    const cropButton = document.querySelector('.crop-button');
+    if (cropButton.classList.contains('toggled')) {
+      cropButton.click();
+    }
   }
 
   createFramesContainer() {

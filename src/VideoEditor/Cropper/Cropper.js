@@ -19,7 +19,17 @@ import './cropper.css';
  */
 
 class Cropper {
-  constructor({ src, el, viewport, boundary, points, scale }) {
+  constructor({
+    src,
+    el,
+    viewport,
+    boundary,
+    points,
+    scale,
+    onClickOutside,
+    enableOrientation = false,
+    enableResize = false,
+  }) {
     if (!el) {
       throw new TypeError('Cropper element cannot be null');
     }
@@ -33,8 +43,8 @@ class Cropper {
       boundary,
       showZoomer: true,
       customClass: 'cropper',
-      // enableOrientation: true,
-      // enableResize: true,
+      enableOrientation,
+      enableResize,
     });
     this.croppie.bind({
       url: this.src,
@@ -42,25 +52,28 @@ class Cropper {
       zoom: scale,
       // orientation: 1,
     });
-    this.el = el;
-    this.elementValues = { x: null, y: null, zoom: null };
     // croppie values
     this.points = null;
     this.zoom = null;
     this.orientation = null;
-    //
-    this.zoomRangeInput = el.querySelector('input[type=range]');
-    this.img = el.querySelector('img');
-    this.hidden = false;
     this.zoom = 0;
     this.x = 0;
     this.y = 0;
     this.origin = 0;
-    // this.getInitialElementValues();
+    this.hidden = false;
+    //elements
+    this.el = el;
+    this.elementValues = { x: null, y: null, zoom: null };
+    this.zoomRangeInput = el.querySelector('input[type=range]');
+    this.img = el.querySelector('img');
+    // callbacks
+    this.onClickOutside = onClickOutside;
+    // bind
     this.touchdown = this.touchdown.bind(this);
     this.touchup = this.touchup.bind(this);
     this.handleZoomRangeChange = this.handleZoomRangeChange.bind(this);
     this.update = this.update.bind(this);
+    // init
     this.attachEvents();
     this.initialValues = { x: null, y: null, zoom: null };
 
@@ -191,6 +204,12 @@ class Cropper {
   }
 
   touchdown(event) {
+    const { target } = event;
+    if (target.closest('.cropper') == null) {
+      if (this.onClickOutside instanceof Function) {
+        this.onClickOutside();
+      }
+    }
     if (!this.initialValues.x) {
       const [x, y] = this.getTransformCoordinates(this.el);
       // const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
