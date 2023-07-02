@@ -496,10 +496,10 @@ class Timeline {
    */
   async handleTimelineReady() {
     setTimeout(async () => {
-      // await this.initCropper(this.transformations?.crop);
+      await this.initCropper(this.transformations?.crop);
 
       setTimeout(() => {
-        // this.applyCrop();
+        this.applyCrop();
         if (this.onReady instanceof Function) {
           this.onReady();
         }

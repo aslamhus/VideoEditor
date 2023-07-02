@@ -342,20 +342,23 @@ class VideoEditor {
     vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
     // get new width
     requestAnimationFrame(() => {
+      // console.log('this.previousBounds', this.previousBounds);
       if (this.previousBounds) {
         const { scaleX, scaleY, translateX, translateY } = decomposeMatrix(this.video);
         const scaleDiff = vidMaxWidth / this.previousBounds.width;
+        console.log('scaleDiff', scaleDiff);
         const [originX, originY] = getTranslateOrigin(this.video);
         const newScale = scaleX * scaleDiff;
         const vidHeight = vidContainer.getBoundingClientRect().height;
         const widthDiff = vidMaxWidth - this.previousBounds.width;
         const heightDiff = vidHeight - this.previousBounds.height;
-        const newTransformOriginValue = `${originX * scaleDiff}px ${originY * scaleDiff}px`;
+        // const newTransformOriginValue = `${originX * scaleDiff}px ${originY * scaleDiff}px`;
         const newX = translateX + widthDiff / 2;
         const newY = translateY + heightDiff / 2;
+
         const newTransformValue = `translate3d(${newX}px, ${newY}px, 0px) scale(${newScale})`;
         this.video.style.transform = newTransformValue;
-        // this.video.style.transformOrigin = newTransformOriginValue;
+        // this.video.style.transformOrigin = `${vidBounds.width / 2}px ${vidBounds.height / 2}px`;
         // update crop
         if (this.timeline.cropper) {
           const cropButton = document.querySelector('.crop-button');
