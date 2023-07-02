@@ -75,7 +75,7 @@ class Timeline {
     });
     // popover
     this.popover = new Popover({
-      title: 'Maximum Video Length Exceeded',
+      title: 'Maximum video length exceeded',
       body: 'Please select a shorter video.',
       variant: 'danger',
     });

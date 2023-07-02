@@ -559,7 +559,7 @@ class RangeSelector {
         this.currentMarker.setPositionByTimeIndex(maxOutMarkerTime);
       }
       // show popover on current marker
-      this.popover.setBody(`Please select video shorter than ${maxDuration} seconds.`);
+      this.popover.setBody(`Please select a length shorter than ${maxDuration} seconds.`);
       this.popover.render(this.currentMarker.marker);
       // trigger custom callback
       if (this.onRangeLimit) {
