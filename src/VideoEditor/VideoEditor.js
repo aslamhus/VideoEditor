@@ -10,8 +10,14 @@ import './themes.css';
 import './video-editor.css';
 /** font awesome, import only used icons to keep build size small */
 import { dom, library } from '@fortawesome/fontawesome-svg-core';
-import { faPlay, faPause, faStepBackward, faStepForward } from '@fortawesome/free-solid-svg-icons';
-library.add(faPlay, faPause, faStepBackward, faStepForward);
+import {
+  faPlay,
+  faPause,
+  faCheck,
+  faStepBackward,
+  faStepForward,
+} from '@fortawesome/free-solid-svg-icons';
+library.add(faPlay, faPause, faCheck, faStepBackward, faStepForward);
 dom.watch();
 
 /**
