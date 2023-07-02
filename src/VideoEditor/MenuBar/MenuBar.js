@@ -19,6 +19,7 @@ class MenuBar {
    *
    *
    * @typedef {Object} button
+   * @property {Number} index - the index of the button (used for sorting)
    * @property {string} label - button label
    * @property {string} title -  button title popover
    * @property {string} className - button class
@@ -77,6 +78,7 @@ class MenuBar {
     // bind
     this.createMenuBar = this.createMenuBar.bind(this);
     this.createButtons = this.createButtons.bind(this);
+    this.sortByIndex = this.sortByIndex.bind(this);
     this.handleClick = this.handleClick.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
     this.render = this.render.bind(this);
@@ -93,20 +95,23 @@ class MenuBar {
   async importFontAwesomeIcons(library) {
     const icons = Object.values({ ...this.inlineStartButtons, ...this.inlineEndButtons }).map(
       (button) => {
-        console.log(button);
+        // remove fa, fas, -, and spaces so that "fa fa-times" becomes "times"
         return button?.fontAwesomeIcon.replace(/(fa|fas|-|\s)/g, '');
       }
     );
     // import icons from fortawesome
     const faIcons = await import('@fortawesome/free-solid-svg-icons');
     icons.forEach((icon) => {
+      // fatimes -> faTimes
       const iconName = `fa${icon.charAt(0).toUpperCase() + icon.slice(1)}`;
-      const faIcon = faIcons[iconName];
-      console.log('faIcon', faIcon);
-      library.add(faIcon);
+      const faIcon = faIcons?.[iconName];
+      // add icon to library
+      faIcon && library.add(faIcon);
     });
+  }
 
-    // await import({ ...icons } from '@fortawesome/free-solid-svg-icons';
+  sortByIndex(a, b) {
+    return a?.index > b?.index ? 1 : -1;
   }
 
   createMenuBar() {
@@ -115,11 +120,15 @@ class MenuBar {
     // inline start
     const inlineStartContainer = document.createElement('div');
     inlineStartContainer.className = 'inline-start-buttons';
-    inlineStartContainer.append(...this.createButtons(Object.values(this.inlineStartButtons)));
+    inlineStartContainer.append(
+      ...this.createButtons(Object.values(this.inlineStartButtons).sort(this.sortByIndex))
+    );
     // inline end
     const inlineEndContainer = document.createElement('div');
     inlineEndContainer.className = 'inline-end-buttons';
-    inlineEndContainer.append(...this.createButtons(Object.values(this.inlineEndButtons)));
+    inlineEndContainer.append(
+      ...this.createButtons(Object.values(this.inlineEndButtons).sort(this.sortByIndex))
+    );
     // append buttons to menu container
     menuContainer.append(...[inlineStartContainer, inlineEndContainer]);
     return menuContainer;

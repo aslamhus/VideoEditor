@@ -16,14 +16,15 @@ window.onload = function () {
     // transformations,
     // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
     // time: { in: 5, out: 10 },
-    menuBarButtons: {
-      inlineEndButtons: {
-        cancel: {
-          label: 'Cancel',
-          fontAwesomeIcon: 'fa fa-times',
-        },
-      },
-    },
+    // menuBarButtons: {
+    //   inlineEndButtons: {
+    //     cancel: {
+    //       index: 3,
+    //       label: 'Exit',
+    //       fontAwesomeIcon: 'fa fa-times',
+    //     },
+    //   },
+    // },
     limit: { maxDuration: 5 },
     // onError: (error) => {
     //   console.error('onError', error);
