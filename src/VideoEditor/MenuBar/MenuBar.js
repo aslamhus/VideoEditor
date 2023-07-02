@@ -160,7 +160,7 @@ class MenuBar {
           this.handleClick(event, onClick);
         }
       };
-      if (button.title) {
+      if (title) {
         button.title = title;
       }
 

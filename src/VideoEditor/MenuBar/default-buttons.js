@@ -1,6 +1,7 @@
 export const defaultButtons = {
   darkmode: {
     index: 0,
+    title: 'Switch between dark mode and light mode',
     label: 'Dark',
     fontAwesomeIcon: 'fa fa-moon',
   },
