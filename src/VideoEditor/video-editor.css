@@ -47,6 +47,7 @@ Note on Video Editor element structure:
   flex-grow: 1;
   max-height: 60%;
   /* background: var(--container-bg); */
+  /* background: blue; */
 }
 
 .video-editor-container video {
@@ -103,5 +104,12 @@ Note on Video Editor element structure:
 @media only screen and (max-width: 768px) {
   .video-editor-wrapper {
     padding: 0rem;
+  }
+}
+
+/** short height **/
+@media only screen and (max-height: 500px) {
+  .video-flexbox-container {
+    max-height: 50%;
   }
 }

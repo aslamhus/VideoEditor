@@ -25,7 +25,7 @@
 @media screen and (max-width: 768px) {
   .video-editor-controls {
     margin-top: 0.25rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
     display: flex;
     flex-direction: row;
   }

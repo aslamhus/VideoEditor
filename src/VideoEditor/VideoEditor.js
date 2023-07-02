@@ -74,7 +74,9 @@ class VideoEditor {
     this.videoEditorContainer = null;
     this.maxHeight = maxHeight || null;
     // the maximum height of the video display as apercent of the window size
-    this.maxHeightPercent = 0.5;
+    // (must be the same as css for .video-flexbox-container)
+    // this is recalculated on window resize
+    this.maxHeightPercent = 0.6;
     this.limit = limit;
     this.onError = onError;
     this.onReady = onReady;
@@ -291,26 +293,57 @@ class VideoEditor {
   }
 
   attachResizeEvent() {
+    const vidContainerFlexbox = this.video.closest('.video-flexbox-container');
+    const vidContainer = this.video.closest('.video-wrap');
     window.addEventListener('resize', (event) => {
       const { videoWidth, videoHeight } = this.video;
-      const vidContainer = this.video.closest('.video-wrap');
-      // this.previousScale = videoEl.getBoundingClientRect().width / videoEl.offsetWidth;
       this.previousBounds = vidContainer.getBoundingClientRect();
       const videoBounds = this.video.getBoundingClientRect();
       this.previousVidBounds = videoBounds;
       if (!this.containerToVideoRatio) {
         this.containerToVideoRatio = this.previousBounds.width / videoBounds.width;
       }
+      this.maxHeightPercent = this.getMaxHeightPercent(vidContainerFlexbox);
       this.updateVideoContainerDimensions(videoWidth, videoHeight);
     });
+  }
+
+  getMaxHeightPercent(vidContainerFlexbox) {
+    const percentValue = getComputedStyle(vidContainerFlexbox).maxHeight;
+    return parseInt(percentValue) / 100;
+  }
+
+  getVideoEditorSize() {
+    const vidEditorWrapper = this.videoEditorContainer.closest('.video-editor-wrapper');
+    const vidEditorWrapperStyle = getComputedStyle(vidEditorWrapper);
+    const height =
+      parseFloat(vidEditorWrapperStyle.height) -
+      parseFloat(vidEditorWrapperStyle.paddingTop) -
+      parseFloat(vidEditorWrapperStyle.paddingBottom) -
+      parseFloat(vidEditorWrapperStyle.borderTop) -
+      parseFloat(vidEditorWrapperStyle.borderBottom) -
+      parseFloat(vidEditorWrapperStyle.marginTop) -
+      parseFloat(vidEditorWrapperStyle.marginBottom);
+    // get vidEditorWrapper width
+    const width =
+      parseFloat(vidEditorWrapperStyle.width) -
+      parseFloat(vidEditorWrapperStyle.paddingLeft) -
+      parseFloat(vidEditorWrapperStyle.paddingRight) -
+      parseFloat(vidEditorWrapperStyle.borderLeft) -
+      parseFloat(vidEditorWrapperStyle.borderRight) -
+      parseFloat(vidEditorWrapperStyle.marginLeft) -
+      parseFloat(vidEditorWrapperStyle.marginRight);
+    return { width, height };
   }
 
   updateVideoContainerDimensions(width, height) {
     // aspect ratio of device
     const aspectRatio = height / width;
     // console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
+
+    const vidEditorSize = this.getVideoEditorSize();
+
     const vidWrap = this.video.closest('.video-wrap');
-    const vidWrapBounds = vidWrap.getBoundingClientRect();
     const vidContainer = this.video.closest('.video-container');
     const vidBounds = this.video.getBoundingClientRect();
     let vidMaxWidth;
@@ -320,16 +353,18 @@ class VideoEditor {
       vidMaxWidth = this.maxHeight / aspectRatio;
     } else {
       // limit height of video display if screen size exceeds limit
+      // HOWEVER, use the primary ancestor of the editor as the limit, not the screen
+      // so that the video doesn't get too small when the editor is in a small container
 
-      const maxHeight = window.innerHeight * this.maxHeightPercent;
+      const maxHeight = vidEditorSize.height * this.maxHeightPercent;
       // console.log('maxHeight', maxHeight);
       vidMaxWidth = maxHeight / aspectRatio;
     }
     /**
      * to do: on window resize, recalculate video max width
      */
-    if (vidMaxWidth > window.innerWidth) {
-      vidMaxWidth = window.innerWidth;
+    if (vidMaxWidth > vidEditorSize.width) {
+      vidMaxWidth = vidEditorSize.width;
     }
     // console.log('vidMaxWidth', vidMaxWidth, vidWrapBounds);
 
@@ -346,7 +381,6 @@ class VideoEditor {
       if (this.previousBounds) {
         const { scaleX, scaleY, translateX, translateY } = decomposeMatrix(this.video);
         const scaleDiff = vidMaxWidth / this.previousBounds.width;
-        console.log('scaleDiff', scaleDiff);
         const [originX, originY] = getTranslateOrigin(this.video);
         const newScale = scaleX * scaleDiff;
         const vidHeight = vidContainer.getBoundingClientRect().height;
@@ -371,50 +405,6 @@ class VideoEditor {
           this.timeline.cropper = null;
         }
         return;
-
-        const cropContainer = document.querySelector('.crop-container');
-        const crBoundary = cropContainer.querySelector('.cr-boundary');
-        const crImage = cropContainer.querySelector('img');
-        const crViewport = cropContainer.querySelector('.cr-viewport');
-        const crOverlay = cropContainer.querySelector('.cr-overlay');
-        // set image transform
-        // return;
-        // crImage.style.transform = newTransformValue;
-        // // crImage.style.width = '100%';
-        // // set boundary width to video width
-        // crBoundary.style.width = '100%';
-        // crBoundary.style.height = '100%';
-
-        // this.timeline.cropper.update();
-
-        // return;
-        // set viewport
-        const cropAspectRatio = this.crop.width / this.crop.height;
-        console.log(`cropRatio ${cropAspectRatio}, videoRatio ${aspectRatio}`);
-        let vpWidth, vpHeight;
-        // if (cropAspectRatio > aspectRatio) {
-        vpWidth = vidHeight * cropAspectRatio;
-        vpHeight = vidHeight;
-        // } else {
-        //   vpWidth = vidMaxWidth;
-        //   vpHeight = vidMaxWidth / cropAspectRatio;
-        // }
-
-        crViewport.style.width = `${vpWidth}px`;
-        crViewport.style.height = `${vpHeight}px`;
-        this.timeline.cropper.update();
-
-        console.log('zoomRange', this.timeline.cropper.getZoomRangeMinMax());
-        // set crop overlay
-        // crOverlay.style.width = `${vidMaxWidth}px`;
-        // crOverlay.style.height = `${vidHeight + 5}px`;
-        // const overlayBounds = crOverlay.getBoundingClientRect();
-        // const overlayTop = parseFloat(overlayBounds.top) + 1;
-        // const overlayLeft = parseFloat(overlayBounds.left) + 1;
-        // console.log('overlayTop, left', overlayTop, overlayLeft, widthDiff / 2);
-        // crOverlay.style.top = `${overlayTop}px`;
-        // crOverlay.style.left = `${overlayLeft}px`;
-        // console.log('viewport dimensions', vpWidth, vpHeight);
       }
     });
   }

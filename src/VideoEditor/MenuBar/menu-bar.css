@@ -46,9 +46,21 @@
   cursor: pointer;
 }
 /** mobile styles **/
-@media only screen and (max-width: 768px) {
+@media screen and (max-width: 768px), screen and (max-height: 712px) {
   .menu-bar-container {
     padding: 0.55rem;
     background: transparent;
+  }
+}
+
+/** remove menu bar button text when height is small **/
+@media only screen and (max-height: 712px) {
+  .menu-bar-container {
+    padding: 0;
+    background: transparent;
+  }
+  .menu-bar-button-container span {
+    padding: 0;
+    display: none;
   }
 }

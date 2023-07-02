@@ -11,7 +11,7 @@
   background-color: var(--container-bg);
   box-sizing: border-box;
   margin: 0 auto;
-  margin-top: auto;
+  margin-top: 0;
   min-height: 50px;
   max-height: 150px;
   height: 15%;
@@ -74,7 +74,7 @@
   .timeline-container {
     margin-top: 0rem;
     margin-bottom: 0;
-    padding: 5px 0 !important;
+    padding: 5px 10px !important;
     background: transparent;
   }
   .timeline {
