@@ -302,7 +302,6 @@ class VideoEditor {
     const vidContainerFlexbox = this.video.closest('.video-flexbox-container');
     const vidContainer = this.video.closest('.video-wrap');
     window.addEventListener('resize', (event) => {
-      const { videoWidth, videoHeight } = this.video;
       this.previousBounds = vidContainer.getBoundingClientRect();
       const videoBounds = this.video.getBoundingClientRect();
       this.previousVidBounds = videoBounds;
@@ -310,7 +309,7 @@ class VideoEditor {
         this.containerToVideoRatio = this.previousBounds.width / videoBounds.width;
       }
       this.maxHeightPercent = this.getMaxHeightPercent(vidContainerFlexbox);
-      this.updateVideoContainerDimensions(videoWidth, videoHeight);
+      this.updateVideoContainerDimensions();
     });
   }
 
@@ -342,7 +341,17 @@ class VideoEditor {
     return { width, height };
   }
 
-  updateVideoContainerDimensions(width, height) {
+  updateVideoContainerDimensions() {
+    // use crop dimensions if set, otherwise use video dimensions
+    let width, height;
+    if (this.crop.width && this.crop.height) {
+      width = this.crop.width;
+      height = this.crop.height;
+    } else {
+      width = this.video.videoWidth;
+      height = this.video.videoHeight;
+    }
+
     // aspect ratio of device
     const aspectRatio = height / width;
     // console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
@@ -491,9 +500,8 @@ class VideoEditor {
      */
 
     this.video.currentTime = 1e101;
-    const { videoWidth, videoHeight } = this.video;
 
-    this.updateVideoContainerDimensions(videoWidth, videoHeight);
+    this.updateVideoContainerDimensions();
     this.crop && this.appendCropOverlay();
   }
 
