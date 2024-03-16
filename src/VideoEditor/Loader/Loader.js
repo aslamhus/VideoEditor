@@ -8,7 +8,7 @@ class Loader {
 
   createLoader() {
     this.loader = document.createElement('div');
-    this.loader.className = 'video-editor-loader error';
+    this.loader.className = 'video-editor-loader';
     const p = document.createElement('p');
     p.textContent = this.message || 'Loading video';
     const spinnerDiv = document.createElement('div');
