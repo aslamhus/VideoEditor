@@ -11,53 +11,47 @@ import '../../types.js';
 gsap.registerPlugin(Draggable);
 import './range-selector.css';
 import Popover from '../../Popover/Popover.js';
+import context from '../../context.js';
 
 class RangeSelector {
   /**
    * @typedef {Object} constructor
-   * @property {HTMLVideoElement} video - the video element
+   * @property {Popover} popver - the popover element in the timeline
+   * @property {Timeline} timeline - the timeline component (parent of range selector and markers)
    * @property {PlayHead} playHead - the playhead component
-   * @property {Function} getTimelineElement - returns the timeline element
-   * @property {Function} getVideoDuration -  returns the video duration
    * @property {Function} setVideoTimeIndex - sets the video time index
    * @property {Object} initialMarkers - the initial in and out markers
    * @property {limit} limit - the min and max time range of the video editor
-   * @property {Popover} popover - the popover component
    * @property {Function} [onRangeUpdate] - callback when the range is updated
-   * @property {Function} [onRangeLimit] - callback when the range limit is reached
-   * @property {Function} [onMarkerDrag] - callback when a marker is dragged
-   *
    */
   /**
    *
    * @param {constructor} constructor
    */
   constructor({
-    video,
+    popover,
+    timeline,
     playHead,
-    getTimelineElement,
-    getVideoDuration,
     setVideoTimeIndex,
     initialMarkers,
     limit,
-    popover,
     onRangeUpdate,
-    onRangeLimit,
-    onMarkerDrag,
   }) {
-    this.initialMarkers = initialMarkers || { in: 0, out: video.duration };
-    if (!this.initialMarkers.out) this.initialMarkers.out = video.duration;
-    this.video = video;
-    this.getVideoDuration = getVideoDuration;
+    const { viewer, onRangeLimit, onMarkerDragStart, onMarkerDragEnd } = context.getContext();
+    this.timeline = timeline;
+    this.video = viewer.video;
+    this.initialMarkers = initialMarkers || { in: 0, out: this.video.duration };
+    if (!this.initialMarkers.out) this.initialMarkers.out = this.video.duration;
+    this.viewer = viewer;
     this.timeIndexPrecision = 3;
-    this.getTimelineElement = getTimelineElement;
     this.setVideoTimeIndex = setVideoTimeIndex;
     this.lastInPos = 0;
     this.lastOutPos = 0;
     this.lastRangeSelectorX = 0;
     this.onRangeUpdate = onRangeUpdate;
     this.onRangeLimit = onRangeLimit;
-    this.onMarkerDrag = onMarkerDrag;
+    this.onMarkerDragStart = onMarkerDragStart;
+    this.onMarkerDragEnd = onMarkerDragEnd;
     // range
     this.currentIndex = this.initialMarkers.in;
     this.inTime = this.currentIndex;
@@ -80,8 +74,6 @@ class RangeSelector {
       name: 'in',
       anchor: 'right',
       initialIndex: initialMarkers?.in || 0,
-      getVideoDuration,
-      getTimelineElement,
       // onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'in', timeIndex, x }),
     });
     this.outMarker = new Marker({
@@ -89,9 +81,8 @@ class RangeSelector {
       name: 'out',
       anchor: 'left',
       direction: 'negative',
-      initialIndex: initialMarkers?.out || this.video.duration,
-      getVideoDuration,
-      getTimelineElement,
+      initialIndex: initialMarkers?.out || this.viewer.video.duration,
+
       // onChange: ({ timeIndex, x }) => this.handleRangeUpdate({ marker: 'out', timeIndex, x }),
     });
 
@@ -152,7 +143,7 @@ class RangeSelector {
   }
 
   getTimelineWidth() {
-    return this.getTimelineElement().getBoundingClientRect().width;
+    return this.timeline.getTimelineElement().getBoundingClientRect().width;
   }
 
   movePlayheadToMarkerPosition() {
@@ -180,17 +171,17 @@ class RangeSelector {
 
   resetRange() {
     this.inMarker.setPositionByTimeIndex(0);
-    this.outMarker.setPositionByTimeIndex(this.video.duration);
+    this.outMarker.setPositionByTimeIndex(this.viewer.video.duration);
     this.setRangeWidth(100);
     this.setRangeSelectorXPos(0);
     this.setSelectedFramesX(0);
   }
 
   attachTimelineEvents() {
-    this.getTimelineElement().addEventListener(
-      'timelineReady',
-      this.handleTimelineReady.bind(this)
-    );
+    console.log('this.timeline', this.timeline);
+    this.timeline
+      .getTimelineElement()
+      .addEventListener('timelineReady', this.handleTimelineReady.bind(this));
   }
 
   attachDraggableEvents(timeline) {
@@ -198,7 +189,7 @@ class RangeSelector {
     const handleDrag = this.handleDrag.bind(this);
     const handleDragEnd = this.handleDragEnd.bind(this);
     const handleDragStart = this.handleDragStart.bind(this);
-    const timelineContainer = this.getTimelineElement().closest('.timeline-container');
+    const timelineContainer = this.timeline.getTimelineElement().closest('.timeline-container');
     const markerOptions = {
       type: 'x',
       inertia: false,
@@ -245,6 +236,7 @@ class RangeSelector {
       },
       onDrag: function (event) {
         event.preventDefault();
+
         handleDragRangeSelector(event, this);
       },
 
@@ -284,7 +276,7 @@ class RangeSelector {
   calculateRangeSelectorDragBounds() {
     // get range selector bounds
 
-    const timelineContainer = this.getTimelineElement().closest('.timeline-container');
+    const timelineContainer = this.timeline.getTimelineElement().closest('.timeline-container');
     const markerWidth = this.inMarker.getBounds().width;
     const timelinePadding = getComputedStyle(timelineContainer).paddingLeft;
     const minX =
@@ -308,12 +300,12 @@ class RangeSelector {
   handleTimelineReady(event) {
     const { target: timeline } = event;
     this.attachDraggableEvents(timeline);
-    this.video.addEventListener('timeupdate', this.handleTimeUpdate.bind(this));
-    this.video.addEventListener('play', this.handlePlay.bind(this));
+    this.viewer.video.addEventListener('timeupdate', this.handleTimeUpdate.bind(this));
+    this.viewer.video.addEventListener('play', this.handlePlay.bind(this));
     this.renderFramesClone();
     if (this.initialMarkers?.in) {
       this.inMarker.setPositionByTimeIndex(this.initialMarkers.in);
-      this.video.currentTime = this.initialMarkers.in;
+      this.viewer.video.currentTime = this.initialMarkers.in;
       this.updateMarkerPosition(this.inMarker, this.initialMarkers.in);
     }
     // handle max duration
@@ -374,14 +366,14 @@ class RangeSelector {
     // set in marker position
     this.inMarker.setXPosition(x1);
     // set out marker position
-    const outX = (this.getTimelineElement().getBoundingClientRect().width - x2) * -1;
+    const outX = (this.timeline.getTimelineElement().getBoundingClientRect().width - x2) * -1;
     this.outMarker.setXPosition(outX);
     // set selected frames position
     const selectedFramesX = parseInt(x1) * -1;
     this.setSelectedFramesX(selectedFramesX);
     // update time index
     const timeIndex = this.inMarker.getTimeIndex();
-    this.video.currentTime = timeIndex;
+    this.viewer.video.currentTime = timeIndex;
     // console.log(`outX vs marker explicit x: ${outX} vs ${this.outMarker.x}`);
     this.handleRangeUpdate({
       marker: 'rangeSelector',
@@ -410,7 +402,7 @@ class RangeSelector {
     // console.log('handleDrag -> currentMarker', this.currentMarker);
     const timeIndex = this.currentMarker.getTimeIndexFromCurrentPosition();
     this.updateMarkerPosition(this.currentMarker, timeIndex);
-    this.video.currentTime = timeIndex;
+    this.viewer.video.currentTime = timeIndex;
 
     /**
      * Though timeUpdate event will automatically adjust the playhead position,
@@ -426,7 +418,7 @@ class RangeSelector {
       timeIndex: this.currentMarker.timeIndex,
       x: this.currentMarker.x,
     });
-    // this.playHead.setPercentPosition(timeIndex / this.video.duration, false);
+    // this.playHead.setPercentPosition(timeIndex / this.viewer.video.duration, false);
     return true;
   }
 
@@ -486,6 +478,10 @@ class RangeSelector {
     // show playhead
 
     this.playHead.show();
+    // fire marker drag end callback
+    if (this.onMarkerDragEnd) {
+      this.onMarkerDragEnd(currentMarker);
+    }
     // fade out the timestamp
     setTimeout(() => {
       /**
@@ -576,10 +572,14 @@ class RangeSelector {
     const selectedMarker = this.findMarkerFromDragEvent(event, draggable);
     event.stopPropagation();
     event.preventDefault();
-    this.video.pause();
+    this.viewer.video.pause();
     this.setCurrentMarker(selectedMarker);
     this.setLastInAndOutMarkerPositions();
     this.currentMarker.timestamp.show();
+    // fire marker drag start callback
+    if (this.onMarkerDragStart) {
+      this.onMarkerDragStart(this.currentMarker);
+    }
   }
 
   findMarkerFromDragEvent(event, draggable) {
@@ -606,8 +606,9 @@ class RangeSelector {
   }
 
   handleWindowResizeDragPositions() {
-    const { width: timelineWidth, height: timelineHeight } =
-      this.getTimelineElement().getBoundingClientRect();
+    const { width: timelineWidth, height: timelineHeight } = this.timeline
+      .getTimelineElement()
+      .getBoundingClientRect();
     // console.log(`outMarker percentX ${this.outMarker.getPercentageX()} timelineWidth: ${timelineWidth}`);
     const inMarkerX = this.inMarker.getPercentageX() * timelineWidth;
     const outMarkerX = this.outMarker.getPercentageX() * timelineWidth;
@@ -637,7 +638,7 @@ class RangeSelector {
     }
     // update range bounds
 
-    const timelineContainer = this.getTimelineElement().closest('.timeline-container');
+    const timelineContainer = this.timeline.getTimelineElement().closest('.timeline-container');
     this.inMarker.draggable.applyBounds(timelineContainer);
     this.outMarker.draggable.applyBounds(timelineContainer);
     this.rsDraggable.applyBounds(this.calculateRangeSelectorDragBounds());
@@ -648,13 +649,13 @@ class RangeSelector {
   /*** VIDEO EVENTS ***/
 
   handlePlay(event) {
-    const currentTime = parseFloat(this.video.currentTime.toFixed(this.timeIndexPrecision));
+    const currentTime = parseFloat(this.viewer.video.currentTime.toFixed(this.timeIndexPrecision));
     const outTime = parseFloat(this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
     if (currentTime >= outTime) {
       // console.log(`currentTime ${currentTime}, outTime ${outTime}`);
       // console.error('video playhead over range limit, returning playhead to inTime');
       // this.playHead.toggleAnimate(false);
-      this.video.currentTime = this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision);
+      this.viewer.video.currentTime = this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision);
     }
     // window.requestAnimationFrame(() => {
     //   this.playHead.toggleAnimate(true);
@@ -664,11 +665,11 @@ class RangeSelector {
   handleTimeUpdate(event) {
     if (this.isDragging) return;
     // move these to onPlay event
-    const isPlaying = !this.video.paused;
+    const isPlaying = !this.viewer.video.paused;
     const inTime = Number(this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
 
     const outTime = Number(this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
-    const currentTime = Number(this.video.currentTime.toFixed(this.timeIndexPrecision));
+    const currentTime = Number(this.viewer.video.currentTime.toFixed(this.timeIndexPrecision));
 
     // console.log(`currentTime ${currentTime}, inTime ${inTime}`);
 
@@ -679,7 +680,7 @@ class RangeSelector {
     }
     if (currentTime == outTime && isPlaying) {
       console.error(`video playhead has reached out marker`);
-      this.video.pause();
+      this.viewer.video.pause();
       return;
     }
     if (currentTime > outTime) {
@@ -688,24 +689,24 @@ class RangeSelector {
       const playHeadIndex = this.playHead.getTimeIndexFromCurrentPosition().toFixed(3);
       const remainingTime = outTime - playHeadIndex;
       // this.playHead.marker.style.transition = `transform ${remainingTime}s linear`;
-      this.video.currentTime = outTime;
-      this.video.pause();
+      this.viewer.video.currentTime = outTime;
+      this.viewer.video.pause();
 
       return;
     }
     if (currentTime < inTime) {
       console.error(`video playhead ${currentTime} is under lower range limit:  ${inTime}`);
-      this.video.currentTime = inTime;
-      this.video.pause();
+      this.viewer.video.currentTime = inTime;
+      this.viewer.video.pause();
       return;
     }
 
-    const percentElapsed = this.video.currentTime / this.video.duration;
+    const percentElapsed = this.viewer.video.currentTime / this.viewer.video.duration;
     this.playHead.setPercentPosition(percentElapsed, false);
   }
 
   createFramesClone() {
-    const framesContainer = this.getTimelineElement().querySelector('.frames-container');
+    const framesContainer = this.timeline.getTimelineElement().querySelector('.frames-container');
     const { width, height } = framesContainer.getBoundingClientRect();
     this.selectedFrames = framesContainer.cloneNode(true);
     this.selectedFrames.classList.add('selected-frames');
@@ -738,7 +739,10 @@ class RangeSelector {
   }
 
   renderFramesClone() {
-    this.getTimelineElement().querySelector('.range-selector').append(this.createFramesClone());
+    this.timeline
+      .getTimelineElement()
+      .querySelector('.range-selector')
+      .append(this.createFramesClone());
   }
 
   render(container) {

@@ -7,7 +7,7 @@ import Cropper from '../Cropper/Cropper.js';
 import '../types.js';
 import Loader from '../Loader/Loader.js';
 import Popover from '../Popover/Popover.js';
-
+import context from '../context.js';
 class Timeline {
   /**
    *
@@ -22,38 +22,33 @@ class Timeline {
    * @property {Function} onReady
    * @property {Function} [onRangeUpdate]
    * @property {Function} [onRangeLimit] - callback when the range limit is reached
-   * @property {Function} [onMarkerDrag] - callback when the marker is dragged
+   * @property {Function} [onMarkerDragStart] - callback when the marker drag is started
+   * @property {Function} [onMarkerDragEnd] - callback when the marker drag is ended
+   *
    * @property {Function} [onTimelineClick] - callback when the timeline is clicked
    * @property {Loader} loader
    *
    * @param {constructor} constructor
    */
-  constructor({
-    video,
-    mimeType,
-    duration,
-    frameTotalLimit,
-    crop,
-    limit,
-    transformations,
-    onReady,
-    onRangeUpdate,
-    onRangeLimit,
-    onMarkerDrag,
-    onTimelineClick,
-    loader,
-  }) {
-    this.video = video;
+  constructor({ onReady }) {
+    const {
+      mimeType,
+      frameTotalLimit,
+      crop,
+      limit,
+      transformations,
+      onRangeUpdate,
+      onTimelineClick,
+      loader,
+    } = context.getContext();
+    this.video = null;
+    this.duration = null;
     this.mimeType = mimeType;
     // video
-    if (!isFinite(duration)) {
-      throw new Error('Video duration is non finite number: ' + duration);
-    }
-    this.duration = duration;
+    this.limit = limit;
+    this.crop = crop;
     this.frameTotalLimit = frameTotalLimit || Math.ceil(window.innerWidth * 0.011); // eventually will be timeline width divided by frame width
-    this.frameInterval = this.duration / this.frameTotalLimit;
-    this.crop = crop || { width: video.videoWidth, height: video.videoHeight };
-    this.cropAspectRatio = this.crop.width / this.crop.height;
+
     this.transformations = transformations;
     this.loader = loader;
     // callbacks
@@ -63,14 +58,35 @@ class Timeline {
     // this.cropAspectRatio = this.crop.width / this.crop.height;
     this.cropper = null;
     this.timeline = null;
+    // bind
+    this.toggleCropperOff = this.toggleCropperOff.bind(this);
+  }
+
+  /**
+   * Initialize the timeline
+   *
+   * This method is called when the video has been loaded by the Viewer
+   * We cannot initialize the timeline's components until we have
+   * the necessary information from the video.
+   *
+   * @param {HTMLVideoElement} video
+   */
+  init(video) {
+    this.video = video;
+    this.duration = video.duration;
+    if (!isFinite(this.duration)) {
+      throw new Error('Video duration is non finite number: ' + this.duration);
+    }
+    this.frameInterval = this.duration / this.frameTotalLimit;
+    this.crop = this.crop || { width: video.videoWidth, height: video.videoHeight };
+    this.cropAspectRatio = this.crop.width / this.crop.height;
+    // initialize sub components
     // playhead
     this.playHead = new PlayHead({
       className: 'play-head',
       name: 'play',
       anchor: 'left',
       initialIndex: 0,
-      getVideoDuration: this.getVideoDuration.bind(this),
-      getTimelineElement: this.getTimelineElement.bind(this),
       isDraggable: false,
     });
     // popover
@@ -81,37 +97,25 @@ class Timeline {
     });
     // range selector
     this.rangeSelector = new RangeSelector({
-      video,
+      timeline: this,
+      popover: this.popover,
       playHead: this.playHead,
-      getTimelineElement: this.getTimelineElement.bind(this),
-      getVideoDuration: this.getVideoDuration.bind(this),
       setVideoTimeIndex: this.setVideoTimeIndex.bind(this),
       initialMarkers: {
         in: this.transformations?.time?.in || 0,
         out: this.transformations?.time?.out || null,
       },
-      limit,
-
-      popover: this.popover,
+      limit: this.limit,
       onRangeUpdate: this.handleRangeUpdate.bind(this),
-      onRangeLimit,
-      onMarkerDrag,
     });
     // control buttons
     this.controls = new Controls({
-      video,
-      rangeSelector: this.rangeSelector,
       onPlayClick: this.handlePlayClick.bind(this),
     });
     // info bar
     this.infoBar = new InfoBar({
-      video,
-      crop,
-      duration: this.video.duration,
       currentIndex: this.transformations?.time?.in,
     });
-    // bind
-    this.toggleCropperOff = this.toggleCropperOff.bind(this);
   }
 
   async handleToggleCropper(toggle) {
@@ -154,10 +158,6 @@ class Timeline {
 
   getTimelineElement() {
     return this.timeline;
-  }
-
-  getVideoDuration() {
-    return this.video.duration;
   }
 
   attachTimelineEvents() {

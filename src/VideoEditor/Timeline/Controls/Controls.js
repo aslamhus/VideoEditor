@@ -1,12 +1,14 @@
 import RangeSelector from '../RangeSelector/RangeSelector';
 import ControlButton from './ControlButton/ControlButton';
 import PlayButton from './PlayButton';
+import context from '../../context';
 import './controls.css';
 class Controls {
-  constructor({ video, rangeSelector, onPlayToggle, onTrimToggle, onPlayClick, onCropToggle }) {
-    this.video = video;
+  constructor({ rangeSelector, onPlayToggle, onTrimToggle, onPlayClick, onCropToggle }) {
+    const { viewer } = context.getContext();
+    this.video = viewer.video;
     this.controls = null;
-    this.playBtn = new PlayButton({ video, onPlayToggle, onPlayClick });
+    this.playBtn = new PlayButton({ video: this.video, onPlayToggle, onPlayClick });
     // this.trimBtn = new ControlButton({
     //   className: 'trim-btn',
     //   iconClassName: 'fa fa-scissors',

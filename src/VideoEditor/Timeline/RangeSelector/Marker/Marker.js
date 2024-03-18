@@ -1,6 +1,7 @@
 import Timestamp from '../Timestamp/TimeStamp';
 import { getTranslateX } from '../../../utils';
 import HTMLElement from '../../../../HTMLElement/HTMLElement';
+import context from '../../../context';
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 //without this line, PixiPlugin and MotionPathPlugin may get dropped by your bundler (tree shaking)...
@@ -12,7 +13,6 @@ import './marker.css';
  * @property {string} name
  * @property {string} anchor - right|left
  * @property {string} className
- * @property {Function} getTimelineElement
  * @property {Function} getVideoDuration
  * @property {string} direction - position|negative
  * @property {number} initialIndex
@@ -30,16 +30,15 @@ class Marker extends HTMLElement {
     name,
     anchor,
     className,
-    getTimelineElement,
-    getVideoDuration,
     direction = 'positive',
     initialIndex,
     draggable = null,
     onChange,
   }) {
     super();
-    this.getTimelineElement = getTimelineElement;
-    this.getVideoDuration = getVideoDuration;
+    const { viewer, timeline } = context.getContext();
+    this.timeline = timeline;
+    this.duration = viewer.video.duration;
     this.name = name;
     this.className = className;
     this.marker = this.createMarker();
@@ -83,7 +82,7 @@ class Marker extends HTMLElement {
     }
     // include viewport position in offset
     // 1. Calculate timeline x
-    const timelineX = this.getTimelineElement().getBoundingClientRect().x;
+    const timelineX = this.timeline.getTimelineElement().getBoundingClientRect().x;
     const markerX = x - timelineX + offset;
     // console.log('markerX', markerX);
     return markerX;
@@ -106,10 +105,10 @@ class Marker extends HTMLElement {
   }
 
   getTimeIndexFromCurrentPosition() {
-    const timelineWidth = this.getTimelineElement().getBoundingClientRect().width;
+    const timelineWidth = this.timeline.getTimelineElement().getBoundingClientRect().width;
     const markerPosition = this.getTimelinePosition();
     const timelineXPercent = markerPosition / timelineWidth;
-    const timeIndex = this.getVideoDuration() * timelineXPercent;
+    const timeIndex = this.duration * timelineXPercent;
     if (timeIndex < 0) {
       return 0;
     }
@@ -117,9 +116,9 @@ class Marker extends HTMLElement {
   }
 
   getXPositionFromTimeIndex(timeIndex) {
-    const timelineWidth = this.getTimelineElement().getBoundingClientRect().width;
+    const timelineWidth = this.timeline.getTimelineElement().getBoundingClientRect().width;
     // console.log('timelineWidth', timelineWidth);
-    const percentElapsed = timeIndex / this.getVideoDuration();
+    const percentElapsed = timeIndex / this.duration;
     // console.log('video duration', this.getVideoDuration());
     // console.log('percentElapsed (timeIndex/videoDuration)', percentElapsed);
     return timelineWidth * percentElapsed;
@@ -172,7 +171,7 @@ class Marker extends HTMLElement {
     // console.log('timeIndex', timeIndex);
     this.setTimeIndex(timeIndex);
     this.setX(x);
-    const percentX = x / this.getTimelineElement().getBoundingClientRect().width;
+    const percentX = x / this.timeline.getTimelineElement().getBoundingClientRect().width;
     this.setPercentageX(percentX);
   }
 
@@ -180,7 +179,7 @@ class Marker extends HTMLElement {
     let x = this.getXPositionFromTimeIndex(timeIndex);
     if (this.direction == 'negative') {
       // for out marker, or any marker that advances towards negative coordinates
-      x = (this.getTimelineElement().getBoundingClientRect().width - x) * -1;
+      x = (this.timeline.getTimelineElement().getBoundingClientRect().width - x) * -1;
     }
 
     // console.log('getXPositionFromTimeIndex', x);

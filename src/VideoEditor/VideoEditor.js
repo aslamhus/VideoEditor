@@ -1,10 +1,11 @@
 import MenuBar from './MenuBar/MenuBar.js';
+import Viewer from './Viewer/Viewer.js';
 import Timeline from './Timeline/Timeline.js';
 import Instructions from './Instructions';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
-import axios from 'axios';
 import { decomposeMatrix, getTranslateOrigin } from './utils.js';
+import context from './context.js';
 import './types.js';
 import './themes.css';
 import './video-editor.css';
@@ -43,17 +44,119 @@ library.add(
 dom.watch();
 
 /**
- * To do:
+ * # VideoEditor 1.0.0
  *
- * 1) find moment to revoke object url of video src
- * 2) window event listener clean up when video editor is destroyed
- * 3) Readme
- */
+ * ## Summary
+ *
+ * A VanillaJS video editor that allows users to crop, trim, and save videos.
+ *
+ * ## Basic Usage
+ *
+ * ```javascript
+ * import VideoEditor from 'video-editor';
+ * const src = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
+ * const videoEditor = new VideoEditor({ src })
+ * videoEditor.render(myHTMLContainer);
+ *```
 
+ * ## Options
+ *
+ * ### src (required)
+ *
+ * @type string | Blob
+ * The video source. This can be a Blob or a URL string.
+ * Example: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4'
+ *
+ * ### crop
+ *
+ * @type object
+ * An object with the width and height of the crop.
+ * Example: { width: 16, height: 9 }
+ *
+ * ### transformations
+ *
+ * @type object
+ * An object with the crop and time transformations.
+ * Example: { crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' }, time: { in: 5, out: 10 } }
+ *
+ *
+ * ### maxHeight
+ *
+ * @type number
+ * The max height of the video editor. The default is 300.
+ *
+ * ### limit
+ *
+ * @type object
+ * An object with the max duration the video can be trimmed to.
+ * Example: {  maxDuration: 5 }
+ *
+ * ### menuBarButtons
+ *
+ * @type object
+ * An object with custom menu bar buttons with option to disable default buttons.
+ * Example: { inlineStartButtons: {}, inlineEndButtons: {}, disable: []}
+ * Menu bar button options:
+ * - index: the position of the button
+ * - label: the button label
+ * - fontAwesomeIcon: the font awesome icon
+ * Example: { index: 3, label: 'Exit', fontAwesomeIcon: 'fa fa-times' }
+ *
+ * ### disabledButtons
+ *
+ * @type object
+ * An object with keys of button names to disable
+ * The default button keys are: 'mute', 'crop', 'save', 'help'
+ * Example: { mute: true, crop: true }
+ *
+ * ### onError
+ *
+ * @type function
+ * Error callback. If the error type is AxiosError, the error will contain
+ * status and statusText properties.
+ * Example: (error) => { console.error(error) }
+ * Example (AxiosError): (error) => { console.error(error.status, error.statusText) }
+ *
+ *
+ * ### onReady
+ *
+ * @type function
+ * onReady callback
+ * Example: () => { console.log('video editor is ready') }
+ *
+ * ### onRangeUpdate
+ *
+ * @type function
+ * Callback when the range is updated
+ * Example: (currentIndex, { in : 0, out : 1 }) => { console.log(currentIndex) }
+ *
+ * ### onRangeLimit
+ *
+ * @type function
+ * Callback when the range limit is reached
+ * Example: ({ marker, maxDuration, time }) => { console.log('range limit reached') }
+ *
+ *
+ * ### onMarkerDragStart
+ *
+ * @type function
+ * Callback when the marker drag is started
+ * Example: (currentMarker) => { console.log('marker drag started', currentMarker) }
+ *
+ * ### onMarkerDragEnd
+ *
+ * @type function
+ * Callback when the marker drag is ended
+ * Example: (currentMarker) => { console.log('marker drag ended', currentMarker) }
+ *
+ *
+ *
+ *
+ */
 class VideoEditor {
   /**
    *
-   *
+   * Video Editor
    *
    * @typedef {Object} constructor
    * @property {Blob|string} videoSrc
@@ -68,7 +171,8 @@ class VideoEditor {
    * @property {Function}  [onReady] - onReady callback
    * @property {Function}  [onRangeUpdate] - callback when the range is updated
    * @property {Function}  [onRangeLimit] - callback when the range limit is reached
-   * @property {Function} [onMarkerDrag] - callback when the marker is dragged
+   * @property {Function} [onMarkerDragStart] - callback when the marker drag is started
+   * @property {Function}  [onMarkerDragEnd] -  callback when the marker drag is ended
    * @property {Function}  [onClickHelpButton] - onRangeUpdate callback
    * @property {Function} [onTimelineClick] - onTimelineClick callback
    * @property {Function} [onSave] - onSave callback. Fired when save button is clicked. Returns transformations and time indices.
@@ -89,23 +193,29 @@ class VideoEditor {
     onReady,
     onRangeUpdate,
     onRangeLimit,
-    onMarkerDrag,
+    onMarkerDragStart,
+    onMarkerDragEnd,
     onClickHelpButton,
     onTimelineClick,
     onSave,
+    debug = false,
   }) {
-    this.videoSrc = src;
+    // set context to the VideoEditor instance
+    context.setContext(this);
+    this.src = src;
     this.mimeType = '';
     this.crop = crop;
     this.transformations = transformations;
     this.video = null;
-    this.videoEditorContainer = null;
+    this.videoEditorContainer = this.createVideoEditorContainer();
     this.maxHeight = maxHeight || null;
     // the maximum height of the video display as apercent of the window size
     // (must be the same as css for .video-flexbox-container)
     // this is recalculated on window resize
     this.maxHeightPercent = 0.6;
     this.limit = limit;
+    this.debug = debug;
+    // callbacks
     this.onError = onError;
     this.onReady = onReady;
     this.onTimelineClick = onTimelineClick;
@@ -113,220 +223,42 @@ class VideoEditor {
     this.onSave = onSave;
     this.onRangeUpdate = onRangeUpdate;
     this.onRangeLimit = onRangeLimit;
-    this.onMarkerDrag = onMarkerDrag;
-    // both timeline and info bar are invoked when we know the video duration
-    this.timeline = null;
-    this.loader = new Loader({ message: 'Loading video' });
-    // get custom buttons (custom buttons cannot override default buttons)
+    this.onMarkerDragStart = onMarkerDragStart;
+    this.onMarkerDragEnd = onMarkerDragEnd;
+    // Components
 
+    this.loader = new Loader({ message: 'Loading video' });
+    // both timeline and info bar are invoked when we know the video duration
+    this.viewer = new Viewer({
+      src,
+      loader: this.loader,
+      onLoad: this.handleVideoLoad.bind(this),
+    });
+    this.timeline = new Timeline({
+      onReady: this.handleTimelineReady.bind(this),
+    });
+    // get custom buttons (custom buttons cannot override default buttons)
     // init menu bar
     this.menuBar = new MenuBar({
       customButtons: menuBarButtons,
       onToggleDarkMode: this.handleToggleDarkMode.bind(this),
       onClickHelpButton: this.handleClickHelpButton.bind(this),
       onToggleCrop: this.handleToggleCrop.bind(this),
-      onSaveButtonClick: this.handleSaveButtonClick.bind(this),
+      onClickSaveButton: this.handleSaveButtonClick.bind(this),
       onToggleMute: this.handleToggleMute.bind(this),
       library,
     });
-
     // bind
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
-    this.handleAxiosError = this.handleAxiosError.bind(this);
     this.attachResizeEvent = this.attachResizeEvent.bind(this);
   }
 
-  createWrapper() {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'video-editor-wrapper';
-    return wrapper;
-  }
-
-  async createVideoEditor() {
-    this.videoEditorContainer = document.createElement('div');
-    this.videoEditorContainer.style.opacity = 0;
-    this.videoEditorContainer.className = 'video-editor-container';
-
-    this.loader.updateMessage('Loading video');
-    // menu bar
-    this.menuBar.render(this.videoEditorContainer);
-    // create flexbox container to center video in viewport
-    const videoFlexboxContainer = document.createElement('div');
-    videoFlexboxContainer.classList.add('video-flexbox-container');
-    this.videoEditorContainer.append(videoFlexboxContainer);
-    // create video element
-    videoFlexboxContainer.append(await this.createVideo());
-    this.loader.updateMessage('Initializing video editor');
-    return this.videoEditorContainer;
-  }
-
-  createCropContainer() {
-    const cropContainer = document.createElement('div');
-    cropContainer.className = 'crop-container';
-    cropContainer.style.position = 'absolute';
-    cropContainer.style.left = 0;
-    cropContainer.style.top = 0;
-    cropContainer.style.zIndex = 3;
-    cropContainer.style.width = '100%';
-    cropContainer.style.height = '100%';
-    return cropContainer;
-  }
-
-  appendCropOverlay() {
-    const container = this.video.closest('.video-container');
-    const viewBox = { width: this.video.videoWidth, height: this.video.videoHeight };
-    const svgOverlay = createCropSVG(this.crop, viewBox);
-    container.append(svgOverlay);
-  }
-
-  async createVideo() {
-    const vidContainer = document.createElement('div');
-    vidContainer.className = 'video-container';
-    const vidWrap = document.createElement('div');
-    vidWrap.className = 'video-wrap';
-    this.video = document.createElement('video');
-    this.video.id = 'video-preview';
-    this.video.className = 'preview';
-    const src = await this.getURLObjectString();
-    if (!src) {
-      return;
-    }
-    // this.video.src = src;
-    this.video.autoplay = false;
-    this.video.setAttribute('playsinline', 'true');
-    this.video.setAttribute('webkit-playsinline', 'true');
-    this.video.playsinline = true;
-    this.video.preload = 'metadata';
-    this.video.controls = false;
-    this.video.playbackRate = 16;
-    this.video.style.width = '100%';
-    // create source tag
-    const source = document.createElement('source');
-    source.src = src;
-    this.video.append(source);
-    // video events must be attached before rendering in the DOM
-    this.attachVideoEvents(vidContainer);
-    vidWrap.append(this.video);
-    vidContainer.append(vidWrap);
-    vidContainer.append(this.createCropContainer());
-    // not sure why this is here and not in constructor
-
-    return vidContainer;
-  }
-
-  handleVideoDownloadProgress(progressEvent) {
-    const progress = parseInt(progressEvent.progress * 100);
-    this.loader.updateMessage(`Loading video ${progress}%`);
-  }
-
-  /**
-   * Get Video URL Object
-   *
-   * @returns {Promise<String>} - returns a url string
-   */
-  async getURLObjectString() {
-    let src = this.videoSrc;
-    const isBlob = src instanceof Blob;
-    const isUrl = typeof src == 'string' && src?.startsWith('http');
-    // Validate video src
-    if (!isBlob && !isUrl) {
-      throw new TypeError('video src must be a Blob or url, found ' + typeof src);
-    }
-    // if src is a url, download the video
-    if (isUrl) {
-      src = await axios(src, {
-        onDownloadProgress: this.handleVideoDownloadProgress.bind(this),
-        responseType: 'blob',
-      })
-        .then((res) => {
-          // console.log('result type', res.data.type, /video/.test(res.data.type));
-          if (res.data.type && !/video/.test(res.data.type)) {
-            throw new TypeError(
-              'Video src type was invalid. Expected video but found: ' + res.data.type
-            );
-          }
-          return res?.data;
-        })
-        .catch(this.handleAxiosError);
-    }
-    if (src) {
-      this.videoSrc = src;
-      this.mimeType = src.type || 'unknown';
-      const blob = window.URL.createObjectURL(src);
-      return blob;
-    }
-    return;
-  }
-
-  attachVideoEvents(container) {
-    const handleDuration = this.handleDurationChange.bind(this);
-    this.handleDurationChange = (event) => {
-      handleDuration(event, container);
-    };
-    this.video.addEventListener('durationchange', this.handleDurationChange);
-    this.video.addEventListener('loadedmetadata', this.handleLoadedMetaData);
-  }
-
-  /**
-   * handle duration change
-   *
-   * Renders timeline   when we have the duration.
-   * This event occurs after the initial render and precipitates
-   * the timelineReady event / onReady callback.
-   *
-   * Once we have rendered the timeline we can remove
-   * the event listeners listening for the video duration/metadata.
-   *
-   * @returns {void}
-   */
-  handleDurationChange() {
-    if (this.video.videoWidth == 0 || this.video.videoHeight == 0) {
-      this.handleError(
-        new Error(
-          'We were unable to load the video. It may be corrupted, or your browser may not support this video format. Please try another video or browser'
-        )
-      );
-      return;
-    }
-    if (!isFinite(this.video.duration)) {
-      console.error('durationchange: duration is infinity', this.video.duration);
-      return;
-    }
-    // console.info('durationchange', this.video.duration);
-    this.video.pause();
-    this.video.currentTime = 0;
-    this.video.playbackRate = 1;
-    console.info('%cRender Timeline', 'color:green');
-    // render timeline
-    this.timeline = new Timeline({
-      video: this.video,
-      mimeType: this.mimeType,
-      duration: this.video.duration,
-      frameInterval: 10,
-      crop: this.crop,
-      limit: this.limit,
-      transformations: this.transformations,
-      onReady: this.handleTimelineReady.bind(this),
-      onError: this.onError,
-      onRangeUpdate: this.onRangeUpdate,
-      onRangeLimit: this.onRangeLimit,
-      onMarkerDrag: this.onMarkerDrag,
-      onTimelineClick: this.onTimelineClick,
-      loader: this.loader,
-    });
-
-    this.timeline.render(this.videoEditorContainer);
-
-    // remove events
-    this.removeEvents();
-  }
-
   attachResizeEvent() {
-    const vidContainerFlexbox = this.video.closest('.video-flexbox-container');
-    const vidContainer = this.video.closest('.video-wrap');
+    const vidContainerFlexbox = this.viewer.video.closest('.video-flexbox-container');
+    const vidContainer = this.viewer.video.closest('.video-wrap');
     window.addEventListener('resize', (event) => {
       this.previousBounds = vidContainer.getBoundingClientRect();
-      const videoBounds = this.video.getBoundingClientRect();
+      const videoBounds = this.viewer.video.getBoundingClientRect();
       this.previousVidBounds = videoBounds;
       if (!this.containerToVideoRatio) {
         this.containerToVideoRatio = this.previousBounds.width / videoBounds.width;
@@ -367,7 +299,7 @@ class VideoEditor {
   updateVideoContainerDimensions() {
     // use crop dimensions if set, otherwise use video dimensions
     let width, height;
-    if (this.crop.width && this.crop.height) {
+    if (this.crop?.width && this.crop?.height) {
       width = this.crop.width;
       height = this.crop.height;
     } else {
@@ -377,10 +309,7 @@ class VideoEditor {
 
     // aspect ratio of device
     const aspectRatio = height / width;
-    // console.log(`height: ${height}, width: ${width}, aspect: ${aspectRatio}`);
-
     const vidEditorSize = this.getVideoEditorSize();
-
     const vidWrap = this.video.closest('.video-wrap');
     const vidContainer = this.video.closest('.video-container');
     const vidBounds = this.video.getBoundingClientRect();
@@ -393,25 +322,15 @@ class VideoEditor {
       // limit height of video display if screen size exceeds limit
       // HOWEVER, use the primary ancestor of the editor as the limit, not the screen
       // so that the video doesn't get too small when the editor is in a small container
-
       const maxHeight = vidEditorSize.height * this.maxHeightPercent;
-      // console.log('maxHeight', maxHeight);
       vidMaxWidth = maxHeight / aspectRatio;
     }
-    /**
-     * to do: on window resize, recalculate video max width
-     */
+    // limit width of video display to the width of the editor
     if (vidMaxWidth > vidEditorSize.width) {
       vidMaxWidth = vidEditorSize.width;
     }
-    // console.log('vidMaxWidth', vidMaxWidth, vidWrapBounds);
-
-    // set the width
-
+    // set max width of video container
     vidContainer.style.width = `${vidMaxWidth}px`;
-    /**
-     *
-     */
     vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
     // get new width
     requestAnimationFrame(() => {
@@ -458,7 +377,6 @@ class VideoEditor {
       this.timeline.disable();
     } else {
       span.innerText = 'Crop';
-      // icon.style.display = '';
       icon.classList.remove('fa-check');
       icon.classList.add('fa-crop');
       this.timeline.controls.enableControlButtons();
@@ -481,7 +399,6 @@ class VideoEditor {
       this.video.muted = true;
     } else {
       // unmuted
-
       this.video.volume = 1;
       // update button UI
       span.innerText = 'Mute';
@@ -520,16 +437,25 @@ class VideoEditor {
     }
   }
 
-  removeEvents() {
-    this.video.removeEventListener('durationchange', this.handleDurationChange);
-    this.video.onloadedmetadata = null;
-  }
-
   handleTimelineReady() {
     this.show();
     if (this.onReady instanceof Function) {
       this.onReady();
     }
+  }
+
+  /**
+   * Handle Video Load
+   *
+   * Initializes the timeline
+   *
+   * @see Viewer
+   */
+  handleVideoLoad() {
+    const { video } = this.viewer;
+    this.video = video;
+    this.timeline.init(video);
+    this.timeline.render(this.videoEditorContainer);
   }
 
   show() {
@@ -553,69 +479,72 @@ class VideoEditor {
     this.crop && this.appendCropOverlay();
   }
 
-  handleError(error) {
-    console.error(error);
-    if (this.onError instanceof Function) {
-      this.onError(error);
-    } else {
-      if (error.name === 'AxiosError') {
-        /**
-         * ince video editor already shows an error message in the handle axios error method,
-         * we don't need to display an error modal as well
-         */
-        return;
-      }
-      this.loader.showError(error?.message);
-    }
-  }
-
-  handleAxiosError(error) {
-    // show error message
-    const displayErrorMessage = `There was an error loading the video`;
-    this.loader.showError(displayErrorMessage);
-    // generate custom axios error
-    const axiosError = new Error(displayErrorMessage);
-    const { response, message } = error || {};
-    axiosError.message = message;
-    if (response?.status) {
-      axiosError.message = axiosError.message;
-      if (response.statusText) {
-        // include statusText
-        axiosError.message = `${axiosError.message} : ${response.statusText}`;
-      }
-      axiosError.statusText = response?.statusText;
-      axiosError.status = response?.status;
-    }
-    axiosError.name = 'AxiosError';
-    this.handleError(axiosError);
-  }
-
   handleSaveButtonClick(event) {
     if (this.onSave instanceof Function) {
       const transformations = this.timeline.getTransformations();
-      this.onSave(transformations, this.videoSrc);
+      this.onSave(transformations, this.viewer.getSrc());
     }
   }
 
+  createWrapper() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'video-editor-wrapper';
+    return wrapper;
+  }
+
+  createVideoEditorContainer() {
+    const videoEditorContainer = document.createElement('div');
+    videoEditorContainer.style.opacity = 0;
+    videoEditorContainer.className = 'video-editor-container';
+    return videoEditorContainer;
+  }
+
+  createVideoFlexboxContainer() {
+    const videoFlexboxContainer = document.createElement('div');
+    videoFlexboxContainer.classList.add('video-flexbox-container');
+    return videoFlexboxContainer;
+  }
+
+  async createVideoEditor() {
+    // let the user know we are loading the video
+    this.loader.updateMessage('Loading video');
+    // menu bar
+    this.menuBar.render(this.videoEditorContainer);
+    // create flexbox container to center video in viewport
+    const videoFlexboxContainer = this.createVideoFlexboxContainer();
+    // create viewer element as child of flexbox container
+    // Note: the render method of the viewer is asynchronous
+    await this.viewer.render(videoFlexboxContainer);
+    // append the video flexbox container to the video editor container
+    this.videoEditorContainer.append(videoFlexboxContainer);
+
+    //update loader message
+    this.loader.updateMessage('Initializing video editor');
+    return this.videoEditorContainer;
+  }
+
+  appendCropOverlay() {
+    const container = this.video.closest('.video-container');
+    const viewBox = { width: this.video.videoWidth, height: this.video.videoHeight };
+    const svgOverlay = createCropSVG(this.crop, viewBox);
+    container.append(svgOverlay);
+  }
+
   async render(container) {
-    try {
-      const wrapper = this.createWrapper();
-      // instructions
+    const wrapper = this.createWrapper();
+    // instructions
 
-      this.instructions = new Instructions({ container });
-      // this.instructions.render(container);
-      //  loader
-      this.loader.render(wrapper);
-      container.append(wrapper);
-      //  video editor
-      const videoEditor = await this.createVideoEditor();
-      wrapper.append(videoEditor);
+    this.instructions = new Instructions({ container });
+    // this.instructions.render(container);
+    //  loader
+    this.loader.render(wrapper);
+    container.append(wrapper);
+    //  video editor
+    const videoEditor = await this.createVideoEditor();
+    wrapper.append(videoEditor);
 
-      // attach resize events
-      this.attachResizeEvent();
-    } catch (error) {
-      this.handleError(error);
-    }
+    // attach resize events
+    this.attachResizeEvent();
   }
 }
 

@@ -1,50 +1,56 @@
-import VideoEditor from '../VideoEditor/VideoEditor.js';
+import VideoEditor from '../VideoEditor';
 
-let src = 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4';
-// src =
-//   'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687484528/video-editor/vxwbazvzjgzitgkjzxgj.mov';
-// src =
-//   'https://res.cloudinary.com/dmxpkxal2/video/upload/v1687579716/video-editor/PXL_20230519_034925382_aqp36e.mp4';
+const videoSrcs = {
+  large: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+  small: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+};
 
 window.onload = function () {
   const root = document.getElementById('root');
+  let vidEditor = initializeVideoEditor();
+  vidEditor.render(root);
+};
 
-  let vidEditor = new VideoEditor({
-    src,
-    crop: { width: 7, height: 4 },
-    // maxHeight,
-    // transformations,
-    // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
-    // time: { in: 5, out: 10 },
+function initializeVideoEditor() {
+  return new VideoEditor({
+    // choose from 'small' or 'large' or add your own video source
+    src: videoSrcs.small,
+    crop: { width: 8, height: 4 },
+    maxHeight: null,
+    // optionally, add transformations
+    transformations: {
+      // crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
+      // time: { in: 5, out: 10 },
+    },
+
+    limit: { maxDuration: 5 },
+    // optionally, a menu bar items with font awesome icons
     // menuBarButtons: {
     //   inlineEndButtons: {
     //     cancel: {
-    //       index: 3,
+    //       index: 3,``
     //       label: 'Exit',
     //       fontAwesomeIcon: 'fa fa-times',
     //     },
     //   },
     // },
-    limit: { maxDuration: 5 },
-    // onError: (error) => {
-    //   console.error('onError', error);
-    // },
+    onError: (error) => {
+      // do something with the error
+    },
     onSave: (transform, videoSrc) => {
-      console.log('onSave', transform, videoSrc);
-      // if (onSave) onSave(transform, videoSrc);
+      // do something with the transformed video
     },
     onTimelineClick: (timeIndex) => {
-      // console.log('onTimelineClick', timeIndex);
+      // get the current time index
     },
-    // onClickHelpButton: (event) => {
-    //   // alert('help!');
-    // },
+    onClickHelpButton: (event) => {
+      // custom help button
+    },
     onRangeLimit: ({ marker, maxDuration, time }) => {
-      // console.log('onRangeLimit', { marker, maxDuration, time });
+      // do something when the range limit is reached
     },
     onRangeUpdate: (...args) => {
-      // console.log('onRangeUpdate', ...args);
+      // do something when the range is updated
     },
   });
-  vidEditor.render(root);
-};
+}

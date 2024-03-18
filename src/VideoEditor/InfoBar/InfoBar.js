@@ -1,11 +1,18 @@
 import { convertDecimalToTime } from '../utils';
+import context from '../context';
 import './info-bar.css';
 
+/**
+ * InfoBar
+ *
+ * Sub-component of Timeline
+ */
 class InfoBar {
-  constructor({ video, crop, duration, currentIndex }) {
-    this.video = video;
+  constructor({ currentIndex }) {
+    const { viewer, crop } = context.getContext();
+    this.video = viewer.video;
     this.crop = crop;
-    this.duration = duration ?? '-';
+    this.duration = viewer.video.darution ?? '-';
     this.currentIndex = currentIndex ?? 0;
     this.infoBarContainer = null;
     // bind
