@@ -67,6 +67,35 @@ class VideoEditor {
 }
 ```
 
+### Extending the HTML Component
+
+Some components can access the `onRender()` method, which is called after the component is rendered. This is useful for adding event listeners to the component's elements. Extend the HTMLElement and override the `render()` and `onRender()` methods. Don't forget to call `super()` in the constructor and the `render()` method, passing in the appropriate arguments.
+
+```javascript
+class MyComponent extends HTMLElement {
+  constructor() {
+    super();
+    this.componentElement = this.componentElement();
+  }
+
+  createVideoEditorContainer() {
+    // ... logic to create video editor container
+  }
+
+  render(container) {
+    super(this.componentElement, container);
+    // render the component into the container
+    container.appendChild(this.componentElement);
+  }
+
+  onRender() {
+    // do something after the component is rendered
+  }
+}
+```
+
+### State Management
+
 State changes occur in an imperative manner, meaning that the parent component calls the child component's methods to change the state of the child component. The child component then re-renders itself to reflect the new state.
 
 ## Component Breakdown
@@ -126,7 +155,7 @@ class SubComponent {
 
 ## Bundle Size
 
-The VideoEditor is currently 320KB. I would like to reduce the bundle size to 150KB or less. The two dependencies that are contributing to the large bundle size are `cropperjs`, `fontawesome` and `gsap`, which are used for the cropper UI, menubar icons, and the rangeselector drag controls, respectively.
+The VideoEditor is currently 320KB. I would like to reduce the bundle size to 200KB or less. The two dependencies that are contributing to the large bundle size are `cropperjs`, `fontawesome` and `gsap`, which are used for the cropper UI, menubar icons, and the rangeselector drag controls, respectively.
 
 ### Bundle Size Reduction Suggestions
 
