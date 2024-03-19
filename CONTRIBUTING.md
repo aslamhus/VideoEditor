@@ -7,7 +7,7 @@ Hello! And thanks for contributing to the VideoEditor library. This document wil
 The VideoEditor is a VanillaJS library for video editing. I built it with expedience as part of an ongoing project. It was built with the following expectations in mind:
 
 - Lightweight build with limited dependencies (Choose VanillaJS over React)
-- Create only the features needed for the project's needs (YAGNI principle!)
+- Create only the features needed for the project which were trimming and cropping videos.
 - Design to promote extensibility in the future
 
 ## What needs work
@@ -17,6 +17,12 @@ Because the VideoEditor was built as part of another project where I have many d
 ## Contributing
 
 There are `Features to add` and `TODO` lists at the bottom of this document. The `TODOs` are ordered by priority. If you would like to contribute, please take a look at the lists and see if there is anything you would like to work on. If you have an idea for a new feature, please open an issue to discuss it before you start working on it. If you would like to work on a `TODO` item, open an issue to let me know that you are working on it. This will help to avoid duplicate work. Also feel free to suggest new `TODO` items.
+
+## Fork it! And clone it!
+
+To get started, fork the repository and clone it to your local machine. Then, run `npm install --dev` to install the dependencies. The VideoEditor uses Webpack to bundle the code. To start the development server, run `npm run dev`. This will start the development server and open the VideoEditor in your browser.
+
+You can find the test index.js file in the `src/test` directory. This is where you can test the VideoEditor.
 
 ## VideoEditor Architecture
 
