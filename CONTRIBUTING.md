@@ -4,22 +4,19 @@
 
 Hello! And thanks for contributing to the VideoEditor library. This document will guide you through the structure of the VideoEditor and how to make contributions.
 
-The VideoEditor is a VanillaJS component that provides a UI for video editing. I built it with expedience as a component for an ongoing project. It was built with the following considerations:
+The VideoEditor is a VanillaJS library for video editing. I built it with expedience as part of an ongoing project. It was built with the following expectations in mind:
 
-- To be lightweight with limited dependencies
-- Built with features limited to the project's needs (YAGNI principle!)
-- Designed to promote extensibility in the future
-- VanillaJS build, not React.
-
-The decision not to use `React` was to keep the build size small.
+- Lightweight build with limited dependencies (Choose VanillaJS over React)
+- Create only the features needed for the project's needs (YAGNI principle!)
+- Design to promote extensibility in the future
 
 ## What needs work
 
-Because the VideoEditor was built as part of another project where I had many different responsibilites, I built it expediently, just to make it functional. Because of this, documentation is not comprehensive and the code quality is not as clean as I would like it to be. I am looking for contributors to help clean up the code and improve the design of the VideoEditor. New features are also welcome!
+Because the VideoEditor was built as part of another project where I have many different responsibilites, I built it with expendience, just to make it functional. As a result, documentation is not comprehensive and the code quality is not as clean as I would like it to be. I am looking for contributors to help clean up the code and improve the design of the VideoEditor. New features are also welcome!
 
 ## Contributing
 
-There are `Features to add` and `TODO` lists at the bottom of this document. The TODOs are ordered by priority. If you would like to contribute, please take a look at the lists and see if there is anything you would like to work on. If you have an idea for a new feature, please open an issue to discuss it before you start working on it. If you would like to work on a `TODO` item, open an issue to let me know that you are working on it. This will help to avoid duplicate work. Also feel free to suggest new `TODO` items.
+There are `Features to add` and `TODO` lists at the bottom of this document. The `TODOs` are ordered by priority. If you would like to contribute, please take a look at the lists and see if there is anything you would like to work on. If you have an idea for a new feature, please open an issue to discuss it before you start working on it. If you would like to work on a `TODO` item, open an issue to let me know that you are working on it. This will help to avoid duplicate work. Also feel free to suggest new `TODO` items.
 
 ## VideoEditor Architecture
 
@@ -194,14 +191,14 @@ The three dependencies that are contributing to the large bundle size are `cropp
 
 ## Features to Add
 
-1. Minimum duration limit. Current the `limit` argument excepts max duration only. This limits how much the range selector can be expanded. I would like to add a minimum duration limit as well.
+1. Minimum duration limit. Current the `limit` option excepts `maxDuration` as a property only. I would like to add a minimum duration limit as well to limit the range selector to a minimum duration.
 2. Loop toggle control button. This would allow the user to loop the video, toggling the loop on and off.
 3. Rotate video. Extend the cropper to allow the user to rotate the video. (Lowest priority)
 
 ## TODOS
 
 1. Code quality improvements
-2. Fix flash when the cropper is toggled on.
+2. Fix a brief flash that occurs when the cropper is toggled on.
 3. Add more documentation
 4. Reduce complexity of Timeline / RangeSelector
 5. Move responsibility of the Cropper to the Viewer or more appropriate component than Timeline.
