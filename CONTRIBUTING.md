@@ -4,11 +4,22 @@
 
 Hello! And thanks for contributing to the VideoEditor library. This document will guide you through the structure of the VideoEditor and how to make contributions.
 
-The VideoEditor is a VanillaJS component that provides a UI for video editing. It was built to be lightweight with only the features the project I was working on required. I also have tried to limit dependencies. The decision not to use `React` was to keep the build size small. Because the VideoEditor was built as part of another project where I had many different responsibilites, I built it expediently (read: not as cleanly as I would have liked). Documentation needs to be improved, and there are some calculations which could probably benefit work. I am looking for contributors to help clean up the code and improve the design of the VideoEditor. New features are welcome!
+The VideoEditor is a VanillaJS component that provides a UI for video editing. I built it with expedience as a component for an ongoing project. It was built with the following considerations:
+
+- To be lightweight with limited dependencies
+- Built with features limited to the project's needs (YAGNI principle!)
+- Designed to promote extensibility in the future
+- VanillaJS build, not React.
+
+The decision not to use `React` was to keep the build size small.
+
+## What needs work
+
+Because the VideoEditor was built as part of another project where I had many different responsibilites, I built it expediently, just to make it functional. Because of this, documentation is not comprehensive and the code quality is not as clean as I would like it to be. I am looking for contributors to help clean up the code and improve the design of the VideoEditor. New features are also welcome!
 
 ## Contributing
 
-There is a `TODO` list at the bottom of this document. If you would like to contribute, please take a look at the list and see if there is anything you would like to work on. If you have an idea for a new feature, please open an issue to discuss it before you start working on it. If you would like to work on a `TODO` item, open an issue to let me know that you are working on it. This will help to avoid duplicate work. Also feel free to suggest new `TODO` items.
+There are `Features to add` and `TODO` lists at the bottom of this document. The TODOs are ordered by priority. If you would like to contribute, please take a look at the lists and see if there is anything you would like to work on. If you have an idea for a new feature, please open an issue to discuss it before you start working on it. If you would like to work on a `TODO` item, open an issue to let me know that you are working on it. This will help to avoid duplicate work. Also feel free to suggest new `TODO` items.
 
 ## VideoEditor Architecture
 
@@ -19,15 +30,29 @@ The parent component is the VideoEditor itself.
 VideoEditor
     |---- MenuBar
     |---- Viewer
+    |---- Instructions Modal
     |---- Timeline
         |---- Playhead
         |---- RangeSelector
+        |---- Cropper
         |---- Controls
         |---- Popover
         |---- InfoBar
 ```
 
-The majority of the video Editor logic is handled by the `Timeline` and `RangeSelector` components.
+The majority of the VideoEditor's logic is handled by the `Timeline` and `RangeSelector` components.
+
+## Rendering of the VideoEditor
+
+The UI is rendered in the following steps:
+
+1. `VideoEditor` receives a video source from the client.
+2. `VideoEditor` initializes its child components, passing the video source to the `Viewer` component.
+3. `Viewer` loads the video fires the `onLoad` event when the video is ready to play.
+4. `VideoEditor` can now initialize the `Timeline` hooking into the `onLoad` callback. Loading the video allows the timeline to draw the frames of the video onto the timeline.
+5. `Timeline` renders all of its sub-components, such as the `Playhead`, `RangeSelector`, `Controls`, `Popover`, `InfoBar` and `Cropper`.
+6. `RangeSelector` initializes the in and out markers, creating a range that can be trimmed. The `RangeSelector` clones the timeline's frames in order to show which frames have been selected.
+7. Done! The VideoEditor is now ready to be used.
 
 ## Individual Component Architecture
 
@@ -167,22 +192,23 @@ The three dependencies that are contributing to the large bundle size are `cropp
 - I would also like to remove the `cropperjs` dependency and replace it with a custom cropper. Again, this would require a significant amount of work.
 - general clean up and seek and destroy any unused / duplicate code.
 
-## TODOS
-
-1. Window event listener clean up when video editor is destroyed
-2. Add property @type for menu bar button (types should go in the type.js file)
-3. Expand readme
-4. Further encapsulate cropper functionality in the Timeline component. Probably, the Viewer component is the right place for it.
-5. Housecleaning: removed commented out code, erroneous comments, and unused variables.
-6. Decrease bundle size.
-7. Add tests
-8. Reduce complexity of Timeline / RangeSelector
-9. Add more documentation
-10. There is a brief flash when the cropper is toggled on.
-11. Lazyload instructions component
-
 ## Features to Add
 
-1. Minimum duration limit
-2. Loop toggle control button
-3. Rotate video
+1. Minimum duration limit. Current the `limit` argument excepts max duration only. This limits how much the range selector can be expanded. I would like to add a minimum duration limit as well.
+2. Loop toggle control button. This would allow the user to loop the video, toggling the loop on and off.
+3. Rotate video. Extend the cropper to allow the user to rotate the video. (Lowest priority)
+
+## TODOS
+
+1. Code quality improvements
+2. Fix flash when the cropper is toggled on.
+3. Add more documentation
+4. Reduce complexity of Timeline / RangeSelector
+5. Move responsibility of the Cropper to the Viewer or more appropriate component than Timeline.
+6. Decrease bundle size.
+7. Window event listener clean up when video editor is destroyed
+8. Add property @type for menu bar button (types should go in the type.js file)
+9. Expand readme
+10. Housecleaning: remove commented out code, erroneous comments, and unused variables.
+11. Lazyload instructions component
+12. Add tests
