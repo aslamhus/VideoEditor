@@ -199,21 +199,37 @@ The three dependencies that are contributing to the large bundle size are `cropp
 
 ## Features to Add
 
-1. Minimum duration limit. Current the `limit` option excepts `maxDuration` as a property only. I would like to add a minimum duration limit as well to limit the range selector to a minimum duration.
-2. Loop toggle control button. This would allow the user to loop the video, toggling the loop on and off.
-3. Rotate video. Extend the cropper to allow the user to rotate the video. (Lowest priority)
+1. Minimum duration limit.
+   Currently, the `limit` option excepts `maxDuration` as a property only. I would like to add a minimum duration limit as well to limit the range selector to a minimum duration.
+2. Loop toggle control button.
+   This would allow the user to loop the video, toggling the loop on and off.
+3. Rotate video.
+   Extend the cropper to allow the user to rotate the video. (Lowest priority)
+4. Crop Overlay
+   At one point, there was a "Crop Overlay" that was used to show the user the area of the video that was cut out by the initial crop they chose for their frame. For instance, if a user supplied a video with a 320 \* 480 resolution and the frame crop was 1:1, the area of the video that was cut out by the frame would visible underneath this dark overlay. This was removed because it was tricky to implement with the cropperjs library and I was running out of time. Potentially, this could be added back in or an option to toggle it on and off could be added.
 
 ## TODOS
 
+### High Priority
+
+1. Fix a brief flash that occurs when the cropper is toggled on.
+2. Fix cropper UI yellow border that is only partly visible when cropping videos with a smaller frame than their native resolution. (i.e. when the client passess in a crop of { width: 100, height: 100 } for a video with a resolution of 1920x1080)
+
+### Medium Priority
+
+1. Decrease bundle size.
+2. Lazyload instructions component and look for other opportunities to lazyload components.
+3. Housecleaning: remove commented out code, erroneous comments, and unused variables.
+4. Improve error handling. Currently, the error handling is minimal with some defensive program strategies implemented sparsely. The most robust error handling occurs in the Viewer component where errors are most likely to occur due to incompatible sources.
+5. Improve Cropper component. Cropper acts as a wrapper for the `cropperjs` library, is the most need of attention for code quality improvements. It is currently a child of the Timeline component, but there may be a more appropriate place for it. The integration of the cropper feature was done hastily. Ideally, It should also be more easily replaceable with another cropper library.
+
+### Low Priority
+
 1. Code quality improvements
-2. Fix a brief flash that occurs when the cropper is toggled on.
-3. Reduce complexity of Timeline / RangeSelector
-4. Move responsibility of the Cropper to the Viewer or more appropriate component than Timeline.
-5. Decrease bundle size.
-6. Window event listener clean up when video editor is destroyed
-7. Add property @type for menu bar button (types should go in the type.js file)
+2. Reduce complexity of Timeline / RangeSelector
+3. Reassign responsibility of the Cropper to the Viewer or more appropriate component than Timeline where it currently resides.
+4. Window event listener clean up when video editor is destroyed
+5. Add property @type for menu bar button (types should go in the type.js file)
+6. Add tests
+7. Improve documentation naming conventions. For example, currently I am using SubComponent and ChildComponent interchangeably. I would like to standardize the naming conventions. These are small things, but they add up.
 8. Expand readme
-9. Housecleaning: remove commented out code, erroneous comments, and unused variables.
-10. Lazyload instructions component
-11. Add tests
-12. Improve documentation naming conventions. For example, currently I am using SubComponent and ChildComponent interchangeably. I would like to standardize the naming conventions. These are small things, but they add up.
