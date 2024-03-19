@@ -2,7 +2,7 @@
 
 ## Summary
 
-A VanillaJS video editor that allows users to crop, trim, and save videos.
+The VideoEditor is a VanillaJS library that allows users to crop, trim, and save videos. It is a component-based library that can be used in any web application. The VideoEditor is designed to be simple and easy-to-use and customizable to fit your needs. Please note that it does not perform any video transformations itself, but it does provide an object detailing the transformations that can be used to transform the video with a backend service.
 
 ## Basic Usage
 
@@ -55,6 +55,42 @@ const options = {
         // do something when the range is updated
     },
 
+}
+```
+
+## Saving the Video
+
+You can save the video by passing a callback to the onSave option or by calling the save method on the VideoEditor instance.
+The VideoEditor does not perform any transformations, however it does provide an object detailing the transformations that can be used to transform the video. For convenience, the video source is also provided.
+
+### onSave
+
+```javascript
+const options = {
+    src : 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
+    onSave: (transformations, videoSrc) => {
+        // do something with the transformations and video source
+    },
+}
+```
+
+### save method
+
+```javascript
+const videoEditor = new VideoEditor({ options });
+videoEditor.render(myHTMLContainer);
+// after the video is edited...
+const [transformations, videoSrc] = videoEditor.save();
+```
+
+### Transformations
+
+The transformations object contains the crop and time transformations.
+
+```javascript
+{
+    crop: { h: 173, scale: '0.2', w: 343, x: '308', y: '153' },
+    time: { in: 5, out: 10 }, // time in seconds
 }
 ```
 

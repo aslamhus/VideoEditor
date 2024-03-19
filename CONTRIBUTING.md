@@ -173,3 +173,5 @@ The VideoEditor is currently 320KB. I would like to reduce the bundle size to 20
 6. Further encapsulate cropper functionality in the Timeline component. Probably, the Viewer component is the right place for it.
 7. Housecleaning: removed commented out code, erroneous comments, and unused variables.
 8. Decrease bundle size.
+9. Add tests
+10. Reduce complexity of Timeline / RangeSelector
