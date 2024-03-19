@@ -15,7 +15,7 @@ function initializeVideoEditor() {
   return new VideoEditor({
     // choose from 'small' or 'large' or add your own video source
     src: videoSrcs.small,
-    crop: { width: 8, height: 4 },
+    // crop: { width: 3, height: 4 },
     maxHeight: null,
     // optionally, add transformations
     transformations: {
