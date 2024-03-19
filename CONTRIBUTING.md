@@ -37,7 +37,7 @@ VideoEditor
         |---- InfoBar
 ```
 
-The majority of the VideoEditor's logic is handled by the `Timeline` and `RangeSelector` components.
+The VideoEditor serves as the app entry point, orchestrating the loading of the video and initialization of major components. The loading process is handled by the Viewer and the majority of the VideoEditor's user interactions are handled by the `Timeline` and `RangeSelector` components.
 
 ## Rendering of the VideoEditor
 
@@ -45,17 +45,19 @@ The UI is rendered in the following steps:
 
 1. `VideoEditor` receives a video source from the client.
 2. `VideoEditor` initializes its child components, passing the video source to the `Viewer` component.
-3. `Viewer` loads the video fires the `onLoad` event when the video is ready to play.
+3. `Viewer` loads the video, then fires the `onLoad` event when the video is ready to play.
 4. `VideoEditor` can now initialize the `Timeline` hooking into the `onLoad` callback. Loading the video allows the timeline to draw the frames of the video onto the timeline.
 5. `Timeline` renders all of its sub-components, such as the `Playhead`, `RangeSelector`, `Controls`, `Popover`, `InfoBar` and `Cropper`.
-6. `RangeSelector` initializes the in and out markers, creating a range that can be trimmed. The `RangeSelector` clones the timeline's frames in order to show which frames have been selected.
-7. Done! The VideoEditor is now ready to be used.
+6. `RangeSelector` initializes the in and out `Marker`s, creating a range that can be trimmed. The `RangeSelector` clones the timeline's frames, overlaying them ontop of the timeline in order to show which frames have been selected.
+
+And that's it! The `VideoEditor` is now ready to be used.
 
 ## Individual Component Architecture
 
-Each component of the VideoEditor is responsible for rendering a specific part of the video editor, described by its title. The only required method is `render()`, which takes an `HTMLElement` as an argument. It renders the component by appends the main element to the container passed in as an argument.
+Each component of the VideoEditor is responsible for rendering a specific part of the editor, described by its title. The only required method is `render()`, which takes an `HTMLElement` as an argument. It renders the component by appending its main element to the container passed in as an argument. See the example below.
 
 ```javascript
+// Child component
 class VideoEditorComponent {
   constructor() {
     this.container = this.createVideoEditorContainer();
@@ -71,17 +73,21 @@ class VideoEditorComponent {
 }
 ```
 
-When the component is ready to be rendered, the `render()` method is called. Usually, a parent component will instantiate a sub-component in the constructor where it can set its options. Later, when the parent component is rendered, it calls the `render` method on the sub component.
+### Component Lifecycle
+
+The component lifecycle is simple. There is an initialization phase and a rendering phase. In the initialization phase, the component is instantiated and its options are set. When the component is ready to be rendered, the `render()` method is called.
 
 ```javascript
 class VideoEditor {
   constructor() {
+    // initialize the components
     this.menuBar = new MenuBar(...options);
     this.viewer = new Viewer(...options);
     this.timeline = new Timeline(...options);
   }
 
   render(container) {
+    // render the components
     this.menuBar.render(container);
     this.viewer.render(container);
     this.timeline.render(container);
@@ -91,7 +97,9 @@ class VideoEditor {
 
 ### Extending the HTML Component
 
-Some components can access the `onRender()` method, which is called after the component is rendered. This is useful for adding event listeners to the component's elements. Extend the HTMLElement and override the `render()` and `onRender()` methods. Don't forget to call `super()` in the constructor and the `render()` method, passing in the appropriate arguments.
+Some components can access the `onRender()` method, which is called after the component is rendered. This is useful for adding event listeners to the component's elements. To use the `onRender()` method, extend your component with `HTMLElement` and override the `render()` and `onRender()` methods. Don't forget to call `super()` in the constructor and the `render()` method, passing in the appropriate arguments.
+
+`HTMLElement` uses `MutationObserver` to implement the `onRender()` method.
 
 ```javascript
 class MyComponent extends HTMLElement {
@@ -118,47 +126,47 @@ class MyComponent extends HTMLElement {
 
 ### State Management
 
-State changes occur in an imperative manner as opposed to the functional paradigm in `React`. State is updated by directly manipulating the DOM. This can be seen in the `RangeSelector` component, where the `mousedown` event listener is used to update the state of the component. State can also be handled by event listeners, which are added to the component's elements in the `onRender()` method.
+State changes occur in an imperative manner as opposed to the more functional paradigm in `React`. State is updated by directly manipulating the DOM. This can be seen in the `RangeSelector` component, where the `mousedown` event listener is used to update the state of the component. State can also be handled by event listeners, which are added to the component's elements in the `onRender()` method.
 
-As much as possible, I try to keep state management modular. For instance, though the VideoEditor receives a video src from the client, the video source is loaded and managed by the Viewer component alone. Other components can access the video through the Viewer component but the Viewer has no knowledge of the other components. Only VideoEditor has knowledge of all the components.
+As much as possible, I try to keep state management modular with separate of concerns between components. For instance, the video source is loaded and managed by the Viewer component alone. Other components can access the video element only through Viewer component methods, but the `Viewer` has no knowledge of the other components. Only `VideoEditor` has knowledge of all the components.
 
 ## Component Breakdown
 
 ### VideoEditor
 
-The VideoEditor is the parent component that contains all the other components. It is responsible for initializing the video and the child components. It also contains the global state of the video editor.
+The VideoEditor is the parent component that contains all the other components.You can think of it as the main app. It holds the global state of the video editor. It is responsible for initializing the child components and orchestrating the rendering process.
 
 ### MenuBar
 
-The MenuBar component is responsible for rendering the menu bar at the top of the VideoEditor. It contains buttons that allow the user to perform actions such as play, pause, and save.
+The MenuBar component is responsible for rendering the menu bar at the top of the VideoEditor. It contains buttons that configure the video editor, such as the "Crop" button, the "Save" button, the "Help" button, and the "Dark Mode" toggle button.
 
 ### Viewer
 
-The Viewer component is responsible for rendering the video and the timeline. It contains the video element and fires events when the video is ready to play.
+The Viewer component is responsible for loading the video and calculating video dimensions, which are crucial for the responsive design.
 
 ### Timeline
 
-The Timeline component is responsible for rendering the timeline and all the components within it. It contains the Playhead, RangeSelector, Controls, Popover, and InfoBar components. It is rendered after the Viewer component has begun to load the video.
+The Timeline component is responsible for rendering the timeline and all the components within it. It contains the Playhead, RangeSelector, Controls, Popover, Cropper and InfoBar components. It is rendered after the Viewer component has begun to load the video. The Timeline component is also responsible for handling the video's time updates. It handles user interactions with the timeline, such as dragging the playhead and the range selector.
 
 ### Playhead
 
-The Playhead component is responsible for rendering the playhead on the timeline. It is also responsible for moving the playhead when the video is playing.
+The Playhead component is responsible for rendering the playhead on the timeline. It extends the `Marker` class, which is a simple class that renders a marker on the timeline. The playhead is a special type of marker that is updated as the video plays.
 
 ### RangeSelector
 
-The RangeSelector component is responsible for rendering the range selector on the timeline. It is also responsible for allowing the user to select a range of the video to be edited.
+The RangeSelector component is responsible for rendering the range selector on the timeline. It is also responsible for allowing the user to select a range of the video to be edited. It holds the in and out `Marker` components, which are used to select the range.
 
 ### Controls
 
-The Controls component is responsible for rendering the controls on the timeline. It is also responsible for allowing the user to control the video.
+The Controls component is responsible for rendering all `ControlButton`s on the timeline such as the `PlayButton`. To add your own `ControlButton`, please see the documentation in the `Control` component. These buttons allow the user to control the video, such as play, pause, and stop.
 
 ### InfoBar
 
-The InfoBar component is responsible for rendering the info bar on the timeline. It is also responsible for displaying information about the video.
+The InfoBar component is responsible for rendering the info bar on the timeline. It displays information about the video such as the current time and the duration of the video and the video resolution.
 
 ### Popover
 
-The Popover component is responsible for rendering the popover on the timeline. It is provides warnings such as "Maximum duration reached" if such limits are set.
+The Popover component provides warnings such as "Maximum duration reached" if such limits are set.
 
 ## Context and Global Video Editor Instance
 
@@ -169,7 +177,7 @@ All descendant components of the VideoEditor have access to the global instance 
 ```javascript
 import { context } from './context.js';
 
-class SubComponent {
+class ChidComponent {
   constructor() {
     this.videoEditor = context.getContext();
     // now you can access all the methods and properties of the VideoEditor
@@ -199,13 +207,13 @@ The three dependencies that are contributing to the large bundle size are `cropp
 
 1. Code quality improvements
 2. Fix a brief flash that occurs when the cropper is toggled on.
-3. Add more documentation
-4. Reduce complexity of Timeline / RangeSelector
-5. Move responsibility of the Cropper to the Viewer or more appropriate component than Timeline.
-6. Decrease bundle size.
-7. Window event listener clean up when video editor is destroyed
-8. Add property @type for menu bar button (types should go in the type.js file)
-9. Expand readme
-10. Housecleaning: remove commented out code, erroneous comments, and unused variables.
-11. Lazyload instructions component
-12. Add tests
+3. Reduce complexity of Timeline / RangeSelector
+4. Move responsibility of the Cropper to the Viewer or more appropriate component than Timeline.
+5. Decrease bundle size.
+6. Window event listener clean up when video editor is destroyed
+7. Add property @type for menu bar button (types should go in the type.js file)
+8. Expand readme
+9. Housecleaning: remove commented out code, erroneous comments, and unused variables.
+10. Lazyload instructions component
+11. Add tests
+12. Improve documentation naming conventions. For example, currently I am using SubComponent and ChildComponent interchangeably. I would like to standardize the naming conventions. These are small things, but they add up.
