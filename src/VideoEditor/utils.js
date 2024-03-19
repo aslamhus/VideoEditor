@@ -4,6 +4,14 @@ export function getTranslateX(el) {
   return matrix.m41;
 }
 
+/**
+ * Decompose matrix
+ *
+ * Decompose the matrix to get the translateX, translateY, scaleX, scaleY, skewX, skewY, and rotation
+ *
+ * @param {HTMLElement} el
+ * @returns
+ */
 export function decomposeMatrix(el) {
   function deltaTransformPoint(matrix, point) {
     var dx = point.x * matrix.a + point.y * matrix.c + 0;
@@ -68,7 +76,7 @@ export const isMobile = () => {
   return window.matchMedia('(max-width: 768px)').matches;
 };
 
-export const calcElementSizeByComputedStyle = (el) => {
+export const getComputedWidthAndHeightForElement = (el) => {
   const style = getComputedStyle(el);
   const height =
     parseFloat(style.height) -

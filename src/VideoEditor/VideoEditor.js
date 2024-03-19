@@ -4,44 +4,16 @@ import Timeline from './Timeline/Timeline.js';
 import Instructions from './Instructions';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
-import { decomposeMatrix, getTranslateOrigin, calcElementSizeByComputedStyle } from './utils.js';
+import {
+  decomposeMatrix,
+  getTranslateOrigin,
+  getComputedWidthAndHeightForElement,
+} from './utils.js';
 import context from './context.js';
+import fontAwesomeLibrary from './font-awesome.js';
 import './types.js';
 import './themes.css';
 import './video-editor.css';
-/** font awesome, import only used icons to keep build size small */
-import { dom, library } from '@fortawesome/fontawesome-svg-core';
-import {
-  faPlay,
-  faPause,
-  faCheck,
-  faStepBackward,
-  faStepForward,
-  faVolumeUp,
-  faVolumeMute,
-  faSun,
-  faMoon,
-  faCrop,
-  faSave,
-  faTimes,
-  faQuestion,
-} from '@fortawesome/free-solid-svg-icons';
-library.add(
-  faPlay,
-  faPause,
-  faCheck,
-  faStepBackward,
-  faStepForward,
-  faVolumeUp,
-  faVolumeMute,
-  faSun,
-  faMoon,
-  faCrop,
-  faSave,
-  faTimes,
-  faQuestion
-);
-dom.watch();
 
 /**
  * # VideoEditor 1.0.0
@@ -209,8 +181,8 @@ class VideoEditor {
     this.video = null;
     this.videoEditorContainer = this.createVideoEditorContainer();
     this.maxHeight = maxHeight || null;
-    // the maximum height of the video display as apercent of the window size
-    // (must be the same as css for .video-flexbox-container)
+    // maxHeight restricts the responsive height of the video editor, which
+    // is usually set as a percentage based on the window height
     // this is recalculated on window resize
     this.maxHeightPercent = 0.6;
     this.limit = limit;
@@ -246,43 +218,50 @@ class VideoEditor {
       onToggleCrop: this.handleToggleCrop.bind(this),
       onClickSaveButton: this.handleSaveButtonClick.bind(this),
       onToggleMute: this.handleToggleMute.bind(this),
-      library,
+      library: fontAwesomeLibrary,
     });
     // bind
     this.attachResizeEvent = this.attachResizeEvent.bind(this);
   }
 
+  /**
+   * Attach Window Resize Event
+   *
+   * Handles responsive video editor height,
+   * recalculating the video editor dimensions.
+   *
+   * Because all child elements are responsive, we only need to
+   * recalculate the primary ancestor (video container) dimensions
+   */
   attachResizeEvent() {
     const vidContainerFlexbox = this.viewer.video.closest('.video-flexbox-container');
-    const vidContainer = this.viewer.video.closest('.video-wrap');
+    // define the event here so we keep vidContainerFlexbox and vidContainer in scope
     window.addEventListener('resize', (event) => {
-      this.previousBounds = vidContainer.getBoundingClientRect();
+      // keep track of previous video bounds
       const videoBounds = this.viewer.video.getBoundingClientRect();
       this.previousVidBounds = videoBounds;
-      if (!this.containerToVideoRatio) {
-        this.containerToVideoRatio = this.previousBounds.width / videoBounds.width;
-      }
+      // update max height percent
       this.maxHeightPercent = this.getMaxHeightPercent(vidContainerFlexbox);
+      // update video container dimensions
       this.updateVideoContainerDimensions();
     });
   }
 
+  /**
+   * Update Video Container Dimensions
+   *
+   * This method is called when the window is resized.
+   * It recalculates the video container dimensions based on the
+   * max height percent and the video aspect ratio.
+   */
   updateVideoContainerDimensions() {
     // use crop dimensions if set, otherwise use video dimensions
-    let width, height;
-    if (this.crop?.width && this.crop?.height) {
-      width = this.crop.width;
-      height = this.crop.height;
-    } else {
-      width = this.video.videoWidth;
-      height = this.video.videoHeight;
-    }
-
-    // aspect ratio of device
+    let width = this.crop?.width || this.video.videoWidth;
+    let height = this.crop?.height || this.video.videoHeight;
+    // aspect ratio of video (or crop)
     const aspectRatio = height / width;
     const vidEditorWrapper = this.videoEditorContainer.closest('.video-editor-wrapper');
-
-    const vidEditorSize = calcElementSizeByComputedStyle(vidEditorWrapper);
+    const vidEditorDimensions = getComputedWidthAndHeightForElement(vidEditorWrapper);
     const vidWrap = this.video.closest('.video-wrap');
     const vidContainer = this.video.closest('.video-container');
     const vidBounds = this.video.getBoundingClientRect();
@@ -295,12 +274,12 @@ class VideoEditor {
       // limit height of video display if screen size exceeds limit
       // HOWEVER, use the primary ancestor of the editor as the limit, not the screen
       // so that the video doesn't get too small when the editor is in a small container
-      const maxHeight = vidEditorSize.height * this.maxHeightPercent;
+      const maxHeight = vidEditorDimensions.height * this.maxHeightPercent;
       vidMaxWidth = maxHeight / aspectRatio;
     }
     // limit width of video display to the width of the editor
-    if (vidMaxWidth > vidEditorSize.width) {
-      vidMaxWidth = vidEditorSize.width;
+    if (vidMaxWidth > vidEditorDimensions.width) {
+      vidMaxWidth = vidEditorDimensions.width;
     }
     // set max width of video container
     vidContainer.style.width = `${vidMaxWidth}px`;
@@ -308,8 +287,13 @@ class VideoEditor {
     // get new width
     requestAnimationFrame(() => {
       if (this.previousBounds) {
+        // get the transform values
         const { scaleX, scaleY, translateX, translateY } = decomposeMatrix(this.video);
+        // calculate the scale difference between the previous and current bounds
         const scaleDiff = vidMaxWidth / this.previousBounds.width;
+        // this method is a holdover from a previous version which
+        // attempted to calculate the crop overlay position.
+        // May be useful in the future.
         const [originX, originY] = getTranslateOrigin(this.video);
         const newScale = scaleX * scaleDiff;
         const vidHeight = vidContainer.getBoundingClientRect().height;
@@ -317,7 +301,7 @@ class VideoEditor {
         const heightDiff = vidHeight - this.previousBounds.height;
         const newX = translateX + widthDiff / 2;
         const newY = translateY + heightDiff / 2;
-
+        // update transform value
         const newTransformValue = `translate3d(${newX}px, ${newY}px, 0px) scale(${newScale})`;
         this.video.style.transform = newTransformValue;
         // update crop

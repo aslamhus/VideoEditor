@@ -25,8 +25,8 @@ class Viewer {
   /**
    * handle duration change
    *
-   * Renders timeline   when we have the duration.
-   * This event occurs after the initial render and precipitates
+   * Renders timeline  when we have the duration.
+   * This event occurs after the initial render and fires
    * the timelineReady event / onReady callback.
    *
    * Once we have rendered the timeline we can remove
@@ -57,35 +57,46 @@ class Viewer {
     if (this.onLoad instanceof Function) {
       this.onLoad();
     }
-    // remove events
+    // remove event listeners for duration change and metadata
     this.removeEvents();
   }
 
+  /**
+   * Handle Loaded Meta Data
+   *
+   *
+   * loadedmetadata will return a duration of infinity.
+   * This is a known bug. To get the duration,
+   * we set the currentTime to a very large number.
+   * This will trigger the duration change event
+   * so we can retrive the duration value without having
+   * to play the  entire length of the video.
+   *
+   * @param {Event} event
+   */
   handleLoadedMetaData(event) {
-    /**
-     * loadedmetadata will return a duration of infinity.
-     * This is a known bug. To get the duration,
-     * we set the currentTime to a very large number.
-     * This will trigger the duration change event
-     * so we can retrive the duration value without having
-     * to play the  entire length of the video.
-     */
-
     this.video.currentTime = 1e101;
     if (this.onLoadMetaData instanceof Function) {
       this.onLoadMetaData();
     }
   }
 
+  /**
+   * Handle Video Download Progress
+   *
+   * @param {AxiosProgressEvent} progressEvent
+   */
   handleVideoDownloadProgress(progressEvent) {
     const progress = parseInt(progressEvent.progress * 100);
     this.loader.updateMessage(`Loading video ${progress}%`);
   }
 
-  getVideoEditorSize() {
-    const vidEditorWrapper = this.video.closest('.video-editor-wrapper');
-  }
-
+  /**
+   * Handle Error
+   *
+   * @param {Error} error
+   * @returns
+   */
   handleError(error) {
     console.error(error);
     if (this.onError instanceof Function) {

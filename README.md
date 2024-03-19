@@ -6,7 +6,7 @@ The VideoEditor is a responsive VanillaJS library that allows users to crop, tri
 
 ### Screenshot
 
-![Video Editor](/video-editor.png);
+![Video Editor](/video-editor.png)
 
 ## Basic Usage
 
