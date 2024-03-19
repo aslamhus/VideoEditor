@@ -2,17 +2,18 @@
 
 ## Welcome
 
-Hello! And thanks for contributing to the VideoEditor library. This document will help you understand the structure of the VideoEditor and how to contribute to it.
-The VideoEditor is a VanillaJS component that allows you to edit a video. It was built to be lightweight with as few dependencies as posssible. The VideoEditor was built as quickly as possible as possible for use in another project. As a result, the code is not as clean as it could be. I am looking for contributors to help clean up the code and improve the structure of the VideoEditor. New features are also welcome!
+Hello! And thanks for contributing to the VideoEditor library. This document will guide you through the structure of the VideoEditor and how to make contributions.
+
+The VideoEditor is a VanillaJS component that provides a UI for video editing. It was built to be lightweight with only the features the project I was working on required. I also have tried to limit dependencies. The decision not to use `React` was to keep the build size small. Because the VideoEditor was built as part of another project where I had many different responsibilites, I built it expediently (read: not as cleanly as I would have liked). Documentation needs to be improved, and there are some calculations which could probably benefit work. I am looking for contributors to help clean up the code and improve the design of the VideoEditor. New features are welcome!
 
 ## Contributing
 
-There is a `TODO` list at the bottom of this document. If you would like to contribute, please take a look at the `TODO` list and see if there is anything you would like to work on. If you have an idea for a new feature, please open an issue to discuss it before you start working on it. If you would like to work on a `TODO` item, please open an issue to let me know that you are working on it. This will help to avoid duplicate work. Also feel free to suggest new `TODO` items.
+There is a `TODO` list at the bottom of this document. If you would like to contribute, please take a look at the list and see if there is anything you would like to work on. If you have an idea for a new feature, please open an issue to discuss it before you start working on it. If you would like to work on a `TODO` item, open an issue to let me know that you are working on it. This will help to avoid duplicate work. Also feel free to suggest new `TODO` items.
 
 ## VideoEditor Architecture
 
-The VideoEditor is a VanillaJS component that allows you to edit a video. Here is a list of the main components within the VideoEditor with their child components.
-The parent component is the VideoEditor itself. It contains the following child components:
+Here is a list of the main components within the VideoEditor.
+The parent component is the VideoEditor itself.
 
 ```bash
 VideoEditor
@@ -30,7 +31,7 @@ The majority of the video Editor logic is handled by the `Timeline` and `RangeSe
 
 ## Individual Component Architecture
 
-Each component of the VideoEditor is responsible for rendering a specific part of the video editor, described by its title. The only prescribed method is `render()`, which takes an `HTMLElement` as an argument and appends the component as a child of this contiainer.
+Each component of the VideoEditor is responsible for rendering a specific part of the video editor, described by its title. The only required method is `render()`, which takes an `HTMLElement` as an argument. It renders the component by appends the main element to the container passed in as an argument.
 
 ```javascript
 class VideoEditorComponent {
@@ -43,13 +44,12 @@ class VideoEditorComponent {
   }
 
   render(container) {
-    // render the component into the container
     container.appendChild(this.container);
   }
 }
 ```
 
-When the component is ready to be rendered, the `render()` method is called. Usually, the component to render is instantiated in a parent component's constructor and then rendered in that parent component's `render()` method.
+When the component is ready to be rendered, the `render()` method is called. Usually, a parent component will instantiate a sub-component in the constructor where it can set its options. Later, when the parent component is rendered, it calls the `render` method on the sub component.
 
 ```javascript
 class VideoEditor {
@@ -96,7 +96,9 @@ class MyComponent extends HTMLElement {
 
 ### State Management
 
-State changes occur in an imperative manner, meaning that the parent component calls the child component's methods to change the state of the child component. The child component then re-renders itself to reflect the new state.
+State changes occur in an imperative manner as opposed to the functional paradigm in `React`. State is updated by directly manipulating the DOM. This can be seen in the `RangeSelector` component, where the `mousedown` event listener is used to update the state of the component. State can also be handled by event listeners, which are added to the component's elements in the `onRender()` method.
+
+As much as possible, I try to keep state management modular. For instance, though the VideoEditor receives a video src from the client, the video source is loaded and managed by the Viewer component alone. Other components can access the video through the Viewer component but the Viewer has no knowledge of the other components. Only VideoEditor has knowledge of all the components.
 
 ## Component Breakdown
 
@@ -155,30 +157,29 @@ class SubComponent {
 
 ## Bundle Size
 
-Currently, the VideoEditor in its minified, uncompressed bundle is 320KB. I would like to attempt to reduce the bundle size to 250KB or less. However, if more features are implemented this becomes increasingly unlikely.
+Currently, the VideoEditor bundle when minified (but uncompressed) is 320KB. I would like to attempt to reduce the bundle size to 250KB or less. However, if more features are implemented this becomes increasingly unlikely.
 
 The three dependencies that are contributing to the large bundle size are `cropperjs`, `fontawesome` and `gsap`, which are used for the cropper UI, menubar icons, and the rangeselector drag controls, respectively.
 
 ### Bundle Size Reduction Suggestions
 
-- I would like to replace these dependencies with smaller, more lightweight alternatives. Potentially, we could use a custom SVG for the menubar icons, and a custom drag control for the rangeselector.
-- I would also like to remove the `cropperjs` dependency and replace it with a custom cropper.
-- clean up the code to remove any unused variables and functions.
+- I would like to replace these dependencies with smaller, more lightweight alternatives. Potentially, we could use a custom SVG for the menubar icons, and a custom drag control for the rangeselector. However, this would require a significant amount of work. And draggables are not easy to implement, especially for cross browser and mobile support. There may be another library that is smaller and more lightweight that we could use instead of `gsap`.
+- I would also like to remove the `cropperjs` dependency and replace it with a custom cropper. Again, this would require a significant amount of work.
+- general clean up and seek and destroy any unused / duplicate code.
 
 ## TODOS
 
-1. Find moment to revoke object url of video src
-2. Window event listener clean up when video editor is destroyed
-3. Add property @type for menu bar button (types should go in the type.js file)
-4. Expand readme
-5. Further encapsulate cropper functionality in the Timeline component. Probably, the Viewer component is the right place for it.
-6. Housecleaning: removed commented out code, erroneous comments, and unused variables.
-7. Decrease bundle size.
-8. Add tests
-9. Reduce complexity of Timeline / RangeSelector
-10. Add more documentation
-11. There is a brief flash when the cropper is toggled on.
-12. Lazyload instructions component
+1. Window event listener clean up when video editor is destroyed
+2. Add property @type for menu bar button (types should go in the type.js file)
+3. Expand readme
+4. Further encapsulate cropper functionality in the Timeline component. Probably, the Viewer component is the right place for it.
+5. Housecleaning: removed commented out code, erroneous comments, and unused variables.
+6. Decrease bundle size.
+7. Add tests
+8. Reduce complexity of Timeline / RangeSelector
+9. Add more documentation
+10. There is a brief flash when the cropper is toggled on.
+11. Lazyload instructions component
 
 ## Features to Add
 
