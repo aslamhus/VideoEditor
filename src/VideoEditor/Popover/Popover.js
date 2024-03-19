@@ -1,5 +1,13 @@
 import './popover.css';
 
+/**
+ * Popover
+ *
+ * A class for creating and managing a popover UI component.
+ *
+ * The popover is a sub-component of the Timeline, though it could be used
+ * in other contexts as well.
+ */
 class Popover {
   constructor({ title, body, variant = 'info', fadeOutTime = 500 }) {
     this.title = title;

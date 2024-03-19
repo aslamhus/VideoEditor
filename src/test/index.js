@@ -39,6 +39,7 @@ function initializeVideoEditor() {
     },
     onSave: (transform, videoSrc) => {
       // do something with the transformed video
+      console.log('Saved!', transform, videoSrc);
     },
     onTimelineClick: (timeIndex) => {
       // get the current time index

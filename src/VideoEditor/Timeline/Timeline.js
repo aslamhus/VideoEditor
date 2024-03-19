@@ -89,6 +89,12 @@ class Timeline {
       initialIndex: 0,
       isDraggable: false,
     });
+    // popover
+    this.popover = new Popover({
+      title: 'Maximum video length exceeded',
+      body: 'Please select a shorter video.',
+      variant: 'danger',
+    });
     // range selector
     this.rangeSelector = new RangeSelector({
       timeline: this,
@@ -108,12 +114,7 @@ class Timeline {
       rangeSelector: this.rangeSelector,
       onPlayClick: this.handlePlayClick.bind(this),
     });
-    // popover
-    this.popover = new Popover({
-      title: 'Maximum video length exceeded',
-      body: 'Please select a shorter video.',
-      variant: 'danger',
-    });
+
     // info bar
     this.infoBar = new InfoBar({
       currentIndex: this.transformations?.time?.in,

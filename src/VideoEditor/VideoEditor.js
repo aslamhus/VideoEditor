@@ -315,13 +315,11 @@ class VideoEditor {
         const vidHeight = vidContainer.getBoundingClientRect().height;
         const widthDiff = vidMaxWidth - this.previousBounds.width;
         const heightDiff = vidHeight - this.previousBounds.height;
-        // const newTransformOriginValue = `${originX * scaleDiff}px ${originY * scaleDiff}px`;
         const newX = translateX + widthDiff / 2;
         const newY = translateY + heightDiff / 2;
 
         const newTransformValue = `translate3d(${newX}px, ${newY}px, 0px) scale(${newScale})`;
         this.video.style.transform = newTransformValue;
-        // this.video.style.transformOrigin = `${vidBounds.width / 2}px ${vidBounds.height / 2}px`;
         // update crop
         if (this.timeline.cropper) {
           this.timeline.toggleCropperOff();
@@ -347,7 +345,6 @@ class VideoEditor {
     const icon = buttonContainer.querySelector('i') ?? buttonContainer.querySelector('svg');
     if (toggleState) {
       span.innerText = 'Done';
-      // icon.style.display = 'none';
       icon.classList.add('fa-check');
       icon.classList.remove('fa-crop');
       this.timeline.controls.disableControlButtons();
@@ -447,9 +444,20 @@ class VideoEditor {
 
   handleSaveButtonClick(event) {
     if (this.onSave instanceof Function) {
-      const transformations = this.timeline.getTransformations();
-      this.onSave(transformations, this.viewer.getSrc());
+      this.onSave(...this.save());
     }
+  }
+
+  /**
+   * Save video
+   *
+   * Returns transformations object and video source
+   *
+   * @returns - [transformations, videoSrc]
+   */
+  save() {
+    const transformations = this.timeline.getTransformations();
+    return [transformations, this.viewer.getSrc()];
   }
 
   createWrapper() {
