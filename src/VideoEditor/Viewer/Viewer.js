@@ -1,12 +1,21 @@
 import axios from 'axios';
 
+/**
+ * Video Viewer
+ *
+ * The Viewer component is responsible for loading and rendering the video.
+ * It's parent is the VideoEditor class.
+ */
 class Viewer {
-  constructor({ src, loader, onLoad }) {
+  constructor({ src, loader, onLoad, onLoadMetaData }) {
     this.src = src;
     this.video = this.createVideo();
     this.loader = loader;
     this.onLoad = onLoad;
+    this.onLoadMetaData = onLoadMetaData;
+    // bind
     this.handleAxiosError = this.handleAxiosError.bind(this);
+    this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
   }
 
   getSrc() {
@@ -52,9 +61,29 @@ class Viewer {
     this.removeEvents();
   }
 
+  handleLoadedMetaData(event) {
+    /**
+     * loadedmetadata will return a duration of infinity.
+     * This is a known bug. To get the duration,
+     * we set the currentTime to a very large number.
+     * This will trigger the duration change event
+     * so we can retrive the duration value without having
+     * to play the  entire length of the video.
+     */
+
+    this.video.currentTime = 1e101;
+    if (this.onLoadMetaData instanceof Function) {
+      this.onLoadMetaData();
+    }
+  }
+
   handleVideoDownloadProgress(progressEvent) {
     const progress = parseInt(progressEvent.progress * 100);
     this.loader.updateMessage(`Loading video ${progress}%`);
+  }
+
+  getVideoEditorSize() {
+    const vidEditorWrapper = this.video.closest('.video-editor-wrapper');
   }
 
   handleError(error) {

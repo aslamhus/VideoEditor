@@ -1,13 +1,13 @@
 import PlayHead from './PlayHead/PlayHead.js';
 import Controls from './Controls/Controls.js';
 import RangeSelector from './RangeSelector/RangeSelector.js';
-import './timeline.css';
 import InfoBar from '../InfoBar/InfoBar.js';
 import Cropper from '../Cropper/Cropper.js';
-import '../types.js';
 import Loader from '../Loader/Loader.js';
 import Popover from '../Popover/Popover.js';
 import context from '../context.js';
+import '../types.js';
+import './timeline.css';
 class Timeline {
   /**
    *
@@ -89,12 +89,6 @@ class Timeline {
       initialIndex: 0,
       isDraggable: false,
     });
-    // popover
-    this.popover = new Popover({
-      title: 'Maximum video length exceeded',
-      body: 'Please select a shorter video.',
-      variant: 'danger',
-    });
     // range selector
     this.rangeSelector = new RangeSelector({
       timeline: this,
@@ -108,9 +102,17 @@ class Timeline {
       limit: this.limit,
       onRangeUpdate: this.handleRangeUpdate.bind(this),
     });
-    // control buttons
+
+    // controls
     this.controls = new Controls({
+      rangeSelector: this.rangeSelector,
       onPlayClick: this.handlePlayClick.bind(this),
+    });
+    // popover
+    this.popover = new Popover({
+      title: 'Maximum video length exceeded',
+      body: 'Please select a shorter video.',
+      variant: 'danger',
     });
     // info bar
     this.infoBar = new InfoBar({
@@ -170,16 +172,19 @@ class Timeline {
   timeupdate() {
     /**
      * If cropper is enabled,
-     * update the crop source
+     * apply the crop to the video
      */
     requestAnimationFrame(() => {
       if (this.cropper && !this.cropper.hidden) {
-        this.getCurrentVideoFrameUrlObject().then((url) => {
-          this.cropper.updateSrc(url);
-          // const img = document.createElement('img');
-          // img.src = url;
-          // document.body.append(img);
-        });
+        this.video.pause();
+        // Potentially we can use this to update the cropper src
+        // However, this would be an expensive operation.
+        // this.getCurrentVideoFrameUrlObject().then((url) => {
+        // this.cropper.updateSrc(url);
+        // const img = document.createElement('img');
+        // img.src = url;
+        // document.body.append(img);
+        // });
       }
     });
   }
@@ -488,10 +493,10 @@ class Timeline {
    */
   async handleTimelineReady() {
     setTimeout(async () => {
-      await this.initCropper(this.transformations?.crop);
+      // await this.initCropper(this.transformations?.crop);
 
       setTimeout(() => {
-        this.applyCrop();
+        // this.applyCrop();
         if (this.onReady instanceof Function) {
           this.onReady();
         }

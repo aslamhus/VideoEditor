@@ -4,7 +4,7 @@ import Timeline from './Timeline/Timeline.js';
 import Instructions from './Instructions';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
-import { decomposeMatrix, getTranslateOrigin } from './utils.js';
+import { decomposeMatrix, getTranslateOrigin, calcElementSizeByComputedStyle } from './utils.js';
 import context from './context.js';
 import './types.js';
 import './themes.css';
@@ -226,13 +226,13 @@ class VideoEditor {
     this.onMarkerDragStart = onMarkerDragStart;
     this.onMarkerDragEnd = onMarkerDragEnd;
     // Components
-
     this.loader = new Loader({ message: 'Loading video' });
     // both timeline and info bar are invoked when we know the video duration
     this.viewer = new Viewer({
       src,
       loader: this.loader,
       onLoad: this.handleVideoLoad.bind(this),
+      onLoadMetaData: this.handleLoadMetaData.bind(this),
     });
     this.timeline = new Timeline({
       onReady: this.handleTimelineReady.bind(this),
@@ -249,7 +249,6 @@ class VideoEditor {
       library,
     });
     // bind
-    this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
     this.attachResizeEvent = this.attachResizeEvent.bind(this);
   }
 
@@ -268,34 +267,6 @@ class VideoEditor {
     });
   }
 
-  getMaxHeightPercent(vidContainerFlexbox) {
-    const percentValue = getComputedStyle(vidContainerFlexbox).maxHeight;
-    return parseInt(percentValue) / 100;
-  }
-
-  getVideoEditorSize() {
-    const vidEditorWrapper = this.videoEditorContainer.closest('.video-editor-wrapper');
-    const vidEditorWrapperStyle = getComputedStyle(vidEditorWrapper);
-    const height =
-      parseFloat(vidEditorWrapperStyle.height) -
-      parseFloat(vidEditorWrapperStyle.paddingTop) -
-      parseFloat(vidEditorWrapperStyle.paddingBottom) -
-      parseFloat(vidEditorWrapperStyle.borderTop) -
-      parseFloat(vidEditorWrapperStyle.borderBottom) -
-      parseFloat(vidEditorWrapperStyle.marginTop) -
-      parseFloat(vidEditorWrapperStyle.marginBottom);
-    // get vidEditorWrapper width
-    const width =
-      parseFloat(vidEditorWrapperStyle.width) -
-      parseFloat(vidEditorWrapperStyle.paddingLeft) -
-      parseFloat(vidEditorWrapperStyle.paddingRight) -
-      parseFloat(vidEditorWrapperStyle.borderLeft) -
-      parseFloat(vidEditorWrapperStyle.borderRight) -
-      parseFloat(vidEditorWrapperStyle.marginLeft) -
-      parseFloat(vidEditorWrapperStyle.marginRight);
-    return { width, height };
-  }
-
   updateVideoContainerDimensions() {
     // use crop dimensions if set, otherwise use video dimensions
     let width, height;
@@ -309,7 +280,9 @@ class VideoEditor {
 
     // aspect ratio of device
     const aspectRatio = height / width;
-    const vidEditorSize = this.getVideoEditorSize();
+    const vidEditorWrapper = this.videoEditorContainer.closest('.video-editor-wrapper');
+
+    const vidEditorSize = calcElementSizeByComputedStyle(vidEditorWrapper);
     const vidWrap = this.video.closest('.video-wrap');
     const vidContainer = this.video.closest('.video-container');
     const vidBounds = this.video.getBoundingClientRect();
@@ -334,7 +307,6 @@ class VideoEditor {
     vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
     // get new width
     requestAnimationFrame(() => {
-      // console.log('this.previousBounds', this.previousBounds);
       if (this.previousBounds) {
         const { scaleX, scaleY, translateX, translateY } = decomposeMatrix(this.video);
         const scaleDiff = vidMaxWidth / this.previousBounds.width;
@@ -360,6 +332,11 @@ class VideoEditor {
         return;
       }
     });
+  }
+
+  getMaxHeightPercent(vidContainerFlexbox) {
+    const percentValue = getComputedStyle(vidContainerFlexbox).maxHeight;
+    return parseInt(percentValue) / 100;
   }
 
   handleToggleCrop(event, toggleState) {
@@ -458,25 +435,14 @@ class VideoEditor {
     this.timeline.render(this.videoEditorContainer);
   }
 
+  handleLoadMetaData() {
+    this.updateVideoContainerDimensions();
+    this.crop && this.appendCropOverlay();
+  }
+
   show() {
     this.videoEditorContainer.style.opacity = 1;
     this.loader.hide();
-  }
-
-  handleLoadedMetaData(event) {
-    /**
-     * loadedmetadata will return a duration of infinity.
-     * This is a known bug. To get the duration,
-     * we set the currentTime to a very large number.
-     * This will trigger the duration change event
-     * so we can retrive the duration value without having
-     * to play the  entire length of the video.
-     */
-
-    this.video.currentTime = 1e101;
-
-    this.updateVideoContainerDimensions();
-    this.crop && this.appendCropOverlay();
   }
 
   handleSaveButtonClick(event) {

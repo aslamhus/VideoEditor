@@ -1,17 +1,16 @@
 import Marker from './Marker/Marker.js';
 import { cloneAllCanvasFrames } from './utils.js';
 import { getTranslateX } from '../../utils.js';
-
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { initPresHoldEvent } from '../../utils/onpresshold.js';
 import PlayHead from '../PlayHead/PlayHead.js';
+import Popover from '../../Popover/Popover.js';
+import context from '../../context.js';
 import '../../types.js';
 //without this line, PixiPlugin and MotionPathPlugin may get dropped by your bundler (tree shaking)...
 gsap.registerPlugin(Draggable);
 import './range-selector.css';
-import Popover from '../../Popover/Popover.js';
-import context from '../../context.js';
 
 class RangeSelector {
   /**

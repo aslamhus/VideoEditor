@@ -67,3 +67,25 @@ export const convertDecimalToTime = (timeIndex, precision = 2) => {
 export const isMobile = () => {
   return window.matchMedia('(max-width: 768px)').matches;
 };
+
+export const calcElementSizeByComputedStyle = (el) => {
+  const style = getComputedStyle(el);
+  const height =
+    parseFloat(style.height) -
+    parseFloat(style.paddingTop) -
+    parseFloat(style.paddingBottom) -
+    parseFloat(style.borderTop) -
+    parseFloat(style.borderBottom) -
+    parseFloat(style.marginTop) -
+    parseFloat(style.marginBottom);
+  // get vidEditorWrapper width
+  const width =
+    parseFloat(style.width) -
+    parseFloat(style.paddingLeft) -
+    parseFloat(style.paddingRight) -
+    parseFloat(style.borderLeft) -
+    parseFloat(style.borderRight) -
+    parseFloat(style.marginLeft) -
+    parseFloat(style.marginRight);
+  return { width, height };
+};

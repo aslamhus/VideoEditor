@@ -12,7 +12,7 @@ class InfoBar {
     const { viewer, crop } = context.getContext();
     this.video = viewer.video;
     this.crop = crop;
-    this.duration = viewer.video.darution ?? '-';
+    this.duration = viewer.video.duration ?? '-';
     this.currentIndex = currentIndex ?? 0;
     this.infoBarContainer = null;
     // bind

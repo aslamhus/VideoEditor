@@ -1,5 +1,6 @@
 import { merge } from 'webpack-merge';
 import common from './webpack.common.js';
+import TerserPlugin from 'terser-webpack-plugin';
 export default merge(common, {
   mode: 'production',
   entry: {
@@ -20,17 +21,17 @@ export default merge(common, {
   experiments: {
     outputModule: true,
   },
-  // optimization: {
-  //   minimize: true,
-  //   minimizer: [
-  //     new TerserPlugin({
-  //       terserOptions: {
-  //         format: {
-  //           comments: false,
-  //         },
-  //       },
-  //       extractComments: false,
-  //     }),
-  //   ],
-  // },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      }),
+    ],
+  },
 });

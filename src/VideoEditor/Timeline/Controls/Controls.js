@@ -3,6 +3,13 @@ import ControlButton from './ControlButton/ControlButton';
 import PlayButton from './PlayButton';
 import context from '../../context';
 import './controls.css';
+
+/**
+ * Controls
+ *
+ * The Controls component is responsible for rendering the video controls.
+ * It's parent is the Timeline class.
+ */
 class Controls {
   constructor({ rangeSelector, onPlayToggle, onTrimToggle, onPlayClick, onCropToggle }) {
     const { viewer } = context.getContext();
@@ -36,6 +43,7 @@ class Controls {
       className: 'last-frame-btn',
       iconClassName: 'fa fa-step-forward',
       onClick: () => {
+        console.log('rangeSelector', rangeSelector);
         this.video.currentTime = rangeSelector.outMarker.getTimeIndex();
       },
       title: 'Jump to last frame',
