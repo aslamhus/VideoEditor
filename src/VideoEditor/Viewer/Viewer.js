@@ -54,7 +54,6 @@ class Viewer {
       console.error('durationchange: duration is infinity', this.video.duration);
       return;
     }
-    console.log('video dimensions', this.video.videoWidth, this.video.videoHeight);
     // console.info('durationchange', this.video.duration);
     this.video.pause();
     this.video.currentTime = 0;
@@ -250,11 +249,13 @@ class Viewer {
    */
   attachResizeEvent() {
     const vidContainerFlexbox = this.video.closest('.video-flexbox-container');
+    const vidContainer = this.video.closest('.video-wrap');
     // define the event here so we keep vidContainerFlexbox and vidContainer in scope
     window.addEventListener('resize', (event) => {
       // keep track of previous video bounds
       const videoBounds = this.video.getBoundingClientRect();
-      this.previousBounds = videoBounds;
+
+      this.previousBounds = vidContainer.getBoundingClientRect();
       // update max height percent
       this.maxHeightPercent = getMaxHeightPercent(vidContainerFlexbox);
       // update video container dimensions

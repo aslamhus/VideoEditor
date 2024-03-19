@@ -59,9 +59,9 @@ export const calcTransformValues = (vidMaxWidth, vidContainer, video, previousBo
   const vidHeight = vidContainer.getBoundingClientRect().height;
   const widthDiff = vidMaxWidth - previousBounds.width;
   const heightDiff = vidHeight - previousBounds.height;
-  const newX = translateX + widthDiff / 2;
-  const newY = translateY + heightDiff / 2;
-  return { x: newX, y: newY, scale: newScale };
+  const x = translateX + widthDiff / 2;
+  const y = translateY + heightDiff / 2;
+  return { x, y, scale: newScale };
 };
 
 export const calcViewerMaxWidth = (video, maxHeight, maxHeightPercent, aspectRatio) => {
