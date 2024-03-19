@@ -1,3 +1,4 @@
+import { createElement } from '../utils.js';
 import { defaultButtons } from './default-buttons.js';
 import './menu-bar.css';
 
@@ -106,17 +107,18 @@ class MenuBar {
   }
 
   createMenuBar() {
-    const menuContainer = document.createElement('div');
-    menuContainer.className = 'menu-bar-container';
+    const menuContainer = createElement('div', { properties: { className: 'menu-bar-container' } });
     // inline start
-    const inlineStartContainer = document.createElement('div');
-    inlineStartContainer.className = 'inline-start-buttons';
+    const inlineStartContainer = createElement('div', {
+      properties: { className: 'inline-start-buttons' },
+    });
     inlineStartContainer.append(
       ...this.createButtons(Object.values(this.inlineStartButtons).sort(this.sortByIndex))
     );
     // inline end
-    const inlineEndContainer = document.createElement('div');
-    inlineEndContainer.className = 'inline-end-buttons';
+    const inlineEndContainer = createElement('div', {
+      properties: { className: 'inline-end-buttons' },
+    });
     inlineEndContainer.append(
       ...this.createButtons(Object.values(this.inlineEndButtons).sort(this.sortByIndex))
     );
@@ -135,8 +137,9 @@ class MenuBar {
     const newButtons = buttons.map((buttonObj) => {
       const { label, title, className, onClick, fontAwesomeIcon, toggle } = buttonObj;
       // create button
-      const buttonContainer = document.createElement('div');
-      buttonContainer.className = 'menu-bar-button-container';
+      const buttonContainer = createElement('div', {
+        properties: { className: 'menu-bar-button-container' },
+      });
       const button = document.createElement('button');
       // add label span
       const span = document.createElement('span');
@@ -163,8 +166,7 @@ class MenuBar {
       }
       // create icon
       if (fontAwesomeIcon) {
-        const icon = document.createElement('i');
-        icon.className = fontAwesomeIcon;
+        const icon = createElement('i', { properties: { className: fontAwesomeIcon } });
         // append icon to button
         button.append(icon);
       }

@@ -76,8 +76,6 @@ class Cropper {
     // init
     this.attachEvents();
     this.initialValues = { x: null, y: null, zoom: null };
-
-    // this.resetInitialValues();
   }
 
   getTransformStyles() {
@@ -212,10 +210,8 @@ class Cropper {
     }
     if (!this.initialValues.x) {
       const [x, y] = this.getTransformCoordinates(this.el);
-      // const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
       this.initialValues.x = x;
       this.initialValues.y = y;
-      // console.log('initialValues', x, y);
     }
   }
 
@@ -234,25 +230,11 @@ class Cropper {
       event.preventDefault();
       return false;
     }
-    // const [x, y] = this.getTransformCoordinates(this.el);
     const img = this.el.querySelector('img');
-    // const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
     const [x, y] = this.getTransformCoordinates(this.el);
     this.x = x;
     this.y = y;
     this.origin = this.getTransformOrigin(img.style.transformOrigin);
-    // const [originX, originY] = this.origin;
-    // const [imgX, imgY] = this.getTransformCoordinates(this.el);
-    // const minusOrigin = { x: Number(originX) + imgX, y: Number(originY) + imgY };
-    // console.log('minusOrigin', minusOrigin);
-    // console.log('---------- touchup');
-    // console.log('current transform origin', this.origin);
-    // console.log('current zoom', this.zoom);
-    // console.log('current x', x);
-    // console.log('deltaX', this.getCropDelta().xDelta);
-
-    // pc = preview
-    // console.log('adjX', `(${center.x} - ${pc.x}) * (1 - ${scale});`);
   }
 
   /**
@@ -262,8 +244,6 @@ class Cropper {
    */
   updateSrc(src) {
     const { points, zoom, orientation } = this.croppie.get();
-    // console.log('croppie get', { points, zoom });
-    // console.log('saved values', { points: this.points, zoom: this.zoom });
     return this.croppie.bind({
       url: src,
       points,
@@ -273,25 +253,15 @@ class Cropper {
 
   update() {
     const { points, zoom, orientation } = this.croppie.get();
-
-    // console.log('updating croppie', { points, zoom });
     this.croppie.setZoom(zoom);
-    // return this.croppie.bind({
-    //   url: this.src,
-    //   points,
-    //   zoom,
-    // });
   }
 
   resetInitialValues() {
-    // this.initialValues = { x: null, y: null, zoom: null };
     const [x, y] = this.getTransformCoordinates(this.el);
-    // const { x, y } = this.el.querySelector('.cr-overlay').getBoundingClientRect();
     this.initialValues.x = x;
     this.initialValues.y = y;
     this.x = x;
     this.y = y;
-    // this.initialValues.zoom = this.zoomRangeInput.value;
   }
 
   hide() {

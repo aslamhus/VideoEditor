@@ -1,5 +1,5 @@
 import Timestamp from '../Timestamp/TimeStamp';
-import { getTranslateX } from '../../../utils';
+import { createElement, getTranslateX } from '../../../utils';
 import HTMLElement from '../../../../HTMLElement/HTMLElement';
 import context from '../../../context';
 import { gsap } from 'gsap';
@@ -9,20 +9,21 @@ gsap.registerPlugin(Draggable);
 import './marker.css';
 
 /**
- * @typedef {Object} constructor
- * @property {string} name
- * @property {string} anchor - right|left
- * @property {string} className
- * @property {Function} getVideoDuration
- * @property {string} direction - position|negative
- * @property {number} initialIndex
- * @property {Draggable|null} draggable
- * @property {Function} [onChange]
+ * Marker
  *
+ * Subcomponent of RangeSelector
  */
-
 class Marker extends HTMLElement {
   /**
+   * @typedef {Object} constructor
+   * @property {string} name
+   * @property {string} anchor - right|left
+   * @property {string} className
+   * @property {Function} getVideoDuration
+   * @property {string} direction - position|negative
+   * @property {number} initialIndex
+   * @property {Draggable|null} draggable
+   * @property {Function} [onChange]
    *
    * @param {constructor} constructor
    */
@@ -81,10 +82,8 @@ class Marker extends HTMLElement {
       offset = width;
     }
     // include viewport position in offset
-    // 1. Calculate timeline x
     const timelineX = this.timeline.getTimelineElement().getBoundingClientRect().x;
     const markerX = x - timelineX + offset;
-    // console.log('markerX', markerX);
     return markerX;
   }
 
@@ -117,10 +116,7 @@ class Marker extends HTMLElement {
 
   getXPositionFromTimeIndex(timeIndex) {
     const timelineWidth = this.timeline.getTimelineElement().getBoundingClientRect().width;
-    // console.log('timelineWidth', timelineWidth);
     const percentElapsed = timeIndex / this.duration;
-    // console.log('video duration', this.getVideoDuration());
-    // console.log('percentElapsed (timeIndex/videoDuration)', percentElapsed);
     return timelineWidth * percentElapsed;
   }
 
@@ -150,12 +146,14 @@ class Marker extends HTMLElement {
     this.handleChange();
   }
 
+  /**
+   * Set Percentage X
+   *
+   * calculate and set marker position as a percentage of the timeline
+   * This will allow us to calculate the proper time index of the marker
+   * and keep the marker position consistent if the timeline is resized
+   */
   setPercentageX(percentX) {
-    /**
-     * calculate and set marker position as a percentage of the timeline
-     * This will allow us to calculate the proper time index of the marker
-     * and keep the marker position consistent if the timeline is resized
-     */
     this.percentageX = percentX;
   }
 
@@ -168,7 +166,6 @@ class Marker extends HTMLElement {
       this.marker.style.transform = `translateX(${translateX}px)`;
     }
     const timeIndex = this.getTimeIndexFromCurrentPosition();
-    // console.log('timeIndex', timeIndex);
     this.setTimeIndex(timeIndex);
     this.setX(x);
     const percentX = x / this.timeline.getTimelineElement().getBoundingClientRect().width;
@@ -181,12 +178,7 @@ class Marker extends HTMLElement {
       // for out marker, or any marker that advances towards negative coordinates
       x = (this.timeline.getTimelineElement().getBoundingClientRect().width - x) * -1;
     }
-
-    // console.log('getXPositionFromTimeIndex', x);
     this.setXPosition(x);
-
-    // // console.log('set x position ', this.name, x);
-    // this.setTimeIndex(timeIndex);
   }
 
   applyBounds(container) {
@@ -256,9 +248,7 @@ class Marker extends HTMLElement {
   }
 
   createMarker() {
-    this.marker = document.createElement('div');
-    this.marker.className = `${this.className} marker`;
-    return this.marker;
+    return createElement('div', { properties: { className: `${this.className} marker` } });
   }
 
   render(container) {

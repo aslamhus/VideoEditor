@@ -1,4 +1,5 @@
 import c from '../../../Cropper/croppie-test';
+import { createElement } from '../../../utils';
 import './control-button.css';
 
 class ControlButton {
@@ -102,12 +103,14 @@ class ControlButton {
   // }
 
   createControlButton() {
-    this.btn = document.createElement('button');
-    this.btn.className = `control-btn ${this.className}`;
-    this.btn.title = this.title || '';
-    this.btn.onclick = this.handleClick.bind(this);
-    const icon = document.createElement('i');
-    icon.className = this.iconClassName || '';
+    this.btn = createElement('button', {
+      properties: {
+        className: 'control-btn',
+        title: this.title || '',
+        onclick: this.handleClick.bind(this),
+      },
+    });
+    const icon = createElement('i', { properties: { className: this.iconClassName || '' } });
     this.btn.append(icon);
     return this.btn;
   }

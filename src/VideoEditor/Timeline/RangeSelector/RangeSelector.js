@@ -1,6 +1,6 @@
 import Marker from './Marker/Marker.js';
 import { cloneAllCanvasFrames } from './utils.js';
-import { getTranslateX } from '../../utils.js';
+import { createElement, getTranslateX } from '../../utils.js';
 import { gsap } from 'gsap';
 import { Draggable } from 'gsap/Draggable';
 import { initPresHoldEvent } from '../../utils/onpresshold.js';
@@ -8,10 +8,18 @@ import PlayHead from '../PlayHead/PlayHead.js';
 import Popover from '../../Popover/Popover.js';
 import context from '../../context.js';
 import '../../types.js';
+import './range-selector.css';
 //without this line, PixiPlugin and MotionPathPlugin may get dropped by your bundler (tree shaking)...
 gsap.registerPlugin(Draggable);
-import './range-selector.css';
 
+/**
+ * Range Selector
+ *
+ * The range selector is a draggable element that allows the user to select a range of frames.
+ * It is composed of two markers, an in and out marker, a draggable range selector and the playhead.
+ *
+ * It is a sub-component of the timeline and is responsible for updating the video time index
+ */
 class RangeSelector {
   /**
    * @typedef {Object} constructor
@@ -22,8 +30,6 @@ class RangeSelector {
    * @property {Object} initialMarkers - the initial in and out markers
    * @property {limit} limit - the min and max time range of the video editor
    * @property {Function} [onRangeUpdate] - callback when the range is updated
-   */
-  /**
    *
    * @param {constructor} constructor
    */
@@ -37,6 +43,7 @@ class RangeSelector {
     onRangeUpdate,
   }) {
     const { viewer, onRangeLimit, onMarkerDragStart, onMarkerDragEnd } = context.getContext();
+    this.rangeSelector = this.createRangeSelector();
     this.timeline = timeline;
     this.video = viewer.video;
     this.initialMarkers = initialMarkers || { in: 0, out: this.video.duration };
@@ -60,7 +67,6 @@ class RangeSelector {
     // isDragging refers to the range selector draggable
     this.isDragging = false;
     this.currentMarker = null;
-    this.rangeSelector = null;
     this.selectedFrames = null;
     this.hidden = false;
 
@@ -109,7 +115,6 @@ class RangeSelector {
     } else {
       this.currentMarker = null;
     }
-    // console.log('dragStart -> this.currentMarker', this.currentMarker);
     return;
   }
 
@@ -177,7 +182,6 @@ class RangeSelector {
   }
 
   attachTimelineEvents() {
-    console.log('this.timeline', this.timeline);
     this.timeline
       .getTimelineElement()
       .addEventListener('timelineReady', this.handleTimelineReady.bind(this));
@@ -229,9 +233,6 @@ class RangeSelector {
         this.playHead.hide();
         this.rangeSelector.parentElement.classList.add('range-selector-dragging');
         document.body.style.setProperty('cursor', 'grabbing', 'important');
-
-        // this.inMarker.draggable.disable();
-        // this.outMarker.draggable.disable();
       },
       onDrag: function (event) {
         event.preventDefault();
@@ -267,14 +268,12 @@ class RangeSelector {
     const pressHoldEvent = initPresHoldEvent(this.rangeSelector, onPressHold, {
       holdDuration: 60,
     });
-
     // rsDraggable.vars.cursor = 'grabbing';
     window.addEventListener('resize', this.handleWindowResizeDragPositions.bind(this));
   }
 
   calculateRangeSelectorDragBounds() {
     // get range selector bounds
-
     const timelineContainer = this.timeline.getTimelineElement().closest('.timeline-container');
     const markerWidth = this.inMarker.getBounds().width;
     const timelinePadding = getComputedStyle(timelineContainer).paddingLeft;
@@ -285,7 +284,6 @@ class RangeSelector {
       parseInt(timelinePadding) * 2 -
       markerWidth * 2;
     return timelineContainer.querySelector('.frames-container');
-    return { left: minX, width: maxX };
   }
   /**
    * Handle Timeline ready event
@@ -318,7 +316,6 @@ class RangeSelector {
       this.updateMarkerPosition(this.outMarker, this.initialMarkers.out);
     }
     this.show();
-    //
   }
 
   /**
@@ -343,7 +340,6 @@ class RangeSelector {
         this.currentIndex = timeIndex;
         break;
       default:
-        // do nothing
         console.error('unknown marker update in handleRangeUpdate', marker);
     }
     // hide popover if visible
@@ -386,7 +382,6 @@ class RangeSelector {
     this.playHead.show();
     this.rangeSelector.style.setProperty('cursor', 'pointer', 'important');
     document.body.style.removeProperty('cursor');
-
     this.rangeSelector.parentElement.classList.remove('range-selector-dragging');
   }
 
@@ -606,14 +601,8 @@ class RangeSelector {
     const currentTime = parseFloat(this.viewer.video.currentTime.toFixed(this.timeIndexPrecision));
     const outTime = parseFloat(this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
     if (currentTime >= outTime) {
-      // console.log(`currentTime ${currentTime}, outTime ${outTime}`);
-      // console.error('video playhead over range limit, returning playhead to inTime');
-      // this.playHead.toggleAnimate(false);
       this.viewer.video.currentTime = this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision);
     }
-    // window.requestAnimationFrame(() => {
-    //   this.playHead.toggleAnimate(true);
-    // });
   }
 
   handleTimeUpdate(event) {
@@ -621,7 +610,6 @@ class RangeSelector {
     // move these to onPlay event
     const isPlaying = !this.viewer.video.paused;
     const inTime = Number(this.inMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
-
     const outTime = Number(this.outMarker.getTimeIndex().toFixed(this.timeIndexPrecision));
     const currentTime = Number(this.viewer.video.currentTime.toFixed(this.timeIndexPrecision));
     if (outTime - inTime < 0.1) {
@@ -640,7 +628,6 @@ class RangeSelector {
       const remainingTime = outTime - playHeadIndex;
       this.viewer.video.currentTime = outTime;
       this.viewer.video.pause();
-
       return;
     }
     if (currentTime < inTime) {
@@ -654,21 +641,24 @@ class RangeSelector {
     this.playHead.setPercentPosition(percentElapsed, false);
   }
 
+  /**
+   * Create frames clone
+   *
+   * Note:
+   * Because the selected frames is nested inside the range selector,
+   * we must explicitly set the height and width of the selected frames
+   * otherwise we will get an accordion squisihing effect when adjusting
+   * the range selector.
+   *
+   * Importantly, this means we must adjust the width/height when the window
+   * resizes.
+   * @returns {HTMLElement} - the cloned frames container
+   */
   createFramesClone() {
     const framesContainer = this.timeline.getTimelineElement().querySelector('.frames-container');
     const { width, height } = framesContainer.getBoundingClientRect();
     this.selectedFrames = framesContainer.cloneNode(true);
     this.selectedFrames.classList.add('selected-frames');
-    /**
-     * Note:
-     * Because the selected frames is nested inside the range selector,
-     * we must explicitly set the height and width of the selected frames
-     * otherwise we will get an accordion squisihing effect when adjusting
-     * the range selector.
-     *
-     * Importantly, this means we must adjust the width/height when the window
-     * resizes.
-     */
     this.selectedFrames.style.width = `${width}px`;
     this.selectedFrames.style.height = `${height}px`;
     this.selectedFrames.style.left = 0;
@@ -677,15 +667,11 @@ class RangeSelector {
   }
 
   createRangeSelectorContainer() {
-    const rsContainer = document.createElement('div');
-    rsContainer.className = 'range-selector-container';
-    return rsContainer;
+    return createElement('div', { properties: { className: 'range-selector-container' } });
   }
 
   createRangeSelector() {
-    this.rangeSelector = document.createElement('div');
-    this.rangeSelector.className = 'range-selector';
-    return this.rangeSelector;
+    return createElement('div', { properties: { className: 'range-selector' } });
   }
 
   renderFramesClone() {
@@ -697,12 +683,10 @@ class RangeSelector {
 
   render(container) {
     const rsContainer = this.createRangeSelectorContainer();
-    const rs = this.createRangeSelector();
-    rsContainer.append(rs);
+    rsContainer.append(this.rangeSelector);
     this.inMarker.render(rsContainer);
     this.outMarker.render(rsContainer);
     container.append(rsContainer);
-
     this.attachTimelineEvents();
   }
 }

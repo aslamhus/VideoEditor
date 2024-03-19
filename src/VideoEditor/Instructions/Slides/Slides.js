@@ -1,3 +1,4 @@
+import { createElement } from '../../utils';
 import './slides.css';
 
 class Slides {
@@ -107,23 +108,16 @@ class Slides {
   }
 
   createSlidesContainer() {
-    // topmost container
-    const container = document.createElement('div');
-    container.className = 'slides-container';
-
-    return container;
+    return createElement('div', { properties: { className: 'slides-container' } });
   }
 
   createAllSlides() {
-    const container = document.createElement('div');
-    container.className = 'all-slides-container';
+    const container = createElement('div', { properties: { className: 'all-slides-container' } });
     /**
      * in order for each slide to be 100% of the parent container,
      * set the container's width to 100% * n slides.
      * i.e., for 3 slides, use a width of 300%
      */
-    // container.style.width = `${this.slides.length * 100}%`;
-    // append all slides
     container.append(...this.slides.map(this.createSlide));
     return container;
   }
@@ -131,8 +125,8 @@ class Slides {
   createSlide(slide, index) {
     const { url, title, body } = slide;
     // container
-    const slideContainer = document.createElement('div');
-    slideContainer.className = `slide-container slide-${index}`;
+    const slideContainer = createElement('div', { properties: { className: 'slide-container ' } });
+    slideContainer.classList.add(`slide-${index}`);
     slideContainer.dataset.slideIndex = index;
     // figure
     const slideFigure = document.createElement('figure');
@@ -142,8 +136,7 @@ class Slides {
     slideImg.src = url;
     slideFigure.append(slideImg);
     // text card
-    const card = document.createElement('div');
-    card.className = 'slide-card';
+    const card = createElement('div', { properties: { className: 'slide-card' } });
     slideContainer.append(card);
     // heading
     const heading = document.createElement('h2');
@@ -159,17 +152,18 @@ class Slides {
   }
 
   createButton({ label, className, onClick }) {
-    const nextBtn = document.createElement('button');
-    nextBtn.className = className;
-    nextBtn.textContent = label;
-    nextBtn.onclick = onClick;
-    return nextBtn;
+    return createElement('button', {
+      properties: {
+        className,
+        textContent: label,
+        onclick: onClick,
+      },
+    });
   }
 
   createButtonBar() {
     // button bar container
-    const container = document.createElement('div');
-    container.className = 'button-bar';
+    const container = createElement('div', { properties: { className: 'button-bar-container' } });
 
     // prev button
     const prevButton = this.createButton({

@@ -1,5 +1,6 @@
 import axios from 'axios';
-
+import { getMaxHeightPercent, calcViewerMaxWidth, calcTransformValues } from './utils';
+import { createElement } from '../utils';
 /**
  * Video Viewer
  *
@@ -7,15 +8,21 @@ import axios from 'axios';
  * It's parent is the VideoEditor class.
  */
 class Viewer {
-  constructor({ src, loader, onLoad, onLoadMetaData }) {
+  constructor({ src, maxHeight, loader, onLoad, onLoadMetaData, onViewerResize }) {
     this.src = src;
+    this.maxHeight = maxHeight;
+    this.maxHeightPercent = 0.6;
+    this.previousBounds = null;
     this.video = this.createVideo();
     this.loader = loader;
     this.onLoad = onLoad;
     this.onLoadMetaData = onLoadMetaData;
+    this.onViewerResize = onViewerResize;
     // bind
     this.handleAxiosError = this.handleAxiosError.bind(this);
     this.handleLoadedMetaData = this.handleLoadedMetaData.bind(this);
+
+    this.attachResizeEvent = this.attachResizeEvent.bind(this);
   }
 
   getSrc() {
@@ -76,6 +83,7 @@ class Viewer {
    */
   handleLoadedMetaData(event) {
     this.video.currentTime = 1e101;
+    this.updateViewerContainerDimensions();
     if (this.onLoadMetaData instanceof Function) {
       this.onLoadMetaData();
     }
@@ -176,6 +184,52 @@ class Viewer {
     return;
   }
 
+  /**
+   * Update Video Container Dimensions
+   *
+   * This method is called when the video metadata is loaded
+   * and when the window is resized.
+   * It recalculates the video container dimensions based on the
+   * max height percent and the video aspect ratio.
+   */
+  updateViewerContainerDimensions() {
+    // use crop dimensions if set, otherwise use video dimensions
+    let width = this.crop?.width || this.video.videoWidth;
+    let height = this.crop?.height || this.video.videoHeight;
+    // aspect ratio of video (or crop)
+    const aspectRatio = height / width;
+    const vidWrap = this.video.closest('.video-wrap');
+    const vidContainer = this.video.closest('.video-container');
+    const vidMaxWidth = calcViewerMaxWidth(
+      this.video,
+      this.maxHeight,
+      this.maxHeightPercent,
+      aspectRatio
+    );
+    // set max width of video container
+    vidContainer.style.width = `${vidMaxWidth}px`;
+    // set aspect ratio of video wrap
+    vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
+    // get new width
+    requestAnimationFrame(() => {
+      if (this.previousBounds) {
+        const { x, y, scale } = calcTransformValues(
+          vidMaxWidth,
+          vidContainer,
+          this.video,
+          this.previousBounds
+        );
+        // update transform value
+        const newTransformValue = `translate3d(${x}px, ${y}px, 0px) scale(${scale})`;
+        this.video.style.transform = newTransformValue;
+        if (this.onViewerResize instanceof Function) {
+          this.onViewerResize();
+        }
+        return;
+      }
+    });
+  }
+
   attachVideoEvents(container) {
     const handleDuration = this.handleDurationChange.bind(this);
     this.handleDurationChange = (event) => {
@@ -186,35 +240,68 @@ class Viewer {
   }
 
   /**
+   * Attach Window Resize Event
+   *
+   * Handles responsive video editor height,
+   * recalculating the video editor dimensions.
+   *
+   * Because all child elements are responsive, we only need to
+   * recalculate the primary ancestor (video container) dimensions
+   */
+  attachResizeEvent() {
+    const vidContainerFlexbox = this.video.closest('.video-flexbox-container');
+    // define the event here so we keep vidContainerFlexbox and vidContainer in scope
+    window.addEventListener('resize', (event) => {
+      // keep track of previous video bounds
+      const videoBounds = this.video.getBoundingClientRect();
+      this.previousBounds = videoBounds;
+      // update max height percent
+      this.maxHeightPercent = getMaxHeightPercent(vidContainerFlexbox);
+      // update video container dimensions
+      this.updateViewerContainerDimensions();
+    });
+  }
+
+  /**
    * Create Video (without src)
    *
    * @returns {HTMLVideoElement} - returns a video element
    */
   createVideo() {
-    const video = document.createElement('video');
-    video.id = 'video-preview';
-    video.className = 'preview';
-    video.autoplay = false;
-    video.setAttribute('playsinline', 'true');
-    video.setAttribute('webkit-playsinline', 'true');
-    video.playsinline = true;
-    video.preload = 'metadata';
-    video.controls = false;
-    video.playbackRate = 16;
-    video.style.width = '100%';
-    return video;
+    return createElement('video', {
+      properties: {
+        id: 'video-preview',
+        className: 'preview',
+        autoplay: false,
+        playsinline: true,
+        preload: 'metadata',
+        controls: false,
+        playbackRate: 16,
+      },
+      style: {
+        width: '100%',
+      },
+      attributes: {
+        playsinline: true,
+        'webkit-playsinline': true,
+      },
+    });
   }
 
   createCropContainer() {
-    const cropContainer = document.createElement('div');
-    cropContainer.className = 'crop-container';
-    cropContainer.style.position = 'absolute';
-    cropContainer.style.left = 0;
-    cropContainer.style.top = 0;
-    cropContainer.style.zIndex = 3;
-    cropContainer.style.width = '100%';
-    cropContainer.style.height = '100%';
-    return cropContainer;
+    return createElement('div', {
+      properties: {
+        className: 'crop-container',
+      },
+      style: {
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        zIndex: 3,
+        width: '100%',
+        height: '100%',
+      },
+    });
   }
 
   /**
@@ -253,6 +340,8 @@ class Viewer {
       container.append(await this.createVideoContainer());
       // revoke object url for video to prevent memory leaks
       window.URL.revokeObjectURL(this.src);
+      // attach resize events
+      this.attachResizeEvent();
     } catch (error) {
       this.handleError(error);
     }

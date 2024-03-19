@@ -4,13 +4,9 @@ import Timeline from './Timeline/Timeline.js';
 import Instructions from './Instructions';
 import { createCropSVG } from './utils/svg-crop-overlay.js';
 import Loader from './Loader/Loader.js';
-import {
-  decomposeMatrix,
-  getTranslateOrigin,
-  getComputedWidthAndHeightForElement,
-} from './utils.js';
 import context from './context.js';
 import fontAwesomeLibrary from './font-awesome.js';
+import { createElement } from './utils.js';
 import './types.js';
 import './themes.css';
 import './video-editor.css';
@@ -180,11 +176,9 @@ class VideoEditor {
     this.transformations = transformations;
     this.video = null;
     this.videoEditorContainer = this.createVideoEditorContainer();
-    this.maxHeight = maxHeight || null;
     // maxHeight restricts the responsive height of the video editor, which
     // is usually set as a percentage based on the window height
     // this is recalculated on window resize
-    this.maxHeightPercent = 0.6;
     this.limit = limit;
     this.debug = debug;
     // callbacks
@@ -202,9 +196,11 @@ class VideoEditor {
     // both timeline and info bar are invoked when we know the video duration
     this.viewer = new Viewer({
       src,
+      maxHeight,
       loader: this.loader,
       onLoad: this.handleVideoLoad.bind(this),
       onLoadMetaData: this.handleLoadMetaData.bind(this),
+      onViewerResize: this.handleViewerResize.bind(this),
     });
     this.timeline = new Timeline({
       onReady: this.handleTimelineReady.bind(this),
@@ -220,105 +216,6 @@ class VideoEditor {
       onToggleMute: this.handleToggleMute.bind(this),
       library: fontAwesomeLibrary,
     });
-    // bind
-    this.attachResizeEvent = this.attachResizeEvent.bind(this);
-  }
-
-  /**
-   * Attach Window Resize Event
-   *
-   * Handles responsive video editor height,
-   * recalculating the video editor dimensions.
-   *
-   * Because all child elements are responsive, we only need to
-   * recalculate the primary ancestor (video container) dimensions
-   */
-  attachResizeEvent() {
-    const vidContainerFlexbox = this.viewer.video.closest('.video-flexbox-container');
-    // define the event here so we keep vidContainerFlexbox and vidContainer in scope
-    window.addEventListener('resize', (event) => {
-      // keep track of previous video bounds
-      const videoBounds = this.viewer.video.getBoundingClientRect();
-      this.previousVidBounds = videoBounds;
-      // update max height percent
-      this.maxHeightPercent = this.getMaxHeightPercent(vidContainerFlexbox);
-      // update video container dimensions
-      this.updateVideoContainerDimensions();
-    });
-  }
-
-  /**
-   * Update Video Container Dimensions
-   *
-   * This method is called when the window is resized.
-   * It recalculates the video container dimensions based on the
-   * max height percent and the video aspect ratio.
-   */
-  updateVideoContainerDimensions() {
-    // use crop dimensions if set, otherwise use video dimensions
-    let width = this.crop?.width || this.video.videoWidth;
-    let height = this.crop?.height || this.video.videoHeight;
-    // aspect ratio of video (or crop)
-    const aspectRatio = height / width;
-    const vidEditorWrapper = this.videoEditorContainer.closest('.video-editor-wrapper');
-    const vidEditorDimensions = getComputedWidthAndHeightForElement(vidEditorWrapper);
-    const vidWrap = this.video.closest('.video-wrap');
-    const vidContainer = this.video.closest('.video-container');
-    const vidBounds = this.video.getBoundingClientRect();
-    let vidMaxWidth;
-    // limit height of video display if maxHeight (in pixels) has been set
-    if (this.maxHeight && vidBounds.height > this.maxHeight) {
-      // find width based on maxHeight of video and apply to vid container
-      vidMaxWidth = this.maxHeight / aspectRatio;
-    } else {
-      // limit height of video display if screen size exceeds limit
-      // HOWEVER, use the primary ancestor of the editor as the limit, not the screen
-      // so that the video doesn't get too small when the editor is in a small container
-      const maxHeight = vidEditorDimensions.height * this.maxHeightPercent;
-      vidMaxWidth = maxHeight / aspectRatio;
-    }
-    // limit width of video display to the width of the editor
-    if (vidMaxWidth > vidEditorDimensions.width) {
-      vidMaxWidth = vidEditorDimensions.width;
-    }
-    // set max width of video container
-    vidContainer.style.width = `${vidMaxWidth}px`;
-    vidWrap.style.paddingBottom = `${aspectRatio * 100}%`;
-    // get new width
-    requestAnimationFrame(() => {
-      if (this.previousBounds) {
-        // get the transform values
-        const { scaleX, scaleY, translateX, translateY } = decomposeMatrix(this.video);
-        // calculate the scale difference between the previous and current bounds
-        const scaleDiff = vidMaxWidth / this.previousBounds.width;
-        // this method is a holdover from a previous version which
-        // attempted to calculate the crop overlay position.
-        // May be useful in the future.
-        const [originX, originY] = getTranslateOrigin(this.video);
-        const newScale = scaleX * scaleDiff;
-        const vidHeight = vidContainer.getBoundingClientRect().height;
-        const widthDiff = vidMaxWidth - this.previousBounds.width;
-        const heightDiff = vidHeight - this.previousBounds.height;
-        const newX = translateX + widthDiff / 2;
-        const newY = translateY + heightDiff / 2;
-        // update transform value
-        const newTransformValue = `translate3d(${newX}px, ${newY}px, 0px) scale(${newScale})`;
-        this.video.style.transform = newTransformValue;
-        // update crop
-        if (this.timeline.cropper) {
-          this.timeline.toggleCropperOff();
-          this.timeline.transformations = this.timeline.getTransformations();
-          this.timeline.cropper.destroy();
-          this.timeline.cropper = null;
-        }
-        return;
-      }
-    });
-  }
-
-  getMaxHeightPercent(vidContainerFlexbox) {
-    const percentValue = getComputedStyle(vidContainerFlexbox).maxHeight;
-    return parseInt(percentValue) / 100;
   }
 
   handleToggleCrop(event, toggleState) {
@@ -387,6 +284,28 @@ class VideoEditor {
     }
   }
 
+  /**
+   * Handle Viewer Resize
+   *
+   * If the timeline has a cropper, it will be destroyed on resize
+   */
+  handleViewerResize() {
+    if (this.timeline.cropper) {
+      this.timeline.toggleCropperOff();
+      this.timeline.transformations = this.timeline.getTransformations();
+      this.timeline.cropper.destroy();
+      this.timeline.cropper = null;
+    }
+  }
+
+  /**
+   * Handle Help Button Click
+   *
+   * Providing a custom onClickHelpButton callback
+   * will override the default instructions
+   *
+   * @param {*} event
+   */
   handleClickHelpButton(event) {
     if (this.onClickHelpButton instanceof Function) {
       this.onClickHelpButton(event);
@@ -417,7 +336,6 @@ class VideoEditor {
   }
 
   handleLoadMetaData() {
-    this.updateVideoContainerDimensions();
     this.crop && this.appendCropOverlay();
   }
 
@@ -445,22 +363,18 @@ class VideoEditor {
   }
 
   createWrapper() {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'video-editor-wrapper';
-    return wrapper;
+    return createElement('div', { properties: { className: 'video-editor-wrapper' } });
   }
 
   createVideoEditorContainer() {
-    const videoEditorContainer = document.createElement('div');
-    videoEditorContainer.style.opacity = 0;
-    videoEditorContainer.className = 'video-editor-container';
-    return videoEditorContainer;
+    return createElement('div', {
+      properties: { className: 'video-editor-container' },
+      style: { opacity: 0 },
+    });
   }
 
   createVideoFlexboxContainer() {
-    const videoFlexboxContainer = document.createElement('div');
-    videoFlexboxContainer.classList.add('video-flexbox-container');
-    return videoFlexboxContainer;
+    return createElement('div', { properties: { className: 'video-flexbox-container' } });
   }
 
   async createVideoEditor() {
@@ -475,7 +389,6 @@ class VideoEditor {
     await this.viewer.render(videoFlexboxContainer);
     // append the video flexbox container to the video editor container
     this.videoEditorContainer.append(videoFlexboxContainer);
-
     //update loader message
     this.loader.updateMessage('Initializing video editor');
     return this.videoEditorContainer;
@@ -491,18 +404,14 @@ class VideoEditor {
   async render(container) {
     const wrapper = this.createWrapper();
     // instructions
-
     this.instructions = new Instructions({ container });
-    // this.instructions.render(container);
+    this.instructions.render(container);
     //  loader
     this.loader.render(wrapper);
     container.append(wrapper);
     //  video editor
     const videoEditor = await this.createVideoEditor();
     wrapper.append(videoEditor);
-
-    // attach resize events
-    this.attachResizeEvent();
   }
 }
 

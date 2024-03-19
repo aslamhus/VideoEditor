@@ -44,9 +44,9 @@ function initializeVideoEditor() {
     onTimelineClick: (timeIndex) => {
       // get the current time index
     },
-    onClickHelpButton: (event) => {
-      // custom help button
-    },
+    // onClickHelpButton: (event) => {
+    //   // custom help button
+    // },
     onRangeLimit: ({ marker, maxDuration, time }) => {
       // do something when the range limit is reached
     },

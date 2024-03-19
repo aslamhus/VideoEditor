@@ -155,7 +155,9 @@ class SubComponent {
 
 ## Bundle Size
 
-The VideoEditor is currently 320KB. I would like to reduce the bundle size to 200KB or less. The two dependencies that are contributing to the large bundle size are `cropperjs`, `fontawesome` and `gsap`, which are used for the cropper UI, menubar icons, and the rangeselector drag controls, respectively.
+Currently, the VideoEditor in its minified, uncompressed bundle is 320KB. I would like to attempt to reduce the bundle size to 250KB or less. However, if more features are implemented this becomes increasingly unlikely.
+
+The three dependencies that are contributing to the large bundle size are `cropperjs`, `fontawesome` and `gsap`, which are used for the cropper UI, menubar icons, and the rangeselector drag controls, respectively.
 
 ### Bundle Size Reduction Suggestions
 
@@ -169,9 +171,17 @@ The VideoEditor is currently 320KB. I would like to reduce the bundle size to 20
 2. Window event listener clean up when video editor is destroyed
 3. Add property @type for menu bar button (types should go in the type.js file)
 4. Expand readme
-5. Add minDuration to limit
-6. Further encapsulate cropper functionality in the Timeline component. Probably, the Viewer component is the right place for it.
-7. Housecleaning: removed commented out code, erroneous comments, and unused variables.
-8. Decrease bundle size.
-9. Add tests
-10. Reduce complexity of Timeline / RangeSelector
+5. Further encapsulate cropper functionality in the Timeline component. Probably, the Viewer component is the right place for it.
+6. Housecleaning: removed commented out code, erroneous comments, and unused variables.
+7. Decrease bundle size.
+8. Add tests
+9. Reduce complexity of Timeline / RangeSelector
+10. Add more documentation
+11. There is a brief flash when the cropper is toggled on.
+12. Lazyload instructions component
+
+## Features to Add
+
+1. Minimum duration limit
+2. Loop toggle control button
+3. Rotate video

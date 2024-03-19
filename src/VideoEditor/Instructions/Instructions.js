@@ -1,6 +1,7 @@
 import Slides from './Slides';
 import Modal from '../Modal';
 import './instructions.css';
+import { createElement } from '../utils';
 
 class Instructions extends Modal {
   constructor({ container, fadeDuration }) {
@@ -50,8 +51,9 @@ class Instructions extends Modal {
   }
 
   render(container) {
-    this.instructions = document.createElement('div');
-    this.instructions.classList.add('instructions-container');
+    this.instructions = createElement('div', {
+      properties: { className: 'instructions-container' },
+    });
     this.slides.render(this.instructions);
     this.setState({ content: this.instructions });
     super.render(container);

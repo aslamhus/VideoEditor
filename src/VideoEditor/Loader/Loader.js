@@ -1,3 +1,4 @@
+import { createElement } from '../utils';
 import './loader.css';
 
 class Loader {
@@ -7,15 +8,14 @@ class Loader {
   }
 
   createLoader() {
-    this.loader = document.createElement('div');
-    this.loader.className = 'video-editor-loader';
-    const p = document.createElement('p');
-    p.textContent = this.message || 'Loading video';
+    this.loader = createElement('div', {
+      properties: { className: 'video-editor-loader' },
+    });
+    const p = createElement('p', { properties: { textContent: this.message || 'Loading video' } });
     const spinnerDiv = document.createElement('div');
     const exclamationMark = document.createElement('div');
     spinnerDiv.append(exclamationMark);
     this.loader.append(spinnerDiv);
-    // this.loader.append(document.createElement('div'));
     this.loader.append(p);
     return this.loader;
   }
