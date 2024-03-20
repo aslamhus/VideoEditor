@@ -18,7 +18,7 @@ gsap.registerPlugin(Draggable);
  * The range selector is a draggable element that allows the user to select a range of frames.
  * It is composed of two markers, an in and out marker, a draggable range selector and the playhead.
  *
- * It is a sub-component of the timeline and is responsible for updating the video time index
+ * It is a sub-component of the timeline.
  */
 class RangeSelector {
   /**
@@ -69,10 +69,6 @@ class RangeSelector {
     this.currentMarker = null;
     this.selectedFrames = null;
     this.hidden = false;
-
-    // bind
-    this.handleRangeUpdate = this.handleRangeUpdate.bind(this);
-    this.calculateRangeSelectorDragBounds = this.calculateRangeSelectorDragBounds.bind(this);
     // components
     this.inMarker = new Marker({
       className: 'in-marker',
@@ -93,11 +89,13 @@ class RangeSelector {
         // hook into out marker change event
       },
     });
-
     this.playHead = playHead;
     this.playHead.onChange = ({ timeIndex, x }) => {
-      // hoook into playhead change event
+      // hook into playhead change event
     };
+    // bind
+    this.handleRangeUpdate = this.handleRangeUpdate.bind(this);
+    this.calculateRangeSelectorDragBounds = this.calculateRangeSelectorDragBounds.bind(this);
   }
 
   setCurrentMarker(target) {
@@ -187,6 +185,22 @@ class RangeSelector {
       .addEventListener('timelineReady', this.handleTimelineReady.bind(this));
   }
 
+  /**
+   * Attach draggable events
+   *
+   * Attaches draggable events to the in and out markers and the range selector.
+   * This is where gsap draggable is initialized and the bounds for each draggable
+   * are set.
+   *
+   * TODO:
+   * - improve inline documentation
+   * - separate code into smaller functions. Doing this requires careful consideration
+   * about scope and the use of 'this' in the functions. Some draggable events need
+   * access to scoped variables and methods as well as the Draggable instance.
+   *
+   *
+   * @param {HTMLElement} timeline - the timeline element
+   */
   attachDraggableEvents(timeline) {
     // attach in marker and out marker draggable options
     const handleDrag = this.handleDrag.bind(this);
