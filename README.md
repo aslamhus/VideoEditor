@@ -11,7 +11,7 @@ The VideoEditor is a responsive VanillaJS library that allows users to crop, tri
 ## Basic Usage
 
 ```javascript
-import VideoEditor from 'video-editor';
+import VideoEditor from '../VideoEditor';
 const options = {
   src: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
 };
