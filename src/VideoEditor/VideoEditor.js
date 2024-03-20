@@ -193,7 +193,6 @@ class VideoEditor {
     this.onMarkerDragEnd = onMarkerDragEnd;
     // Components
     this.loader = new Loader({ message: 'Loading video' });
-    // both timeline and info bar are invoked when we know the video duration
     this.viewer = new Viewer({
       src,
       maxHeight,
@@ -205,8 +204,6 @@ class VideoEditor {
     this.timeline = new Timeline({
       onReady: this.handleTimelineReady.bind(this),
     });
-    // get custom buttons (custom buttons cannot override default buttons)
-    // init menu bar
     this.menuBar = new MenuBar({
       customButtons: menuBarButtons,
       onToggleDarkMode: this.handleToggleDarkMode.bind(this),
