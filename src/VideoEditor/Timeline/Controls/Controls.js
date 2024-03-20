@@ -14,7 +14,8 @@ import './controls.css';
  * To add a new control button, create a new instance of ControlButton and
  * add it to the controlElements array.
  * Control buttons can function as toggles or as simple buttons.
- * For toggle buttons, the onToggle callback will receive the button element
+ * For toggle buttons, use the onToggle event to define the button's behavior.
+ * For simple buttons, use the onClick event to define the button's behavior.
  *
  * You'll want to define the click or toggle event
  *
