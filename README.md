@@ -1,5 +1,7 @@
 # Video Editor 1.0.0
 
+## Check out the [Demo](https://aslamhusain.com/video-editor)
+
 ## Summary
 
 The VideoEditor is a responsive VanillaJS library that allows users to crop, trim, and save videos. It is a component-based library that can be used in any web application. The VideoEditor is designed to be simple and easy-to-use and customizable to fit your needs. Please note that it does not perform any video transformations itself, but it does provide an object detailing the transformations that can be used to transform the video with a backend service.
