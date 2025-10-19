@@ -17,7 +17,7 @@ import VideoEditor from '../VideoEditor';
 const options = {
   src: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
 };
-const videoEditor = new VideoEditor({ options });
+const videoEditor = new VideoEditor(options);
 videoEditor.render(myHTMLContainer);
 ```
 
@@ -83,7 +83,7 @@ const options = {
 ### save method
 
 ```javascript
-const videoEditor = new VideoEditor({ options });
+const videoEditor = new VideoEditor(options);
 videoEditor.render(myHTMLContainer);
 // after the video is edited...
 const [transformations, videoSrc] = videoEditor.save();
