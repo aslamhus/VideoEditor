@@ -6,7 +6,8 @@
   "scripts": {
     "test": "",
     "start": "webpack serve --config './build/webpack.dev.js'",
-    "build": "webpack --config './build/webpack.prod.js'"
+    "build": "webpack --config './build/webpack.prod.js'",
+    "build-bundle": "webpack --config './build/webpack.bundle.js'"
   },
   "repository": {
     "type": "git",
@@ -36,10 +37,13 @@
   },
   "type": "module",
   "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "autoprefixer": "^10.4.13",
+    "babel-loader": "^10.0.0",
+    "css-loader": "^6.7.3",
     "font-awesome": "^4.7.0",
     "html-webpack-plugin": "^5.5.0",
-    "css-loader": "^6.7.3",
-    "autoprefixer": "^10.4.13",
     "postcss-loader": "^7.0.2",
     "sass": "^1.58.0",
     "sass-loader": "^13.2.0",
